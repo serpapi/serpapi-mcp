@@ -40,3 +40,15 @@ Tests the Docker container functionality:
 ## CI/CD
 
 These tests are designed to run in CI/CD pipelines and handle environment-specific issues like SSL certificate verification in restricted networks.
+
+### GitHub Actions
+
+The e2e tests run automatically on every push to `main` and on all pull requests via GitHub Actions. See `.github/workflows/python-package.yml` for the workflow configuration.
+
+The workflow includes:
+- Running the full e2e test suite
+- Code linting with Ruff
+- Docker image build and validation
+- Dependency and Docker layer caching for faster builds
+
+Check the [Actions tab](https://github.com/ilyazub/serpapi-mcp-server/actions) to monitor test results.

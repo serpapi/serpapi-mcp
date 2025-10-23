@@ -1,0 +1,90 @@
+name: Python Package CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+        if [ -f pyproject.toml ]; then
+          pip install -e .[test] || true
+        fi
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Run e2e tests
+      run: |
+        pytest tests/test_e2e_docker.py -v --tb=short
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+        cache: 'pip'
+
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install ruff
+
+    - name: Run Ruff linter
+      run: |
+        ruff check . --output-format=github
+      continue-on-error: true
+
+  docker-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: serpapi-mcp-server:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Test Docker image
+      run: |
+        # Test that container fails without API key
+        docker run --rm serpapi-mcp-server:test 2>&1 | grep -q "SERPAPI_API_KEY" && echo "✓ API key validation works" || exit 1
+        
+        # Test that container starts with API key
+        timeout 3 docker run --rm -e SERPAPI_API_KEY=test_key serpapi-mcp-server:test || [ $? -eq 124 ] && echo "✓ Container starts successfully"
