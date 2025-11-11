@@ -4,19 +4,15 @@ import os
 from typing import Dict, Any
 from serpapi import SerpApiClient as SerpApiSearch
 import httpx
-import json
-# Load environment variables from .env file
+
 load_dotenv()
 API_KEY = os.getenv("SERPAPI_API_KEY")
 
-# Ensure API key is present
 if not API_KEY:
     raise ValueError("SERPAPI_API_KEY not found in environment variables. Please set it in the .env file.")
 
-# Initialize the MCP server
 mcp = FastMCP("SerpApi MCP Server")
 
-# Tool to perform searches via SerpApi
 @mcp.tool()
 async def search(params: Dict[str, Any] = {}) -> str:
     """Perform a search on the specified engine using SerpApi.
@@ -50,7 +46,6 @@ async def search(params: Dict[str, Any] = {}) -> str:
         else:
             return "No organic results found"
 
-    # Handle HTTP-specific errors
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 429:
             return "Error: Rate limit exceeded. Please try again later."
@@ -58,11 +53,9 @@ async def search(params: Dict[str, Any] = {}) -> str:
             return "Error: Invalid API key. Please check your SERPAPI_API_KEY."
         else:
             return f"Error: {e.response.status_code} - {e.response.text}"
-    # Handle other exceptions (e.g., network issues)
     except Exception as e:
         return f"Error: {str(e)}"
 
-# Tool to get weather results via SerpApi
 @mcp.tool()
 async def get_weather(location: str, unit: str = "fahrenheit", include_daily_forecast: bool = False, include_hourly_forecast: bool = False) -> str:
     """Get weather results for a specific location via SerpApi.
@@ -144,7 +137,6 @@ async def get_weather(location: str, unit: str = "fahrenheit", include_daily_for
         print(e)
         return f"Error: {str(e)}"
 
-# Tool to get stock market preview via SerpApi
 @mcp.tool()
 async def get_stock_market_preview(company_name: str) -> str:
     """Get stock market preview for a specific company via SerpApi.
@@ -189,7 +181,6 @@ async def get_stock_market_preview(company_name: str) -> str:
         else:
             return "No weather results found"
 
-    # Handle HTTP-specific errors
     except httpx.HTTPStatusError as e:
         if e.response.status_code == 429:
             return "Error: Rate limit exceeded. Please try again later."
@@ -197,11 +188,9 @@ async def get_stock_market_preview(company_name: str) -> str:
             return "Error: Invalid API key. Please check your SERPAPI_API_KEY."
         else:
             return f"Error: {e.response.status_code} - {e.response.text}"
-    # Handle other exceptions (e.g., network issues)
     except Exception as e:
         print(e)
         return f"Error: {str(e)}"
 
-# Run the server
 if __name__ == "__main__":
     mcp.run()
