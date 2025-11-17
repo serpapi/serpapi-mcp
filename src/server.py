@@ -1,4 +1,6 @@
-from mcp.server.fastmcp import FastMCP
+import uvicorn
+from starlette.middleware.cors import CORSMiddleware
+from fastmcp import FastMCP
 from dotenv import load_dotenv
 import os
 import json
@@ -14,7 +16,7 @@ if not API_KEY:
         "SERPAPI_API_KEY not found in environment variables. Please set it in the .env file."
     )
 
-mcp = FastMCP("SerpApi MCP Server")
+mcp = FastMCP("SerpApi MCP Server", stateless_http=True, json_response=True)
 
 
 def format_answer_box(answer_box: Dict[str, Any]) -> str:
@@ -205,5 +207,22 @@ async def search(params: Dict[str, Any] = {}, raw: bool = False) -> str:
         return f"Error: {str(e)}"
 
 
+def main():
+    starlette_app = mcp.http_app()
+
+    starlette_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    host = os.getenv("MCP_HOST", "0.0.0.0")
+    port = int(os.getenv("MCP_PORT", "8000"))
+
+    uvicorn.run(starlette_app, host=host, port=port)
+
+
 if __name__ == "__main__":
-    mcp.run()
+    main()

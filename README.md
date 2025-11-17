@@ -44,6 +44,16 @@ uv sync
    uv run src/server.py
    ```
 
+## Running with Docker
+
+```bash
+# Build the image
+docker build -t serpapi-mcp-server .
+
+# Run the container
+docker run -e SERPAPI_API_KEY=<your_api_key> -p 8000:8000 serpapi-mcp-server
+```
+
 ## Client Configurations
 
 ### Claude Desktop
@@ -64,49 +74,6 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-### VS Code
-
-Add to your VS Code settings or `.vscode/mcp.json`:
-
-```json
-{
-  "inputs": [
-    {
-      "type": "promptString",
-      "id": "apiKey",
-      "description": "SerpApi API Key",
-      "password": true
-    }
-  ],
-  "servers": {
-    "serpapi": {
-      "command": "uv",
-      "args": ["run", "src/server.py"],
-      "env": {
-        "SERPAPI_API_KEY": "${input:apiKey}"
-      }
-    }
-  }
-}
-```
-
-### Cursor
-
-For Cursor v0.48.6+, add to MCP Servers:
-
-```json
-{
-  "mcpServers": {
-    "serpapi-mcp": {
-      "command": "uv",
-      "args": ["run", "src/server.py"],
-      "env": {
-        "SERPAPI_API_KEY": "YOUR-API-KEY"
-      }
-    }
-  }
-}
-```
 
 ## Available Tools
 
@@ -248,12 +215,23 @@ Common error responses:
 # Install dependencies
 uv sync
 
-# Run with MCP Inspector
-uv run mcp dev src/server.py
-
 # Run server directly
 uv run src/server.py
 ```
+
+### Using MCP Inspector
+
+The MCP Inspector provides a web interface for testing MCP tools.
+
+```bash
+# Install (requires Node.js)
+npm install -g @modelcontextprotocol/inspector
+
+# Run inspector
+npx @modelcontextprotocol/inspector
+```
+
+Then configure: URL `localhost:8000/mcp`, Transport "Streamable HTTP transport", and click "List tools".
 
 ### Project Structure
 
@@ -272,7 +250,7 @@ serpapi-mcp-server/
 ### Basic Search
 ```python
 # Search for information
-result = await session.call_tool("search", {
+result = await client.call_tool("search", {
     "params": {
         "q": "MCP protocol documentation",
         "engine": "google"
@@ -283,7 +261,7 @@ result = await session.call_tool("search", {
 ### Weather Query
 ```python
 # Get weather information
-weather = await session.call_tool("search", {
+weather = await client.call_tool("search", {
     "params": {
         "q": "weather in San Francisco with forecast",
         "engine": "google"
@@ -294,7 +272,7 @@ weather = await session.call_tool("search", {
 ### Stock Information
 ```python
 # Get stock data
-stock = await session.call_tool("search", {
+stock = await client.call_tool("search", {
     "params": {
         "q": "Tesla stock price and market cap",
         "engine": "google"
@@ -305,7 +283,7 @@ stock = await session.call_tool("search", {
 ### Raw JSON Response
 ```python
 # Get full API response
-raw_data = await session.call_tool("search", {
+raw_data = await client.call_tool("search", {
     "params": {
         "q": "artificial intelligence",
         "engine": "google"
