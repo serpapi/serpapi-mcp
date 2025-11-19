@@ -1,4 +1,5 @@
 import uvicorn
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
@@ -9,10 +10,12 @@ import json
 from typing import Dict, Any
 from serpapi import SerpApiClient as SerpApiSearch
 import httpx
+import logging
 
 load_dotenv()
 
 mcp = FastMCP("SerpApi MCP Server", stateless_http=True, json_response=True)
+logger = logging.getLogger(__name__)
 
 
 class ApiKeyMiddleware(BaseHTTPMiddleware):
@@ -23,15 +26,15 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
         if auth and auth.startswith("Bearer "):
             api_key = auth.split(" ", 1)[1].strip()
 
-        if not api_key:
-            path_parts = request.url.path.strip("/").split("/")
-            # Expected pattern: /API_KEY/v1/mcp or /API_KEY/v1/mcp/...
-            if (
-                len(path_parts) >= 3
-                and path_parts[1] == "v1"
-                and path_parts[2] == "mcp"
-            ):
-                api_key = path_parts[0]
+        original_path = request.scope.get("path", "")
+        path_parts = original_path.strip("/").split("/") if original_path else []
+
+        if not api_key and len(path_parts) >= 2 and path_parts[1] == "mcp":
+            api_key = path_parts[0]
+
+            new_path = "/" + "/".join(path_parts[1:])
+            request.scope["path"] = new_path
+            request.scope["raw_path"] = new_path.encode("utf-8")
 
         # 3. Validate API key exists
         if not api_key:
@@ -243,17 +246,17 @@ async def search(params: Dict[str, Any] = {}, raw: bool = False, ctx=None) -> st
 
 
 def main():
-    starlette_app = mcp.http_app()
-
-    starlette_app.add_middleware(ApiKeyMiddleware)
-
-    starlette_app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    middleware = [
+        Middleware(ApiKeyMiddleware),
+        Middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        ),
+    ]
+    starlette_app = mcp.http_app(middleware=middleware)
 
     host = os.getenv("MCP_HOST", "0.0.0.0")
     port = int(os.getenv("MCP_PORT", "8000"))
