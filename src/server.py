@@ -11,6 +11,7 @@ from typing import Dict, Any
 from serpapi import SerpApiClient as SerpApiSearch
 import httpx
 import logging
+from datetime import datetime
 
 load_dotenv()
 
@@ -20,6 +21,10 @@ logger = logging.getLogger(__name__)
 
 class ApiKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
+        # Skip authentication for healthcheck endpoint
+        if request.url.path == "/healthcheck":
+            return await call_next(request)
+
         api_key = None
 
         auth = request.headers.get("Authorization")
@@ -245,6 +250,16 @@ async def search(params: Dict[str, Any] = {}, raw: bool = False, ctx=None) -> st
         return f"Error: {str(e)}"
 
 
+async def healthcheck_handler(request):
+    return JSONResponse(
+        {
+            "status": "healthy",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "service": "SerpApi MCP Server",
+        }
+    )
+
+
 def main():
     middleware = [
         Middleware(ApiKeyMiddleware),
@@ -257,6 +272,8 @@ def main():
         ),
     ]
     starlette_app = mcp.http_app(middleware=middleware)
+
+    starlette_app.add_route("/healthcheck", healthcheck_handler, methods=["GET"])
 
     host = os.getenv("MCP_HOST", "0.0.0.0")
     port = int(os.getenv("MCP_PORT", "8000"))
