@@ -106,10 +106,10 @@ npx @modelcontextprotocol/inspector
 
 ## Troubleshooting
 
-**"Missing API key"**: Include key in URL path `/{YOUR_KEY}/mcp` or header `Bearer YOUR_KEY`
-**"Invalid key"**: Verify at [serpapi.com/dashboard](https://serpapi.com/dashboard)  
-**"Rate limit exceeded"**: Wait or upgrade your SerpApi plan
-**"No results"**: Try different query or engine
+- **"Missing API key"**: Include key in URL path `/{YOUR_KEY}/mcp` or header `Bearer YOUR_KEY`
+- **"Invalid key"**: Verify at [serpapi.com/dashboard](https://serpapi.com/dashboard)  
+- **"Rate limit exceeded"**: Wait or upgrade your SerpApi plan
+- **"No results"**: Try different query or engine
 
 ## Contributing
 
