@@ -7,7 +7,7 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 
 ## Features
 
-- **Multi-Engine Search**: Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and [more](https://serpapi.com/search-engines)
+- **Multi-Engine Search**: Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and [more](https://serpapi.com/search-engine-apis)
 - **Real-time Weather Data**: Location-based weather with forecasts via search queries
 - **Stock Market Data**: Company financials and market data through search integration
 - **Dynamic Result Processing**: Automatically detects and formats different result types
