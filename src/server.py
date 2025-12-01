@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import os
 import json
 from typing import Any
-from serpapi import SerpApiClient as SerpApiSearch
+import serpapi
 import httpx
 import logging
 from datetime import datetime
@@ -186,8 +186,7 @@ async def search(params: dict[str, Any] = {}, raw: bool = False) -> str:
     }
 
     try:
-        search_client = SerpApiSearch(search_params)
-        data = search_client.get_dict()
+        data = serpapi.search(search_params).as_dict()
 
         # Return raw JSON if requested
         if raw:
@@ -240,15 +239,15 @@ async def search(params: dict[str, Any] = {}, raw: bool = False) -> str:
         else:
             return "No results found for the given query. Try adjusting your search parameters or engine."
 
-    except httpx.HTTPStatusError as e:
-        if e.response.status_code == 429:
+    except serpapi.exceptions.HTTPError as e:
+        if "429" in str(e):
             return "Error: Rate limit exceeded. Please try again later."
-        elif e.response.status_code == 401:
+        elif "401" in str(e):
             return "Error: Invalid SerpApi API key. Check your API key in the path or Authorization header."
-        elif e.response.status_code == 403:
+        elif "403" in str(e):
             return "Error: SerpApi API key forbidden. Verify your subscription and key validity."
         else:
-            return f"Error: {e.response.status_code} - {e.response.text}"
+            return f"Error: {str(e)}"
     except Exception as e:
         return f"Error: {str(e)}"
 

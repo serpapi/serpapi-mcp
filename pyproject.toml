@@ -24,11 +24,11 @@ classifiers = [
 requires-python = ">=3.12"
 dependencies = [
     "fastmcp>=2.13.0.2",
-    "google-search-results>=2.4.2",
     "python-dotenv>=1.0.0",
     "httpx>=0.25.0",
     "uvicorn>=0.38.0",
-    "starlette>=0.50.0"
+    "starlette>=0.50.0",
+    "serpapi>=0.1.5",
 ]
 
 [project.optional-dependencies]
