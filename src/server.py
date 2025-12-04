@@ -83,6 +83,23 @@ async def search(params: dict[str, Any] = {}, mode: str = "complete") -> str:
         Stock: {"params": {"q": "AAPL stock", "engine": "google"}, "mode": "complete"}
         General: {"params": {"q": "coffee shops", "engine": "google_light", "location": "Austin, TX"}, "mode": "complete"}
         Compact: {"params": {"q": "news"}, "mode": "compact"}
+
+    Supported engines:
+        - google
+        - google_light
+        - google_flights
+        - google_hotels
+        - google_images
+        - google_news
+        - google_local
+        - google_shopping
+        - google_jobs
+        - bing
+        - yahoo
+        - duckduckgo
+        - youtube_search
+        - baidu
+        - ebay
     """
 
     # Validate mode parameter
