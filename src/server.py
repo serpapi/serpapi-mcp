@@ -79,10 +79,10 @@ async def search(params: dict[str, Any] = {}, mode: str = "complete") -> str:
         A JSON string containing search results or an error message.
 
     Examples:
-        Weather: {"q": "weather in London", "engine": "google"}
-        Stock: {"q": "AAPL stock", "engine": "google"}
-        General: {"q": "coffee shops", "engine": "google_light", "location": "Austin, TX"}
-        Compact: {"q": "news", "mode": "compact"}
+        Weather: {"params": {"q": "weather in London", "engine": "google"}, "mode": "complete"}
+        Stock: {"params": {"q": "AAPL stock", "engine": "google"}, "mode": "complete"}
+        General: {"params": {"q": "coffee shops", "engine": "google_light", "location": "Austin, TX"}, "mode": "complete"}
+        Compact: {"params": {"q": "news"}, "mode": "compact"}
     """
 
     # Validate mode parameter
