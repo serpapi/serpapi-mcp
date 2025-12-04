@@ -32,8 +32,8 @@ You can configure Claude Desktop to use the hosted server:
 
 ### Self-Hosting
 ```bash
-git clone https://github.com/serpapi/mcp-server.git
-cd mcp-server
+git clone https://github.com/serpapi/serpapi-mcp.git
+cd serpapi-mcp
 uv sync && uv run src/server.py
 ```
 
