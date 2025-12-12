@@ -1,4 +1,5 @@
 import uvicorn
+import time
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -18,6 +19,29 @@ load_dotenv()
 
 mcp = FastMCP("SerpApi MCP Server")
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+
+def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
+    emf_event = {
+        "_aws": {
+            "Timestamp": int(time.time() * 1000),
+            "CloudWatchMetrics": [
+                {
+                    "Namespace": namespace,
+                    "Dimensions": [list(dimensions.keys())] if dimensions else [],
+                    "Metrics": [
+                        {"Name": name, "Unit": unit}
+                        for name, (_, unit) in metrics.items()
+                    ],
+                }
+            ],
+        },
+        **dimensions,
+        **{name: value for name, (value, _) in metrics.items()},
+    }
+
+    logger.info(json.dumps(emf_event))
 
 
 def extract_error_response(exception) -> str:
@@ -92,6 +116,28 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
         # Store API key in request state for tools to access
         request.state.api_key = api_key
         return await call_next(request)
+
+
+class RequestMetricsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start = time.time()
+        response = await call_next(request)
+        duration = time.time() - start
+
+        emit_metric(
+            namespace="mcp",
+            metrics={
+                "RequestCount": (1, "Count"),
+                "ResponseTime": (duration * 1000, "Milliseconds"),
+            },
+            dimensions={
+                "Service": "mcp-server-api",
+                "Method": request.method,
+                "StatusCode": str(response.status_code),
+            },
+        )
+
+        return response
 
 
 @mcp.tool()
@@ -201,6 +247,7 @@ async def healthcheck_handler(request):
 
 def main():
     middleware = [
+        Middleware(RequestMetricsMiddleware),
         Middleware(ApiKeyMiddleware),
         Middleware(
             CORSMiddleware,
