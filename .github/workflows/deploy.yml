@@ -14,9 +14,9 @@ jobs:
 
       - name: Install AWS Copilot CLI
         run: |
-          curl -Lo copilot https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux
-          chmod +x copilot
-          sudo mv copilot /usr/local/bin/copilot
+          curl -Lo copilot-cli https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux
+          chmod +x copilot-cli
+          sudo mv copilot-cli /usr/local/bin/copilot
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
