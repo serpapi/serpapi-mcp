@@ -1,0 +1,280 @@
+{
+  "engine": "yahoo",
+  "params": {
+    "p": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Yahoo! search.",
+      "group": "search_query"
+    },
+    "yahoo_domain": {
+      "type": "select",
+      "options": [
+        "espanol",
+        "be",
+        "fr",
+        "br",
+        "ca",
+        "espanol",
+        "espanol",
+        "de",
+        "es",
+        "espanol",
+        "fr",
+        "in",
+        "id",
+        "ie",
+        "it",
+        "malaysia",
+        "espanol",
+        "nl",
+        "no",
+        "at",
+        "espanol",
+        "ph",
+        "pl",
+        "qc",
+        "ro",
+        "ch",
+        "sg",
+        "za",
+        "fi",
+        "se",
+        "tr",
+        "uk",
+        "espanol",
+        "vn",
+        "gr",
+        "ru",
+        "ua",
+        "il",
+        "hk",
+        "tw"
+      ],
+      "description": "Parameter defines the Yahoo! domain to use. It defaults to `search.yahoo.com`. If specified domain is allowed, it will be prepended to the domain (e.g., `fr.search.yahoo.com`). You can check a full list of supported Yahoo! domains.",
+      "group": "localization"
+    },
+    "vc": {
+      "type": "select",
+      "options": [
+        "al",
+        "dz",
+        "ar",
+        "am",
+        "au",
+        "at",
+        "az",
+        "bh",
+        "be",
+        "bo",
+        "ba",
+        "br",
+        "bg",
+        "ca",
+        "cl",
+        "cn",
+        "co",
+        "cr",
+        "hr",
+        "cz",
+        "dk",
+        "do",
+        "ec",
+        "eg",
+        "sv",
+        "ee",
+        "fi",
+        "mk",
+        "fr",
+        "ge",
+        "de",
+        "gr",
+        "gt",
+        "hn",
+        "hk",
+        "hu",
+        "is",
+        "in",
+        "id",
+        "ir",
+        "iq",
+        "ie",
+        "il",
+        "it",
+        "jp",
+        "jo",
+        "ke",
+        "kr",
+        "kw",
+        "lv",
+        "lb",
+        "ly",
+        "lt",
+        "lu",
+        "my",
+        "mt",
+        "mx",
+        "ma",
+        "nl",
+        "nz",
+        "ni",
+        "no",
+        "om",
+        "pk",
+        "pa",
+        "py",
+        "pe",
+        "ph",
+        "pl",
+        "pt",
+        "pr",
+        "qa",
+        "ro",
+        "ru",
+        "sa",
+        "sp",
+        "sg",
+        "sk",
+        "sl",
+        "za",
+        "es",
+        "se",
+        "ch",
+        "sy",
+        "tw",
+        "th",
+        "tn",
+        "tr",
+        "ae",
+        "ua",
+        "gb",
+        "us",
+        "vn",
+        "ye"
+      ],
+      "description": "Parameter defines the country to use for the Yahoo! search. It's a two-letter country code. (e.g., `us` for the United States, `uk` for United Kingdom, or `fr` for France) Head to the Yahoo! countries for a full list of supported Yahoo! countries.",
+      "group": "localization"
+    },
+    "vl": {
+      "type": "select",
+      "options": [
+        "lang_ar",
+        "lang_bg",
+        "lang_zh_chs",
+        "lang_zh_cht",
+        "lang_hr",
+        "lang_cs",
+        "lang_da",
+        "lang_nl",
+        "lang_en",
+        "lang_et",
+        "lang_fi",
+        "lang_fr",
+        "lang_de",
+        "lang_el",
+        "lang_he",
+        "lang_hu",
+        "lang_it",
+        "lang_ja",
+        "lang_ko",
+        "lang_lv",
+        "lang_lt",
+        "lang_no",
+        "lang_pl",
+        "lang_pt",
+        "lang_ro",
+        "lang_ru",
+        "lang_sk",
+        "lang_sl",
+        "lang_es",
+        "lang_sv",
+        "lang_th",
+        "lang_tr"
+      ],
+      "description": "Parameter defines language to limit the search to. It uses `lang_{two-letter language code}` to specify languages. (e.g., `vl=lang_fr` will only search French). `fl` will be set to `1` if this parameter is used. You can check a full list of supported Yahoo! languages.",
+      "group": "localization"
+    },
+    "b": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `1` (default) is the first page of results, `11` is the 2nd page of results, `21` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    },
+    "vm": {
+      "type": "select",
+      "options": [
+        "r",
+        "i",
+        "p"
+      ],
+      "description": "Parameter defines the level of filtering for adult content. Strict: `r`, Moderate: `i`, Off: `p`",
+      "group": "advanced_filters"
+    },
+    "vs": {
+      "description": "Filter results by top-level domains separated by ','. (e.g., `.com,.org`)",
+      "group": "advanced_filters"
+    },
+    "vf": {
+      "type": "select",
+      "options": [
+        "html",
+        "pdf",
+        "xls",
+        "ppt",
+        "doc",
+        "txt"
+      ],
+      "description": "`all formats` or specific file format like `pdf` or `txt`. You can check a full list of supported Yahoo! file formats.",
+      "group": "advanced_filters"
+    },
+    "fr2": {
+      "description": "Parameter is responsible for rendering positions and expansions for some elements (e.g., `p:s,v:w,m:trendingdomain_center` to expand Related Trending Searches).",
+      "group": "advanced_filters"
+    },
+    "d": {
+      "description": "Parameter specifies the destination for related topics. By including a unique identifier for the destination page, this parameter directs users to specific content related to their search query, providing them with more targeted results. (e.g. `{\"dn\":\"topic\",\"ykid\":\"71698d3e-6ef0-4fcd-8551-1ffe56058857\",\"pos\":\"0\",\"oq\":\"Coffee\",\"rq\":\"Drinking\"}`)",
+      "group": "advanced_filters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yahoo` to use the Yahoo API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yahoo results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

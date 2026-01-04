@@ -1,0 +1,161 @@
+{
+  "engine": "yandex_images",
+  "params": {
+    "text": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Yandex Images search. It can be optional if the url parameter is being used.",
+      "group": "search_query"
+    },
+    "yandex_domain": {
+      "type": "select",
+      "options": [
+        "yandex.com",
+        "yandex.ru",
+        "ya.ru",
+        "yandex.by",
+        "yandex.kz",
+        "yandex.uz",
+        "yandex.com.tr",
+        "yandex.az",
+        "yandex.com.ge",
+        "yandex.com.am",
+        "yandex.co.il",
+        "yandex.md",
+        "yandex.tm",
+        "yandex.tj",
+        "yandex.eu"
+      ],
+      "description": "Parameter defines the Yandex Images domain to use. It defaults to `yandex.com`. Head to the Yandex domains for a full list of supported Yandex domains.",
+      "group": "localization"
+    },
+    "width": {
+      "type": "number",
+      "description": "Parameter defines the width of an image. It can only be used in combination with height parameter.",
+      "group": "image_size"
+    },
+    "height": {
+      "type": "number",
+      "description": "Parameter defines the height of an image. It can only be used in combination with width parameter.",
+      "group": "image_size"
+    },
+    "file_type": {
+      "type": "select",
+      "options": [
+        "jpg",
+        "png",
+        "gifan"
+      ],
+      "description": "Parameter is used for filtering images by file type. It can be set to: `jpg` - JPG file extension `png` - PNG file extension `gifan` - GIF file extension",
+      "group": "advanced_yandex_images_parameters"
+    },
+    "color": {
+      "type": "select",
+      "options": [
+        "color",
+        "gray",
+        "red",
+        "orange",
+        "yellow",
+        "cyan",
+        "green",
+        "blue",
+        "violet",
+        "white",
+        "black"
+      ],
+      "description": "Parameter is used for filtering images by color. It can be set to: `color` - Color images only `gray` - Black and white `red` - Red color `orange` - Orange color `yellow` - Yellow color `cyan` - Cyan color `green` - Green color `blue` - Blue color `violet` - Violet color `white` - White color `black` - Black color",
+      "group": "advanced_yandex_images_parameters"
+    },
+    "orientation": {
+      "type": "select",
+      "options": [
+        "horizontal",
+        "vertical",
+        "square"
+      ],
+      "description": "Parameter is used for filtering images by orientation. It can be set to: `horizontal` - Horizontal `vertical` - Vertical `square` - Square",
+      "group": "advanced_yandex_images_parameters"
+    },
+    "image_type": {
+      "type": "select",
+      "options": [
+        "photo",
+        "clipart",
+        "lineart",
+        "face",
+        "demotivator"
+      ],
+      "description": "Parameter is used for filtering images by image type. It can be set to: `photo` - Photograph `clipart` - White background `lineart` - Drawings and sketches `demotivator` - Demotivator `face` - People",
+      "group": "advanced_yandex_images_parameters"
+    },
+    "site": {
+      "description": "Parameter is used for filtering images by their source. Example value: `www.shutterstock.com`.",
+      "group": "advanced_yandex_images_parameters"
+    },
+    "recent": {
+      "type": "checkbox",
+      "description": "Parameter is used for showing images that appeared in the last 7 days.",
+      "group": "advanced_yandex_images_parameters"
+    },
+    "url": {
+      "description": "Parameter defines the URL for an image to perform the reverse image search.",
+      "group": "yandex_reverse_image_parameters"
+    },
+    "crop": {
+      "description": "Parameter is used to crop the image and perform the reverse search on the cropped part of the image. E.g. `0.04;0.46;0.27;0.84`. These coordinates are formatted in the next order: `left edge;top edge;right edge;bottom edge`. The minimum and maximum for each coordinate are `0` and `1`, respectively.",
+      "group": "yandex_reverse_image_parameters"
+    },
+    "crop_id": {
+      "type": "number",
+      "description": "Parameter is used to filter results by a specific section of an image. Parameter will only work with images uploaded by Yandex (e.g. `https://avatars.mds.yandex.net/rest-of-the-image-url`). crop and crop_id parameters should not be used together.",
+      "group": "yandex_reverse_image_parameters"
+    },
+    "tab": {
+      "type": "select",
+      "options": [
+        "about",
+        "similar"
+      ],
+      "description": "Parameter defines the specific tab for the reverse image search. Yandex defaults to the 'About the image' tab. It can be set to: `about` - 'About the image' tab results `similar` - 'Similar images' tab results.",
+      "group": "yandex_reverse_image_parameters"
+    },
+    "p": {
+      "type": "number",
+      "description": "Parameter defines the page number. Pagination starts from `0`, and it can return up to 30 results.",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yandex_images` to use the Yandex Images API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yandex Images results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

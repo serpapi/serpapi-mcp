@@ -1,0 +1,88 @@
+{
+  "engine": "walmart_product_reviews",
+  "params": {
+    "product_id": {
+      "required": true,
+      "description": "Parameter defines the unique product identifier to get reviews of a specific product. You need to pass the `us_item_id`. It can be found from either Organic Results API or Product API results.",
+      "group": "search_query"
+    },
+    "rating": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "1-star"
+        ],
+        [
+          "2",
+          "2-star"
+        ],
+        [
+          "3",
+          "3-star"
+        ],
+        [
+          "4",
+          "4-star"
+        ],
+        [
+          "5",
+          "5-star"
+        ]
+      ],
+      "description": "Parameter is used for filtering reviews by rating. It can be set to: `1`: 1-star, `2`: 2-star, `3`: 3-star, `4`: 4-star, `5`: 5-star.",
+      "group": "advanced_walmart_parameters"
+    },
+    "sort": {
+      "type": "select",
+      "options": [
+        "relevancy",
+        "helpful",
+        "submission-desc",
+        "submission-asc",
+        "rating-desc",
+        "rating-asc"
+      ],
+      "description": "Parameter is used for sorting reviews. It can be set to: `relevancy`, `helpful`, `submission-desc`, `submission-asc`, `rating-desc`, `rating-asc`",
+      "group": "advanced_walmart_parameters"
+    },
+    "page": {
+      "type": "number",
+      "description": "Value is used to get the reviews on a specific page. (e.g., `1` (default) is the first page of results, `2` is the 2nd page of results, `3` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `walmart_product_reviews` to use the Walmart Product Reviews API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Walmart Product Reviews results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

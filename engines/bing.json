@@ -1,0 +1,175 @@
+{
+  "engine": "bing",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Bing search. (e.g., `'query'`, `NOT`, `OR`, `site:`, `filetype:`, `near:`, `ip:`, `loc:`, `feed:` etc.).",
+      "group": "search_query"
+    },
+    "location": {
+      "type": "location",
+      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. The location and uule parameters can't be used together. It is recommended to specify location at the city level in order to simulate a real user\u2019s search. If location is omitted, the search may take on the location of the proxy.",
+      "group": "geographic_location"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Defines a GPS latitude for the search origin",
+      "group": "geographic_location"
+    },
+    "lon": {
+      "type": "number",
+      "description": "Defines a GPS longitude for the search origin",
+      "group": "geographic_location"
+    },
+    "mkt": {
+      "type": "select",
+      "options": [
+        "es-ar",
+        "en-au",
+        "de-at",
+        "nl-be",
+        "fr-be",
+        "pt-br",
+        "en-ca",
+        "fr-ca",
+        "es-cl",
+        "da-dk",
+        "fi-fi",
+        "fr-fr",
+        "de-de",
+        "zh-hk",
+        "en-in",
+        "en-id",
+        "it-it",
+        "ja-jp",
+        "ko-kr",
+        "en-my",
+        "es-mx",
+        "nl-nl",
+        "en-nz",
+        "no-no",
+        "zh-cn",
+        "pl-pl",
+        "en-ph",
+        "ru-ru",
+        "en-za",
+        "es-es",
+        "sv-se",
+        "fr-ch",
+        "de-ch",
+        "zh-tw",
+        "tr-tr",
+        "en-gb",
+        "en-us",
+        "es-us"
+      ],
+      "description": "The market where the results come from (e.g. `en-US`). Typically, mkt is the country where the user is making the request from. However, it could be a different country if the user is not located in a country where Bing delivers results. The market must be in the form -. For example, en-US. The string is case insensitive. For a list of possible market values, see Market Codes. NOTE: If known, you are encouraged to always specify the market. Specifying the market helps Bing route the request and return an appropriate and optimal response. If you specify a market that is not listed in Market Codes, Bing uses a best fit market code based on an internal mapping that is subject to change. This parameter and the cc query parameter are mutually exclusive\u2014do not specify both.",
+      "group": "geographic_location"
+    },
+    "cc": {
+      "type": "select",
+      "options": [
+        "AR",
+        "AU",
+        "AT",
+        "BE",
+        "BR",
+        "CA",
+        "CL",
+        "DK",
+        "FI",
+        "FR",
+        "DE",
+        "HK",
+        "IN",
+        "ID",
+        "IT",
+        "JP",
+        "KR",
+        "MY",
+        "MX",
+        "NL",
+        "NZ",
+        "NO",
+        "CN",
+        "PL",
+        "PT",
+        "PH",
+        "RU",
+        "SA",
+        "ZA",
+        "ES",
+        "SE",
+        "CH",
+        "TW",
+        "TR",
+        "GB",
+        "US"
+      ],
+      "description": "Parameter defines the country to search from. It follows the 2-character ISO_3166-1 format. (e.g., `us` for United States, `de` for Germany, `gb` for United Kingdom, etc.).",
+      "group": "localization"
+    },
+    "first": {
+      "type": "number",
+      "description": "Parameter controls the offset of the organic results. This parameter defaults to `1`. (e.g., `first=10` will move the 10th organic result to the first position).",
+      "group": "pagination"
+    },
+    "safeSearch": {
+      "type": "select",
+      "options": [
+        "off",
+        "moderate",
+        "strict"
+      ],
+      "description": "Parameter defines the level of filtering for adult content. It can be set to: `Off` to return webpages with adult text, images, or videos. `Moderate` to return webpages with adult text, but not adult images or videos. `Strict` to not return webpages with adult text, images, or videos.",
+      "group": "advanced_filters"
+    },
+    "filters": {
+      "description": "Parameter allows usage of a more complex filtering options such as filtering by date range `ex1:\"ez5_18169_18230\"` or using a specific display filters such as `ufn:\"Wunderman+Thompson\"+sid:\"5bede9a2-1bda-9887-e6eb-30b1b8b6b513\"+catguid:\"5bede9a2-1bda-9887-e6eb-30b1b8b6b513_cfb02057\"+segment:\"generic.carousel\"+entitysegment:\"Organization\"`. Exact values can be constructed by using Bing search and copying `filters` query parameter.",
+      "group": "advanced_filters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `bing` to use the Bing API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Bing results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

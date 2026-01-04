@@ -6,6 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 from starlette.requests import Request
 from fastmcp import FastMCP
+from fastmcp.resources.resource import Resource
 from fastmcp.server.dependencies import get_http_request
 from dotenv import load_dotenv
 import os
@@ -14,12 +15,61 @@ from typing import Any
 import serpapi
 import logging
 from datetime import datetime
+from pathlib import Path
 
 load_dotenv()
 
 mcp = FastMCP("SerpApi MCP Server")
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+ENGINES_DIR = Path(__file__).resolve().parents[1] / "engines"
+
+
+def _get_engine_files() -> list[Path]:
+    if not ENGINES_DIR.exists():
+        logger.warning("Engines directory not found: %s", ENGINES_DIR)
+        return []
+    return sorted(ENGINES_DIR.glob("*.json"))
+
+
+@mcp.resource(
+    "serpapi://engines",
+    name="serpapi-engines-index",
+    description="Index of available SerpApi engines and their resource URIs.",
+    mime_type="application/json",
+)
+def engines_index() -> dict[str, Any]:
+    engine_files = _get_engine_files()
+    engines = [path.stem for path in engine_files]
+    return {
+        "count": len(engines),
+        "engines": engines,
+        "resources": [f"serpapi://engines/{engine}" for engine in engines],
+        "schema": {
+            "note": "Each engine resource uses a flat schema: params are engine-specific; common_params are shared SerpApi parameters.",
+            "params_key": "params",
+            "common_params_key": "common_params",
+        },
+    }
+
+
+def _engine_resource_factory(engine: str, engine_path: Path) -> Resource:
+    def _load_engine() -> dict[str, Any]:
+        return json.loads(engine_path.read_text())
+
+    return Resource.from_function(
+        fn=_load_engine,
+        uri=f"serpapi://engines/{engine}",
+        name=f"serpapi-engine-{engine}",
+        description=f"SerpApi engine specification for {engine}.",
+        mime_type="application/json",
+    )
+
+
+for _engine_path in _get_engine_files():
+    _engine_name = _engine_path.stem
+    mcp.add_resource(_engine_resource_factory(_engine_name, _engine_path))
 
 
 def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
@@ -167,7 +217,7 @@ async def search(params: dict[str, Any] = {}, mode: str = "complete") -> str:
         General: {"params": {"q": "coffee shops", "engine": "google_light", "location": "Austin, TX"}, "mode": "complete"}
         Compact: {"params": {"q": "news"}, "mode": "compact"}
 
-    Supported engines:
+    Supported engines include (not limited to):
         - google
         - google_light
         - google_flights
@@ -183,6 +233,8 @@ async def search(params: dict[str, Any] = {}, mode: str = "complete") -> str:
         - youtube_search
         - baidu
         - ebay
+
+    Engine params are available via resources at serpapi://engines/<engine> (index: serpapi://engines).
     """
 
     # Validate mode parameter

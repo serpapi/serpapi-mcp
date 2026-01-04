@@ -1,0 +1,152 @@
+{
+  "engine": "yahoo_videos",
+  "params": {
+    "p": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Yahoo! Videos search.",
+      "group": "search_query"
+    },
+    "yahoo_domain": {
+      "type": "select",
+      "options": [
+        "espanol",
+        "be",
+        "fr",
+        "br",
+        "ca",
+        "espanol",
+        "espanol",
+        "de",
+        "es",
+        "espanol",
+        "fr",
+        "in",
+        "id",
+        "ie",
+        "it",
+        "malaysia",
+        "espanol",
+        "nl",
+        "no",
+        "at",
+        "espanol",
+        "ph",
+        "pl",
+        "qc",
+        "ro",
+        "ch",
+        "sg",
+        "za",
+        "fi",
+        "se",
+        "tr",
+        "uk",
+        "espanol",
+        "vn",
+        "gr",
+        "ru",
+        "ua",
+        "il",
+        "hk",
+        "tw"
+      ],
+      "description": "Parameter defines the Yahoo! domain to use. It defaults to `search.yahoo.com`. If specified domain is allowed, it will be prepended to the domain (e.g., `fr.search.yahoo.com`). You can check a full list of supported Yahoo! domains.",
+      "group": "localization"
+    },
+    "durs": {
+      "type": "select",
+      "options": [
+        "short",
+        "medium",
+        "long"
+      ],
+      "description": "Parameter is used for filtering videos by length. It can be set to: `short` - Short (less than 5 minutes) `medium` - Medium (5-20 minutes) `long` - Long (more than 20 minutes)",
+      "group": "advanced_yahoo_videos_parameters"
+    },
+    "vage": {
+      "type": "select",
+      "options": [
+        "day",
+        "week",
+        "month",
+        "year"
+      ],
+      "description": "Parameter is used for filtering videos by date. It can be set to: `day` - Past 24 hours `week` - Past week `month` - Past month `year` - Past year",
+      "group": "advanced_yahoo_videos_parameters"
+    },
+    "vres": {
+      "type": "select",
+      "options": [
+        "360p",
+        "480p",
+        "720p",
+        "1080p"
+      ],
+      "description": "Parameter is used for filtering videos by resolution. It can be set to: `360p` - 360p or higher `480p` - 480p or higher `720p` - 720p or higher `1080p` - 1080p or higher",
+      "group": "advanced_yahoo_videos_parameters"
+    },
+    "vsite": {
+      "type": "select",
+      "options": [
+        "youtube",
+        "dailymotion",
+        "vimeo",
+        "mtv",
+        "cbsnews",
+        "foxnews",
+        "cnn",
+        "msn"
+      ],
+      "description": "Parameter is used for filtering videos by source. It can be set to: `youtube` - YouTube `dailymotion` - Dailymotion `vimeo` - Vimeo `mtv` - MTV `cbsnews` - CBS `foxnews` - Fox `cnn` - CNN `msn` - MSN",
+      "group": "advanced_yahoo_videos_parameters"
+    },
+    "b": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `1` (default) starts from the first result, `61` starts from the 61st result, `121` starts from the 121st result, etc.).",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yahoo_videos` to use the Yahoo Videos API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yahoo Videos results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

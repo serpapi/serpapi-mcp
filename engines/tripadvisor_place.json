@@ -1,0 +1,99 @@
+{
+  "engine": "tripadvisor_place",
+  "params": {
+    "place_id": {
+      "required": true,
+      "description": "Parameter defines the Tripadvisor place ID. To extract the ID of a place, you can use our Tripadvisor Search API.",
+      "group": "search_query"
+    },
+    "tripadvisor_domain": {
+      "type": "select",
+      "options": [
+        "www.tripadvisor.com",
+        "www.tripadvisor.ca",
+        "fr.tripadvisor.ca",
+        "www.tripadvisor.com.br",
+        "www.tripadvisor.com.mx",
+        "www.tripadvisor.com.ar",
+        "www.tripadvisor.cl",
+        "www.tripadvisor.co",
+        "www.tripadvisor.com.pe",
+        "www.tripadvisor.com.ve",
+        "www.tripadvisor.co.uk",
+        "www.tripadvisor.it",
+        "www.tripadvisor.es",
+        "www.tripadvisor.de",
+        "www.tripadvisor.fr",
+        "www.tripadvisor.se",
+        "www.tripadvisor.nl",
+        "www.tripadvisor.com.tr",
+        "www.tripadvisor.dk",
+        "www.tripadvisor.ie",
+        "www.tripadvisor.at",
+        "www.tripadvisor.com.gr",
+        "no.tripadvisor.com",
+        "www.tripadvisor.pt",
+        "www.tripadvisor.ru",
+        "www.tripadvisor.ch",
+        "fr.tripadvisor.ch",
+        "it.tripadvisor.ch",
+        "fr.tripadvisor.be",
+        "www.tripadvisor.be",
+        "www.tripadvisor.jp",
+        "cn.tripadvisor.com",
+        "www.tripadvisor.in",
+        "www.tripadvisor.com.au",
+        "www.tripadvisor.com.my",
+        "www.tripadvisor.co.nz",
+        "www.tripadvisor.com.ph",
+        "www.tripadvisor.com.sg",
+        "www.tripadvisor.co.id",
+        "www.tripadvisor.co.kr",
+        "th.tripadvisor.com",
+        "www.tripadvisor.com.vn",
+        "www.tripadvisor.com.tw",
+        "en.tripadvisor.com.hk",
+        "www.tripadvisor.com.hk",
+        "ar.tripadvisor.com",
+        "www.tripadvisor.com.eg",
+        "www.tripadvisor.co.za",
+        "www.tripadvisor.co.il"
+      ],
+      "description": "Parameter defines the Tripadvisor domain to use. It defaults to `tripadvisor.com`. Head to the Tripadvisor domains page for a full list of supported Tripadvisor domains.",
+      "group": "localization"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `tripadvisor_place` to use the Tripadvisor Place API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Tripadvisor Place results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

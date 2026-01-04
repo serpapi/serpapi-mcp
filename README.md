@@ -8,6 +8,7 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 ## Features
 
 - **Multi-Engine Search**: Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and [more](https://serpapi.com/search-engine-apis)
+- **Engine Resources**: Per-engine parameter schemas available via MCP resources (see Search Tool)
 - **Real-time Weather Data**: Location-based weather with forecasts via search queries
 - **Stock Market Data**: Company financials and market data through search integration
 - **Dynamic Result Processing**: Automatically detects and formats different result types
@@ -68,6 +69,7 @@ curl "https://mcp.serpapi.com/mcp" -H "Authorization: Bearer your_key" -d '...'
 ## Search Tool
 
 The MCP server has one main Search Tool that supports all SerpApi engines and result types. You can find all available parameters on the [SerpApi API reference](https://serpapi.com/search-api).
+Engine parameter schemas are also exposed as MCP resources: `serpapi://engines` (index) and `serpapi://engines/<engine>`.
 
 The parameters you can provide are specific for each API engine. Some sample parameters are provided below:
 
@@ -87,7 +89,7 @@ The parameters you can provide are specific for each API engine. Some sample par
 {"name": "search", "arguments": {"params": {"q": "detailed search"}, "mode": "complete"}}
 ```
 
-**Supported Engines:** Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and more.
+**Supported Engines:** Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and more (see `serpapi://engines`).
 
 **Result Types:** Answer boxes, organic results, news, images, shopping - automatically detected and formatted.
 

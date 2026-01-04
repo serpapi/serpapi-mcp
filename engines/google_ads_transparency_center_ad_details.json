@@ -1,0 +1,1011 @@
+{
+  "engine": "google_ads_transparency_center_ad_details",
+  "params": {
+    "advertiser_id": {
+      "required": true,
+      "description": "Parameter defines the Google Advertiser ID. It can be found in the Ads Transparency Center advertiser URL. For example, the advertiser ID for the URL `https://adstransparency.google.com/advertiser/AR17828074650563772417` is `AR17828074650563772417`(Tesla Inc).",
+      "group": "search_query"
+    },
+    "creative_id": {
+      "required": true,
+      "description": "Parameter defines the Google Creative ID. It can be found in the Ads Transparency Center creative URL. For example, the creative ID for the URL `https://adstransparency.google.com/advertiser/AR17828074650563772417/creative/CR07110512387970564097` is `CR07110512387970564097`.",
+      "group": "search_query"
+    },
+    "region": {
+      "type": "dropdown",
+      "options": [
+        [
+          "2008",
+          "Albania"
+        ],
+        [
+          "2010",
+          "Antarctica"
+        ],
+        [
+          "2012",
+          "Algeria"
+        ],
+        [
+          "2016",
+          "American Samoa"
+        ],
+        [
+          "2020",
+          "Andorra"
+        ],
+        [
+          "2024",
+          "Angola"
+        ],
+        [
+          "2028",
+          "Antigua and Barbuda"
+        ],
+        [
+          "2031",
+          "Azerbaijan"
+        ],
+        [
+          "2032",
+          "Argentina"
+        ],
+        [
+          "2036",
+          "Australia"
+        ],
+        [
+          "2040",
+          "Austria"
+        ],
+        [
+          "2044",
+          "The Bahamas"
+        ],
+        [
+          "2048",
+          "Bahrain"
+        ],
+        [
+          "2050",
+          "Bangladesh"
+        ],
+        [
+          "2051",
+          "Armenia"
+        ],
+        [
+          "2052",
+          "Barbados"
+        ],
+        [
+          "2056",
+          "Belgium"
+        ],
+        [
+          "2060",
+          "Bermuda"
+        ],
+        [
+          "2064",
+          "Bhutan"
+        ],
+        [
+          "2068",
+          "Bolivia"
+        ],
+        [
+          "2070",
+          "Bosnia and Herzegovina"
+        ],
+        [
+          "2072",
+          "Botswana"
+        ],
+        [
+          "2074",
+          "Bouvet Island"
+        ],
+        [
+          "2076",
+          "Brazil"
+        ],
+        [
+          "2084",
+          "Belize"
+        ],
+        [
+          "2086",
+          "British Indian Ocean Territory"
+        ],
+        [
+          "2090",
+          "Solomon Islands"
+        ],
+        [
+          "2092",
+          "British Virgin Islands"
+        ],
+        [
+          "2096",
+          "Brunei"
+        ],
+        [
+          "2100",
+          "Bulgaria"
+        ],
+        [
+          "2104",
+          "Myanmar (Burma)"
+        ],
+        [
+          "2108",
+          "Burundi"
+        ],
+        [
+          "2112",
+          "Belarus"
+        ],
+        [
+          "2116",
+          "Cambodia"
+        ],
+        [
+          "2120",
+          "Cameroon"
+        ],
+        [
+          "2124",
+          "Canada"
+        ],
+        [
+          "2132",
+          "Cabo Verde"
+        ],
+        [
+          "2136",
+          "Cayman Islands"
+        ],
+        [
+          "2140",
+          "Central African Republic"
+        ],
+        [
+          "2144",
+          "Sri Lanka"
+        ],
+        [
+          "2148",
+          "Chad"
+        ],
+        [
+          "2152",
+          "Chile"
+        ],
+        [
+          "2156",
+          "China"
+        ],
+        [
+          "2158",
+          "Taiwan"
+        ],
+        [
+          "2162",
+          "Christmas Island"
+        ],
+        [
+          "2166",
+          "Cocos (Keeling) Islands"
+        ],
+        [
+          "2170",
+          "Colombia"
+        ],
+        [
+          "2174",
+          "Comoros"
+        ],
+        [
+          "2175",
+          "Mayotte"
+        ],
+        [
+          "2178",
+          "Republic of the Congo"
+        ],
+        [
+          "2180",
+          "Democratic Republic of the Congo"
+        ],
+        [
+          "2184",
+          "Cook Islands"
+        ],
+        [
+          "2188",
+          "Costa Rica"
+        ],
+        [
+          "2191",
+          "Croatia"
+        ],
+        [
+          "2196",
+          "Cyprus"
+        ],
+        [
+          "2203",
+          "Czechia"
+        ],
+        [
+          "2204",
+          "Benin"
+        ],
+        [
+          "2208",
+          "Denmark"
+        ],
+        [
+          "2212",
+          "Dominica"
+        ],
+        [
+          "2214",
+          "Dominican Republic"
+        ],
+        [
+          "2218",
+          "Ecuador"
+        ],
+        [
+          "2222",
+          "El Salvador"
+        ],
+        [
+          "2226",
+          "Equatorial Guinea"
+        ],
+        [
+          "2231",
+          "Ethiopia"
+        ],
+        [
+          "2232",
+          "Eritrea"
+        ],
+        [
+          "2233",
+          "Estonia"
+        ],
+        [
+          "2234",
+          "Faroe Islands"
+        ],
+        [
+          "2238",
+          "Falkland Islands (Islas Malvinas)"
+        ],
+        [
+          "2239",
+          "South Georgia and the South Sandwich Islands"
+        ],
+        [
+          "2242",
+          "Fiji"
+        ],
+        [
+          "2246",
+          "Finland"
+        ],
+        [
+          "2250",
+          "France"
+        ],
+        [
+          "2254",
+          "French Guiana"
+        ],
+        [
+          "2258",
+          "French Polynesia"
+        ],
+        [
+          "2260",
+          "French Southern and Antarctic Lands"
+        ],
+        [
+          "2262",
+          "Djibouti"
+        ],
+        [
+          "2266",
+          "Gabon"
+        ],
+        [
+          "2268",
+          "Georgia"
+        ],
+        [
+          "2270",
+          "The Gambia"
+        ],
+        [
+          "2275",
+          "Palestine"
+        ],
+        [
+          "2276",
+          "Germany"
+        ],
+        [
+          "2288",
+          "Ghana"
+        ],
+        [
+          "2292",
+          "Gibraltar"
+        ],
+        [
+          "2296",
+          "Kiribati"
+        ],
+        [
+          "2300",
+          "Greece"
+        ],
+        [
+          "2304",
+          "Greenland"
+        ],
+        [
+          "2308",
+          "Grenada"
+        ],
+        [
+          "2312",
+          "Guadeloupe"
+        ],
+        [
+          "2316",
+          "Guam"
+        ],
+        [
+          "2320",
+          "Guatemala"
+        ],
+        [
+          "2324",
+          "Guinea"
+        ],
+        [
+          "2328",
+          "Guyana"
+        ],
+        [
+          "2332",
+          "Haiti"
+        ],
+        [
+          "2334",
+          "Heard Island and McDonald Islands"
+        ],
+        [
+          "2336",
+          "Vatican City"
+        ],
+        [
+          "2340",
+          "Honduras"
+        ],
+        [
+          "2344",
+          "Hong Kong"
+        ],
+        [
+          "2348",
+          "Hungary"
+        ],
+        [
+          "2352",
+          "Iceland"
+        ],
+        [
+          "2356",
+          "India"
+        ],
+        [
+          "2360",
+          "Indonesia"
+        ],
+        [
+          "2368",
+          "Iraq"
+        ],
+        [
+          "2372",
+          "Ireland"
+        ],
+        [
+          "2376",
+          "Israel"
+        ],
+        [
+          "2380",
+          "Italy"
+        ],
+        [
+          "2384",
+          "Cote d'Ivoire"
+        ],
+        [
+          "2388",
+          "Jamaica"
+        ],
+        [
+          "2392",
+          "Japan"
+        ],
+        [
+          "2398",
+          "Kazakhstan"
+        ],
+        [
+          "2400",
+          "Jordan"
+        ],
+        [
+          "2404",
+          "Kenya"
+        ],
+        [
+          "2410",
+          "South Korea"
+        ],
+        [
+          "2414",
+          "Kuwait"
+        ],
+        [
+          "2417",
+          "Kyrgyzstan"
+        ],
+        [
+          "2418",
+          "Laos"
+        ],
+        [
+          "2422",
+          "Lebanon"
+        ],
+        [
+          "2426",
+          "Lesotho"
+        ],
+        [
+          "2428",
+          "Latvia"
+        ],
+        [
+          "2430",
+          "Liberia"
+        ],
+        [
+          "2434",
+          "Libya"
+        ],
+        [
+          "2438",
+          "Liechtenstein"
+        ],
+        [
+          "2440",
+          "Lithuania"
+        ],
+        [
+          "2442",
+          "Luxembourg"
+        ],
+        [
+          "2446",
+          "Macao"
+        ],
+        [
+          "2450",
+          "Madagascar"
+        ],
+        [
+          "2454",
+          "Malawi"
+        ],
+        [
+          "2458",
+          "Malaysia"
+        ],
+        [
+          "2462",
+          "Maldives"
+        ],
+        [
+          "2466",
+          "Mali"
+        ],
+        [
+          "2470",
+          "Malta"
+        ],
+        [
+          "2474",
+          "Martinique"
+        ],
+        [
+          "2478",
+          "Mauritania"
+        ],
+        [
+          "2480",
+          "Mauritius"
+        ],
+        [
+          "2484",
+          "Mexico"
+        ],
+        [
+          "2492",
+          "Monaco"
+        ],
+        [
+          "2496",
+          "Mongolia"
+        ],
+        [
+          "2498",
+          "Moldova"
+        ],
+        [
+          "2499",
+          "Montenegro"
+        ],
+        [
+          "2500",
+          "Montserrat"
+        ],
+        [
+          "2504",
+          "Morocco"
+        ],
+        [
+          "2508",
+          "Mozambique"
+        ],
+        [
+          "2512",
+          "Oman"
+        ],
+        [
+          "2516",
+          "Namibia"
+        ],
+        [
+          "2520",
+          "Nauru"
+        ],
+        [
+          "2524",
+          "Nepal"
+        ],
+        [
+          "2528",
+          "Netherlands"
+        ],
+        [
+          "2531",
+          "Curacao"
+        ],
+        [
+          "2533",
+          "Aruba"
+        ],
+        [
+          "2534",
+          "Sint Maarten"
+        ],
+        [
+          "2535",
+          "Caribbean Netherlands"
+        ],
+        [
+          "2540",
+          "New Caledonia"
+        ],
+        [
+          "2548",
+          "Vanuatu"
+        ],
+        [
+          "2554",
+          "New Zealand"
+        ],
+        [
+          "2558",
+          "Nicaragua"
+        ],
+        [
+          "2562",
+          "Niger"
+        ],
+        [
+          "2566",
+          "Nigeria"
+        ],
+        [
+          "2570",
+          "Niue"
+        ],
+        [
+          "2574",
+          "Norfolk Island"
+        ],
+        [
+          "2578",
+          "Norway"
+        ],
+        [
+          "2580",
+          "Northern Mariana Islands"
+        ],
+        [
+          "2581",
+          "United States Minor Outlying Islands"
+        ],
+        [
+          "2583",
+          "Micronesia"
+        ],
+        [
+          "2584",
+          "Marshall Islands"
+        ],
+        [
+          "2585",
+          "Palau"
+        ],
+        [
+          "2586",
+          "Pakistan"
+        ],
+        [
+          "2591",
+          "Panama"
+        ],
+        [
+          "2598",
+          "Papua New Guinea"
+        ],
+        [
+          "2600",
+          "Paraguay"
+        ],
+        [
+          "2604",
+          "Peru"
+        ],
+        [
+          "2608",
+          "Philippines"
+        ],
+        [
+          "2612",
+          "Pitcairn Islands"
+        ],
+        [
+          "2616",
+          "Poland"
+        ],
+        [
+          "2620",
+          "Portugal"
+        ],
+        [
+          "2624",
+          "Guinea-Bissau"
+        ],
+        [
+          "2626",
+          "Timor-Leste"
+        ],
+        [
+          "2630",
+          "Puerto Rico"
+        ],
+        [
+          "2634",
+          "Qatar"
+        ],
+        [
+          "2638",
+          "Reunion"
+        ],
+        [
+          "2642",
+          "Romania"
+        ],
+        [
+          "2646",
+          "Rwanda"
+        ],
+        [
+          "2654",
+          "Saint Helena, Ascension and Tristan da Cunha"
+        ],
+        [
+          "2659",
+          "Saint Kitts and Nevis"
+        ],
+        [
+          "2660",
+          "Anguilla"
+        ],
+        [
+          "2662",
+          "Saint Lucia"
+        ],
+        [
+          "2663",
+          "Saint Martin"
+        ],
+        [
+          "2666",
+          "Saint Pierre and Miquelon"
+        ],
+        [
+          "2670",
+          "Saint Vincent and the Grenadines"
+        ],
+        [
+          "2674",
+          "San Marino"
+        ],
+        [
+          "2678",
+          "Sao Tome and Principe"
+        ],
+        [
+          "2682",
+          "Saudi Arabia"
+        ],
+        [
+          "2686",
+          "Senegal"
+        ],
+        [
+          "2690",
+          "Seychelles"
+        ],
+        [
+          "2694",
+          "Sierra Leone"
+        ],
+        [
+          "2702",
+          "Singapore"
+        ],
+        [
+          "2703",
+          "Slovakia"
+        ],
+        [
+          "2704",
+          "Vietnam"
+        ],
+        [
+          "2705",
+          "Slovenia"
+        ],
+        [
+          "2706",
+          "Somalia"
+        ],
+        [
+          "2710",
+          "South Africa"
+        ],
+        [
+          "2716",
+          "Zimbabwe"
+        ],
+        [
+          "2724",
+          "Spain"
+        ],
+        [
+          "2732",
+          "Western Sahara"
+        ],
+        [
+          "2740",
+          "Suriname"
+        ],
+        [
+          "2744",
+          "Svalbard and Jan Mayen"
+        ],
+        [
+          "2748",
+          "Eswatini"
+        ],
+        [
+          "2752",
+          "Sweden"
+        ],
+        [
+          "2756",
+          "Switzerland"
+        ],
+        [
+          "2762",
+          "Tajikistan"
+        ],
+        [
+          "2764",
+          "Thailand"
+        ],
+        [
+          "2768",
+          "Togo"
+        ],
+        [
+          "2772",
+          "Tokelau"
+        ],
+        [
+          "2776",
+          "Tonga"
+        ],
+        [
+          "2780",
+          "Trinidad and Tobago"
+        ],
+        [
+          "2784",
+          "United Arab Emirates"
+        ],
+        [
+          "2788",
+          "Tunisia"
+        ],
+        [
+          "2792",
+          "Turkiye"
+        ],
+        [
+          "2795",
+          "Turkmenistan"
+        ],
+        [
+          "2796",
+          "Turks and Caicos Islands"
+        ],
+        [
+          "2798",
+          "Tuvalu"
+        ],
+        [
+          "2800",
+          "Uganda"
+        ],
+        [
+          "2804",
+          "Ukraine"
+        ],
+        [
+          "2807",
+          "North Macedonia"
+        ],
+        [
+          "2818",
+          "Egypt"
+        ],
+        [
+          "2826",
+          "United Kingdom"
+        ],
+        [
+          "2831",
+          "Guernsey"
+        ],
+        [
+          "2832",
+          "Jersey"
+        ],
+        [
+          "2833",
+          "Isle of Man"
+        ],
+        [
+          "2834",
+          "Tanzania"
+        ],
+        [
+          "2840",
+          "United States"
+        ],
+        [
+          "2850",
+          "U.S. Virgin Islands"
+        ],
+        [
+          "2854",
+          "Burkina Faso"
+        ],
+        [
+          "2858",
+          "Uruguay"
+        ],
+        [
+          "2860",
+          "Uzbekistan"
+        ],
+        [
+          "2862",
+          "Venezuela"
+        ],
+        [
+          "2876",
+          "Wallis and Futuna"
+        ],
+        [
+          "2882",
+          "Samoa"
+        ],
+        [
+          "2887",
+          "Yemen"
+        ],
+        [
+          "2894",
+          "Zambia"
+        ],
+        [
+          "20277",
+          "Canary Islands"
+        ]
+      ],
+      "description": "Parameter defines from where you want the search to originate. By default it finds results from anywhere. Head to the Google Ads Transparency Center Regions for a full list of supported regions.",
+      "group": "geographic_location"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `google_ads_transparency_center_ad_details` to use the Google Ads Transparency Center Ad Details API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Google Ads Transparency Center Ad Details results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

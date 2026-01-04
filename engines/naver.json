@@ -1,0 +1,103 @@
+{
+  "engine": "naver",
+  "params": {
+    "query": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Naver search. (e.g., `'query'`, `NOT`, `OR`, `site:`, `filetype:`, `near:`, `ip:`, `loc:`, `feed:` etc.).",
+      "group": "search_query"
+    },
+    "start": {
+      "description": "Parameter controls the offset of the organic results. This parameter defaults to 1 (except for the `web`). (e.g. The formula for all searches except the web is `start = (page number * 10) - 9` e.g. Page number 3 ` (3 * 10) - 9 = 21`) The formula for the web will be `start = (page number * 15) - 29` e.g. Page number 3 ` (3 * 15) - 29 = 16`.",
+      "group": "pagination"
+    },
+    "page": {
+      "description": "The page parameter does the `start` parameter math for you! Just define the page number you want. Pagination starts from 1.",
+      "group": "pagination"
+    },
+    "num": {
+      "type": "number",
+      "description": "Parameter defines the maximum number of results to return. `50` (default) returns 50 results. Maximum number of results to return is `100`. Parameter can only be used with Naver Images API.",
+      "group": "pagination"
+    },
+    "where": {
+      "type": "select",
+      "options": [
+        "nexearch",
+        "web",
+        "news",
+        "video",
+        "image"
+      ],
+      "description": "Parameter defines the Search type. This parameter defaults to `nexearch`. Available options: `nexearch`: regular Naver Search, `web`: Naver Web Organic Results, `video`: Naver Video Results, `news`: Naver News Results, `image`: Naver Images API.",
+      "group": "where"
+    },
+    "sort_by": {
+      "type": "select",
+      "options": [
+        "r",
+        "dd",
+        [
+          "0",
+          "Relevance (default)"
+        ],
+        [
+          "1",
+          "Latest"
+        ],
+        [
+          "2",
+          "Oldest"
+        ]
+      ],
+      "description": "Parameter defines how the search results are sorted. This parameter defaults to `0` for Naver News Results, and `r` for other search types. For Naver News Results: `0`: Relevance (default), `1`: Latest, `2`: Oldest (only supported for news). For other search types: `r`: Relevance (default), `dd`: Latest.",
+      "group": "advanced_filters"
+    },
+    "period": {
+      "description": "Parameter defines the time period for search results. This parameter defaults to `all`. Available options: `all`: search without time restrictions (default), `1h`: 1 hour, `1d`: 1 day, `1w`: 1 week, `1m`: 1 month, `3m`: 3 months, `6m`: 6 months, `1y`: 1 year, Custom date range in the format `fromYYYYMMDDtoYYYYMMDD` (e.g., `from20250801to20250830`). Additional options for Naver News Results only: `2h`: 2 hours, `3h`: 3 hours, `4h`: 4 hours, `5h`: 5 hours, `6h`: 6 hours.",
+      "group": "advanced_filters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `naver` to use the Naver API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Naver results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

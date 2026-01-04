@@ -1,0 +1,282 @@
+{
+  "engine": "google_scholar",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the query you want to search. You can also use helpers in your query such as: `author:`, or `source:`. Usage of `cites` parameter makes `q` optional. Usage of `cites` together with `q` triggers search within citing articles. Usage of `cluster` together with `q` and `cites` parameters is prohibited. Use `cluster` parameter only.",
+      "group": "search_query"
+    },
+    "cites": {
+      "description": "Parameter defines unique ID for an article to trigger Cited By searches. Usage of `cites` will bring up a list of citing documents in Google Scholar. Example value: `cites=1275980731835430123`. Usage of `cites` and `q` parameters triggers search within citing articles.",
+      "group": "advanced_google_scholar_parameters"
+    },
+    "as_ylo": {
+      "type": "number",
+      "description": "Parameter defines the year from which you want the results to be included. (e.g. if you set as_ylo parameter to the year `2018`, the results before that year will be omitted.). This parameter can be combined with the as_yhi parameter.",
+      "group": "advanced_google_scholar_parameters"
+    },
+    "as_yhi": {
+      "type": "number",
+      "description": "Parameter defines the year until which you want the results to be included. (e.g. if you set as_yhi parameter to the year `2018`, the results after that year will be omitted.). This parameter can be combined with the as_ylo parameter.",
+      "group": "advanced_google_scholar_parameters"
+    },
+    "scisbd": {
+      "type": "select",
+      "options": [
+        [
+          1,
+          "Abstracts"
+        ],
+        [
+          2,
+          "Everything"
+        ]
+      ],
+      "description": "Parameter defines articles added in the last year, sorted by date. It can be set to `1` to include only abstracts, or `2` to include everything. The default value is `0` which means that the articles are sorted by relevance.",
+      "group": "advanced_google_scholar_parameters"
+    },
+    "cluster": {
+      "description": "Parameter defines unique ID for an article to trigger All Versions searches. Example value: `cluster=1275980731835430123`. Usage of `cluster` together with `q` and `cites` parameters is prohibited. Use `cluster` parameter only.",
+      "group": "advanced_google_scholar_parameters"
+    },
+    "hl": {
+      "type": "select",
+      "options": [
+        "af",
+        "ak",
+        "sq",
+        "ws",
+        "am",
+        "ar",
+        "hy",
+        "az",
+        "eu",
+        "be",
+        "bem",
+        "bn",
+        "bh",
+        "xx-bork",
+        "bs",
+        "br",
+        "bg",
+        "bt",
+        "km",
+        "ca",
+        "chr",
+        "ny",
+        "zh-cn",
+        "zh-tw",
+        "co",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "xx-elmer",
+        "en",
+        "eo",
+        "et",
+        "ee",
+        "fo",
+        "tl",
+        "fi",
+        "fr",
+        "fy",
+        "gaa",
+        "gl",
+        "ka",
+        "de",
+        "el",
+        "kl",
+        "gn",
+        "gu",
+        "xx-hacker",
+        "ht",
+        "ha",
+        "haw",
+        "iw",
+        "he",
+        "hi",
+        "hu",
+        "is",
+        "ig",
+        "id",
+        "ia",
+        "ga",
+        "it",
+        "ja",
+        "jw",
+        "kn",
+        "kk",
+        "rw",
+        "rn",
+        "xx-klingon",
+        "kg",
+        "ko",
+        "kri",
+        "ku",
+        "ckb",
+        "ky",
+        "lo",
+        "la",
+        "lv",
+        "ln",
+        "lt",
+        "loz",
+        "lg",
+        "ach",
+        "mk",
+        "mg",
+        "ms",
+        "ml",
+        "mt",
+        "mv",
+        "mi",
+        "mr",
+        "mfe",
+        "mo",
+        "mn",
+        "sr-me",
+        "my",
+        "ne",
+        "pcm",
+        "nso",
+        "no",
+        "nn",
+        "oc",
+        "or",
+        "om",
+        "ps",
+        "fa",
+        "xx-pirate",
+        "pl",
+        "pt",
+        "pt-br",
+        "pt-pt",
+        "pa",
+        "qu",
+        "ro",
+        "rm",
+        "nyn",
+        "ru",
+        "gd",
+        "sr",
+        "sh",
+        "st",
+        "tn",
+        "crs",
+        "sn",
+        "sd",
+        "si",
+        "sk",
+        "sl",
+        "so",
+        "es",
+        "es-419",
+        "su",
+        "sw",
+        "sv",
+        "tg",
+        "ta",
+        "tt",
+        "te",
+        "th",
+        "ti",
+        "to",
+        "lua",
+        "tum",
+        "tr",
+        "tk",
+        "tw",
+        "ug",
+        "uk",
+        "ur",
+        "uz",
+        "vu",
+        "vi",
+        "cy",
+        "wo",
+        "xh",
+        "yi",
+        "yo",
+        "zu"
+      ],
+      "description": "Parameter defines the language to use for the Google Scholar search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
+      "group": "localization"
+    },
+    "lr": {
+      "description": "Parameter defines one or multiple languages to limit the search to. It uses `lang_{two-letter language code}` to specify languages and `|` as a delimiter. (e.g., `lang_fr|lang_de` will only search French and German pages). Head to the Google lr languages for a full list of supported languages.",
+      "group": "localization"
+    },
+    "start": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    },
+    "num": {
+      "type": "number",
+      "description": "Parameter defines the maximum number of results to return, ranging from `1` to `20`, with a default of `10`.",
+      "group": "pagination"
+    },
+    "as_sdt": {
+      "description": "Parameter can be used either as a search type or a filter. As a Filter (only works when searching articles): `0` - exclude patents (default). `7` - include patents. As a Search Type: `4` - Select case law (US courts only). This will select all the State and Federal courts. e.g. `as_sdt=4` - Selects case law (all courts) To select specific courts, see the full list of supported Google Scholar courts. e.g. `as_sdt=4,33,192` - `4` is the required value and should always be in the first position, `33` selects all New York courts and `192` selects Tax Court. Values have to be separated by comma (`,`)",
+      "group": "search_type"
+    },
+    "safe": {
+      "type": "select",
+      "options": [
+        "active",
+        "off"
+      ],
+      "description": "Parameter defines the level of filtering for adult content. It can be set to `active` or `off`, by default Google will blur explicit content.",
+      "group": "advanced_filters"
+    },
+    "filter": {
+      "type": "checkbox",
+      "description": "Parameter defines if the filters for 'Similar Results' and 'Omitted Results' are on or off. It can be set to `1` (default) to enable these filters, or `0` to disable these filters.",
+      "group": "advanced_filters"
+    },
+    "as_vis": {
+      "type": "checkbox",
+      "description": "Parameter defines whether you would like to include citations or not. It can be set to `1` to exclude these results, or `0` (default) to include them.",
+      "group": "advanced_filters"
+    },
+    "as_rr": {
+      "type": "checkbox",
+      "description": "Parameter defines whether you would like to show only review articles or not (these articles consist of topic reviews, or discuss the works or authors you have searched for). It can be set to `1` to enable this filter, or `0` (default) to show all results.",
+      "group": "advanced_filters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `google_scholar` to use the Google Scholar API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Google Scholar results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}
