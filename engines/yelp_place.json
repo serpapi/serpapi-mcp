@@ -1,0 +1,107 @@
+{
+  "engine": "yelp_place",
+  "params": {
+    "place_id": {
+      "description": "Parameter defines the Yelp ID of a place. Each place has two unique IDs (e.g. `ED7A7vDdg8yLNKJTSVHHmg` and `arabica-brooklyn`) and you can use either of them as a value of the place_id. To extract the IDs of a place you can use our Yelp Search API.",
+      "group": "search_query"
+    },
+    "yelp_domain": {
+      "type": "select",
+      "options": [
+        "ms.yelp.my",
+        "www.yelp.cz",
+        "www.yelp.dk",
+        "www.yelp.de",
+        "www.yelp.at",
+        "de.yelp.ch",
+        "www.yelp.com.au",
+        "en.yelp.be",
+        "www.yelp.ca",
+        "en.yelp.com.hk",
+        "en.yelp.my",
+        "www.yelp.co.nz",
+        "en.yelp.com.ph",
+        "www.yelp.ie",
+        "www.yelp.com.sg",
+        "en.yelp.ch",
+        "www.yelp.co.uk",
+        "www.yelp.com",
+        "www.yelp.com.ar",
+        "www.yelp.cl",
+        "www.yelp.es",
+        "www.yelp.com.mx",
+        "fil.yelp.com.ph",
+        "fr.yelp.be",
+        "fr.yelp.ca",
+        "www.yelp.fr",
+        "fr.yelp.ch",
+        "www.yelp.it",
+        "it.yelp.ch",
+        "nl.yelp.be",
+        "www.yelp.nl",
+        "www.yelp.no",
+        "www.yelp.pl",
+        "www.yelp.com.br",
+        "www.yelp.pt",
+        "fi.yelp.fi",
+        "sv.yelp.fi",
+        "www.yelp.com.tr",
+        "www.yelp.co.jp",
+        "zh.yelp.com.hk",
+        "www.yelp.com.tw"
+      ],
+      "description": "Parameter defines the Yelp domain to use. It defaults to `yelp.com`. Head to the Yelp domains for a full list of supported Yelp domains.",
+      "group": "localization"
+    },
+    "business_alert": {
+      "required": false,
+      "type": "checkbox",
+      "description": "Set parameter to `true` to include business alert information when available. It defaults to `false`.",
+      "group": "advanced_parameters"
+    },
+    "full_menu": {
+      "required": false,
+      "type": "checkbox",
+      "description": "Set parameter to `true` to scrape business full menu when available. It defaults to `false`. When the parameter full_menu is set to `true`, but the business queried doesn't have a full menu page, then `place_results` will be returned instead of `full_menu_results`. This information will also be returned in `search_information` and `error` keys in the json response.",
+      "group": "advanced_parameters"
+    },
+    "menu_name": {
+      "required": false,
+      "description": "Parameter defines the name of which Full Menu to scrape when more than one Full Menu is available. It can only be used in combination with full_menu parameter.",
+      "group": "advanced_parameters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yelp_place` to use the Yelp Place API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yelp Place results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

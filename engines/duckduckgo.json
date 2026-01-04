@@ -1,0 +1,141 @@
+{
+  "engine": "duckduckgo",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular DuckDuckGo search. (e.g., `inurl:`, `site:`, `intitle:`, etc.) Parameter length can not exceed 500 characters.",
+      "group": "search_query"
+    },
+    "kl": {
+      "type": "select",
+      "options": [
+        "ar-es",
+        "au-en",
+        "at-de",
+        "be-fr",
+        "be-nl",
+        "br-pt",
+        "bg-bg",
+        "ca-en",
+        "ca-fr",
+        "ct-ca",
+        "cl-es",
+        "cn-zh",
+        "co-es",
+        "hr-hr",
+        "cz-cs",
+        "dk-da",
+        "ee-et",
+        "fi-fi",
+        "fr-fr",
+        "de-de",
+        "gr-el",
+        "hk-tzh",
+        "hu-hu",
+        "is-is",
+        "in-en",
+        "id-en",
+        "ie-en",
+        "il-en",
+        "it-it",
+        "jp-jp",
+        "kr-kr",
+        "lv-lv",
+        "lt-lt",
+        "my-en",
+        "mx-es",
+        "nl-nl",
+        "nz-en",
+        "no-no",
+        "pk-en",
+        "pe-es",
+        "ph-en",
+        "pl-pl",
+        "pt-pt",
+        "ro-ro",
+        "ru-ru",
+        "xa-ar",
+        "sg-en",
+        "sk-sk",
+        "sl-sl",
+        "za-en",
+        "es-ca",
+        "es-es",
+        "se-sv",
+        "ch-de",
+        "ch-fr",
+        "tw-tzh",
+        "th-en",
+        "tr-tr",
+        "us-en",
+        "us-es",
+        "ua-uk",
+        "uk-en",
+        "vn-en",
+        "wt-wt"
+      ],
+      "description": "Parameter defines the region to use for the DuckDuckGo search. Region code examples: `us-en` for the United States, `uk-en` for United Kingdom, or `fr-fr` for France. Head to the DuckDuckGo regions for a full list of supported regions.",
+      "group": "localization"
+    },
+    "safe": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "Strict"
+        ],
+        "-1",
+        "-2"
+      ],
+      "description": "Parameter defines the level of filtering for adult content. It can be set to `1` (Strict), `-1` (Moderate - default), or `-2` (Off).",
+      "group": "advanced_duckduckgo_filters"
+    },
+    "df": {
+      "description": "Parameter defines results filtered by date. It can be set to: `d`: Past day, `w`: Past week, `m`: Past month, `y`: Past year, or you can pass a custom date following the next format: `from_date` + `..` + `to_date` (e.g. `2021-06-15..2024-06-16`).",
+      "group": "advanced_duckduckgo_filters"
+    },
+    "start": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. When offset is not being used (initial search request, start parameter is set to 0 or left blank), up to 35 `organic_results` can be returned. When offset is being used (start parameter is greater than 0), up to 50 `organic_results` can be returned. DuckDuckGo may return duplicated results or a variable number of results. This is more likely to happen with higher start and m parameters.",
+      "group": "pagination"
+    },
+    "m": {
+      "type": "number",
+      "description": "Parameter defines the maximum number of results to return. Default value:`50` Min. value:`1` Max. value:`50` When offset is not being used (initial search request, start parameter is set to 0 or left blank), up to 35 `organic_results` can be returned. DuckDuckGo may return duplicated results or a variable number of results. This is more likely to happen with higher start and m parameters.",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `duckduckgo` to use the DuckDuckGo API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the DuckDuckGo results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

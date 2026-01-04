@@ -1,0 +1,106 @@
+{
+  "engine": "baidu",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the search query, including all Baidu search operators. (e.g., `inurl:`, `site:`, `intitle:`, etc.).",
+      "group": "search_query"
+    },
+    "ct": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "All Languages"
+        ],
+        [
+          "2",
+          "Simplified Chinese"
+        ],
+        [
+          "3",
+          "Traditional Chinese"
+        ]
+      ],
+      "description": "Parameter defines which language to restrict results. Available options: `1` - All languages `2` - Simplified Chinese `3` - Traditional Chinese",
+      "group": "localization"
+    },
+    "pn": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    },
+    "rn": {
+      "type": "number",
+      "description": "Parameter defines the maximum number of results to return, limited to 50. (e.g., `10` (default) returns 10 results, `30` returns 30 results, and `50` returns 50 results). This parameter is only available for desktop and tablet searches.",
+      "group": "pagination"
+    },
+    "gpc": {
+      "description": "Parameter defines the time period for results. (e.g., `stf=1766826674,1767431474|stftype=1` only returns results from the past 7 days. First integer within the parameter,`1766826674` is Unix Timestamp for 7 days ago. Second integer,`1767431474` is Unix Timestamp for now.).",
+      "group": "advanced_filters"
+    },
+    "q5": {
+      "description": "Similar to using `inurl:` or `intitle:`. (e.g., `1` to search by page title, `2` to search by web address.).",
+      "group": "advanced_filters"
+    },
+    "q6": {
+      "description": "Similar to using `site:`. (e.g., `q6=serpapi.com` to search for results only from the domain `serpapi.com`).",
+      "group": "advanced_filters"
+    },
+    "bs": {
+      "description": "Defines the previous search query.",
+      "group": "advanced_baidu_parameters"
+    },
+    "oq": {
+      "description": "Defines the original search query when navigated from a related search.",
+      "group": "advanced_baidu_parameters"
+    },
+    "f": {
+      "description": "Defines the originating search type. (e.g., `8` is a normal search, `3` is from the suggestion list, and `1` is a related search.",
+      "group": "advanced_baidu_parameters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `baidu` to use the Baidu API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Baidu results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

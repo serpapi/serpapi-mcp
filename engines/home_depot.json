@@ -1,0 +1,127 @@
+{
+  "engine": "home_depot",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular The Home Depot search.",
+      "group": "search_query"
+    },
+    "country": {
+      "type": "select",
+      "options": [
+        "us",
+        "ca"
+      ],
+      "description": "Parameter defines the country to use for the Home Depot search. Only United States(`us`), and Canada(`ca`) are supported.",
+      "group": "localization"
+    },
+    "hd_sort": {
+      "type": "select",
+      "options": [
+        "top_sellers",
+        "price_low_to_high",
+        "price_high_to_low",
+        "top_rated",
+        "best_match"
+      ],
+      "description": "Parameter defines results sorted by different options in Home Depot US. It can be set to: `top_sellers`: Top Sellers, `price_low_to_high`: Price Low to High, `price_high_to_low`: Price High to Low, `top_rated`: Top Rated, `best_match`: Best Match",
+      "group": "advanced_home_depot_parameters"
+    },
+    "hd_filter_tokens": {
+      "description": "Used to pass filter tokens divided by comma. Filter tokens can be obtained from API response",
+      "group": "advanced_home_depot_parameters"
+    },
+    "delivery_zip": {
+      "description": "ZIP Postal code. To filter the shipping products by a selected area.",
+      "group": "advanced_home_depot_parameters"
+    },
+    "store_id": {
+      "description": "Store ID to filter the products by the specific store only. See all Home Depot stores",
+      "group": "advanced_home_depot_parameters"
+    },
+    "store": {
+      "description": "Store ID to filter the products by the specific store only in Home Depot Canada. The default store is Gatineau (`7140`). See all Home Depot Canada stores",
+      "group": "advanced_home_depot_parameters"
+    },
+    "sort": {
+      "type": "select",
+      "options": [
+        "price-asc",
+        "price-desc",
+        "reviewAvgRating",
+        "relevance"
+      ],
+      "description": "Parameter defines results sorted by different options in Home Depot Canada. It can be set to: `price-asc`: Price Low to High, `price-desc`: Price High to Low, `reviewAvgRating`: Top Rated, `relevance`: Recommended (Default)",
+      "group": "advanced_home_depot_parameters"
+    },
+    "filter": {
+      "description": "Used to pass filter tokens divided by dash (-) in Home Depot Canada. Filter tokens can be obtained from API response",
+      "group": "advanced_home_depot_parameters"
+    },
+    "lowerbound": {
+      "type": "number",
+      "description": "Defines lower bound for price in USD.",
+      "group": "price_limit"
+    },
+    "upperbound": {
+      "type": "number",
+      "description": "Defines upper bound for price in USD.",
+      "group": "price_limit"
+    },
+    "minmax": {
+      "description": "Defines lower and upper bound for price in CAD. Parameter is only used in the Home Depot Canada. Example: `price:[100 TO 500]`(Between $100 to $500) Example: `price:[100 TO *]`(Minimum $100) Example: `price:[0 TO 500]`(Maximum $500) Example: `price:%5B100%20TO%20500%5D`(Encoded version, Between $100 to $500)",
+      "group": "price_limit"
+    },
+    "nao": {
+      "description": "Defines offset for products result. A single page contains 24 products. First page offset is 0, second -> 24, third -> 48 and so on.",
+      "group": "pagination"
+    },
+    "page": {
+      "type": "number",
+      "description": "Value is used to get the items on a specific page. (e.g., `1` (default) is the first page of results, `2` is the 2nd page of results, `3` is the 3rd page of results, etc.). This parameter is common for both US and CA searches.",
+      "group": "pagination"
+    },
+    "ps": {
+      "type": "number",
+      "description": "Determines the number of items per page. There are scenarios where The Home Depot overrides the ps value. By default, The Home Depot returns `24` results. The maximum number of results it can return is `48`.",
+      "group": "pagination"
+    },
+    "pagesize": {
+      "description": "Determines the number of items per page in the Home Depot Canada. By default, the Home Depot Canada returns `40` (maximum allowed value) results.",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `home_depot` to use the Home Depot API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Home Depot results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

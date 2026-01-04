@@ -1,0 +1,91 @@
+{
+  "engine": "yahoo_shopping",
+  "params": {
+    "p": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Yahoo! shopping search.",
+      "group": "search_query"
+    },
+    "min_price": {
+      "description": "Lower bound of price range query.",
+      "group": "advanced_yahoo_shopping_parameters"
+    },
+    "max_price": {
+      "description": "Upper bound of price range query.",
+      "group": "advanced_yahoo_shopping_parameters"
+    },
+    "sort_by": {
+      "type": "select",
+      "options": [
+        "price",
+        "relevancy",
+        "popularity",
+        "discountPercentage"
+      ],
+      "description": "Parameter is used for sorting and refining results. Available options: `price` - the costliest items first. `relevancy` - the most relevant items first. `popularity` - the most popular items first. `discountPercentage` - the highest discounted items (by percentage) first.",
+      "group": "advanced_yahoo_shopping_parameters"
+    },
+    "order_by": {
+      "type": "select",
+      "options": [
+        "ASC",
+        "DESC"
+      ],
+      "description": "Parameter used to sort the query results in a top to bottom style or vice-versa. Available options: `ASC` and `DESC`.",
+      "group": "advanced_yahoo_shopping_parameters"
+    },
+    "category_attr_values": {
+      "description": "Gender and Age Range filters on Yahoo! Shopping Search separated by comma (`,`). (e.g. `gender_female,age_adult` is 'female' and 'adult', etc.). Can be obtained from `filters.gender` and `filters.age-range` in API response.",
+      "group": "advanced_yahoo_shopping_parameters"
+    },
+    "merchants": {
+      "description": "Merchants ID separated by comma (`,`). Merchant IDs can be obtained from `filters.stores` in API response. (e.g. `3719d8d4-5edd-4817-998a-91f3229e7323,` is 'Walmart', etc.)",
+      "group": "advanced_yahoo_shopping_parameters"
+    },
+    "start": {
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `1` (default) is the first page of results, `60` is the 2nd page of results, `120` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    },
+    "limit": {
+      "description": "Parameter defines the maximum number of results to return. (e.g., `10` (default) returns 10 results, `40` returns 40 results, and `100` returns 100 results).",
+      "group": "pagination"
+    },
+    "page": {
+      "description": "The page parameter does the `start` parameter math for you! Just define the page number you want. Pagination starts from 1.",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yahoo_shopping` to use the Yahoo Shopping API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yahoo Shopping results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

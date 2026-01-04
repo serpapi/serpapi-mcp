@@ -1,0 +1,1112 @@
+{
+  "engine": "ebay",
+  "params": {
+    "_nkw": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular eBay search. _nkw parameter is optional when category_id parameter is specified.",
+      "group": "search_query"
+    },
+    "ebay_domain": {
+      "type": "select",
+      "options": [
+        "ebay.com.au",
+        "ebay.at",
+        "ebay.ca",
+        "ebay.fr",
+        "ebay.de",
+        "ebay.com.hk",
+        "ebay.ie",
+        "ebay.it",
+        "ebay.com.my",
+        "ebay.nl",
+        "ebay.ph",
+        "ebay.pl",
+        "ebay.com.sg",
+        "ebay.es",
+        "ebay.ch",
+        "ebay.co.uk",
+        "ebay.com"
+      ],
+      "description": "Parameter defines the eBay domain to use. It defaults to `ebay.com`. Head to the eBay domains for a full list of supported eBay domains.",
+      "group": "localization"
+    },
+    "_salic": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "United States"
+        ],
+        [
+          "2",
+          "Canada"
+        ],
+        [
+          "3",
+          "United Kingdom"
+        ],
+        [
+          "4",
+          "Afghanistan"
+        ],
+        [
+          "5",
+          "Albania"
+        ],
+        [
+          "6",
+          "Algeria"
+        ],
+        [
+          "7",
+          "American Samoa"
+        ],
+        [
+          "8",
+          "Andorra"
+        ],
+        [
+          "9",
+          "Angola"
+        ],
+        [
+          "10",
+          "Anguilla"
+        ],
+        [
+          "11",
+          "Antigua and Barbuda"
+        ],
+        [
+          "12",
+          "Argentina"
+        ],
+        [
+          "13",
+          "Armenia"
+        ],
+        [
+          "14",
+          "Aruba"
+        ],
+        [
+          "15",
+          "Australia"
+        ],
+        [
+          "16",
+          "Austria"
+        ],
+        [
+          "17",
+          "Azerbaijan Republic"
+        ],
+        [
+          "18",
+          "Bahamas"
+        ],
+        [
+          "19",
+          "Bahrain"
+        ],
+        [
+          "20",
+          "Bangladesh"
+        ],
+        [
+          "21",
+          "Barbados"
+        ],
+        [
+          "22",
+          "Belarus"
+        ],
+        [
+          "23",
+          "Belgium"
+        ],
+        [
+          "24",
+          "Belize"
+        ],
+        [
+          "25",
+          "Benin"
+        ],
+        [
+          "26",
+          "Bermuda"
+        ],
+        [
+          "27",
+          "Bhutan"
+        ],
+        [
+          "28",
+          "Bolivia"
+        ],
+        [
+          "29",
+          "Bosnia and Herzegovina"
+        ],
+        [
+          "30",
+          "Botswana"
+        ],
+        [
+          "31",
+          "Brazil"
+        ],
+        [
+          "32",
+          "British Virgin Islands"
+        ],
+        [
+          "33",
+          "Brunei Darussalam"
+        ],
+        [
+          "34",
+          "Bulgaria"
+        ],
+        [
+          "35",
+          "Burkina Faso"
+        ],
+        [
+          "36",
+          "Burma"
+        ],
+        [
+          "37",
+          "Burundi"
+        ],
+        [
+          "38",
+          "Cambodia"
+        ],
+        [
+          "39",
+          "Cameroon"
+        ],
+        [
+          "40",
+          "Cape Verde Islands"
+        ],
+        [
+          "41",
+          "Cayman Islands"
+        ],
+        [
+          "42",
+          "Central African Republic"
+        ],
+        [
+          "43",
+          "Chad"
+        ],
+        [
+          "44",
+          "Chile"
+        ],
+        [
+          "45",
+          "China"
+        ],
+        [
+          "46",
+          "Colombia"
+        ],
+        [
+          "47",
+          "Comoros"
+        ],
+        [
+          "48",
+          "Congo, Democratic Republic of the"
+        ],
+        [
+          "49",
+          "Congo, Republic of the"
+        ],
+        [
+          "50",
+          "Cook Islands"
+        ],
+        [
+          "51",
+          "Costa Rica"
+        ],
+        [
+          "52",
+          "Cote d Ivoire (Ivory Coast)"
+        ],
+        [
+          "53",
+          "Croatia, Republic of"
+        ],
+        [
+          "55",
+          "Cyprus"
+        ],
+        [
+          "56",
+          "Czech Republic"
+        ],
+        [
+          "57",
+          "Denmark"
+        ],
+        [
+          "58",
+          "Djibouti"
+        ],
+        [
+          "59",
+          "Dominica"
+        ],
+        [
+          "60",
+          "Dominican Republic"
+        ],
+        [
+          "61",
+          "Ecuador"
+        ],
+        [
+          "62",
+          "Egypt"
+        ],
+        [
+          "63",
+          "El Salvador"
+        ],
+        [
+          "64",
+          "Equatorial Guinea"
+        ],
+        [
+          "65",
+          "Eritrea"
+        ],
+        [
+          "66",
+          "Estonia"
+        ],
+        [
+          "67",
+          "Ethiopia"
+        ],
+        [
+          "68",
+          "Falkland Islands (Islas Malvinas)"
+        ],
+        [
+          "69",
+          "Fiji"
+        ],
+        [
+          "70",
+          "Finland"
+        ],
+        [
+          "71",
+          "France"
+        ],
+        [
+          "72",
+          "French Guiana"
+        ],
+        [
+          "73",
+          "French Polynesia"
+        ],
+        [
+          "74",
+          "Gabon Republic"
+        ],
+        [
+          "75",
+          "Gambia"
+        ],
+        [
+          "76",
+          "Georgia"
+        ],
+        [
+          "77",
+          "Germany"
+        ],
+        [
+          "78",
+          "Ghana"
+        ],
+        [
+          "79",
+          "Gibraltar"
+        ],
+        [
+          "80",
+          "Greece"
+        ],
+        [
+          "81",
+          "Greenland"
+        ],
+        [
+          "82",
+          "Grenada"
+        ],
+        [
+          "83",
+          "Guadeloupe"
+        ],
+        [
+          "84",
+          "Guam"
+        ],
+        [
+          "85",
+          "Guatemala"
+        ],
+        [
+          "86",
+          "Guernsey"
+        ],
+        [
+          "87",
+          "Guinea"
+        ],
+        [
+          "88",
+          "Guinea-Bissau"
+        ],
+        [
+          "89",
+          "Guyana"
+        ],
+        [
+          "90",
+          "Haiti"
+        ],
+        [
+          "91",
+          "Honduras"
+        ],
+        [
+          "92",
+          "Hong Kong"
+        ],
+        [
+          "93",
+          "Hungary"
+        ],
+        [
+          "94",
+          "Iceland"
+        ],
+        [
+          "95",
+          "India"
+        ],
+        [
+          "96",
+          "Indonesia"
+        ],
+        [
+          "97",
+          "Iran"
+        ],
+        [
+          "98",
+          "Iraq"
+        ],
+        [
+          "99",
+          "Ireland"
+        ],
+        [
+          "100",
+          "Israel"
+        ],
+        [
+          "101",
+          "Italy"
+        ],
+        [
+          "102",
+          "Jamaica"
+        ],
+        [
+          "104",
+          "Japan"
+        ],
+        [
+          "105",
+          "Jersey"
+        ],
+        [
+          "106",
+          "Jordan"
+        ],
+        [
+          "107",
+          "Kazakhstan"
+        ],
+        [
+          "108",
+          "Kenya"
+        ],
+        [
+          "109",
+          "Kiribati"
+        ],
+        [
+          "111",
+          "South Korea"
+        ],
+        [
+          "112",
+          "Kuwait"
+        ],
+        [
+          "113",
+          "Kyrgyzstan"
+        ],
+        [
+          "114",
+          "Laos"
+        ],
+        [
+          "115",
+          "Latvia"
+        ],
+        [
+          "116",
+          "Lebanon"
+        ],
+        [
+          "117",
+          "Lesotho"
+        ],
+        [
+          "118",
+          "Liberya"
+        ],
+        [
+          "119",
+          "Libya"
+        ],
+        [
+          "120",
+          "Liechtenstein"
+        ],
+        [
+          "121",
+          "Lithuania"
+        ],
+        [
+          "122",
+          "Luxembourg"
+        ],
+        [
+          "123",
+          "Macau"
+        ],
+        [
+          "124",
+          "Macedonia"
+        ],
+        [
+          "125",
+          "Madagascar"
+        ],
+        [
+          "126",
+          "Malawi"
+        ],
+        [
+          "127",
+          "Malaysia"
+        ],
+        [
+          "128",
+          "Maldives"
+        ],
+        [
+          "129",
+          "Mali"
+        ],
+        [
+          "130",
+          "Malta"
+        ],
+        [
+          "131",
+          "Marshall Islands"
+        ],
+        [
+          "132",
+          "Martinique"
+        ],
+        [
+          "133",
+          "Mauritania"
+        ],
+        [
+          "134",
+          "Mauritius"
+        ],
+        [
+          "135",
+          "Mayotte"
+        ],
+        [
+          "136",
+          "Mexico"
+        ],
+        [
+          "137",
+          "Moldova"
+        ],
+        [
+          "138",
+          "Monaco"
+        ],
+        [
+          "139",
+          "Mongolia"
+        ],
+        [
+          "140",
+          "Montserrat"
+        ],
+        [
+          "141",
+          "Morocco"
+        ],
+        [
+          "142",
+          "Mozambique"
+        ],
+        [
+          "143",
+          "Namibia"
+        ],
+        [
+          "144",
+          "Nauru"
+        ],
+        [
+          "145",
+          "Nepal"
+        ],
+        [
+          "146",
+          "Netherlands"
+        ],
+        [
+          "147",
+          "Netherlands Antilles"
+        ],
+        [
+          "148",
+          "New Caledonia"
+        ],
+        [
+          "149",
+          "New Zealand"
+        ],
+        [
+          "150",
+          "Nicaragua"
+        ],
+        [
+          "151",
+          "Niger"
+        ],
+        [
+          "152",
+          "Nigeria"
+        ],
+        [
+          "153",
+          "Niue"
+        ],
+        [
+          "154",
+          "Norway"
+        ],
+        [
+          "155",
+          "Oman"
+        ],
+        [
+          "156",
+          "Pakistan"
+        ],
+        [
+          "157",
+          "Palau"
+        ],
+        [
+          "158",
+          "Panama"
+        ],
+        [
+          "159",
+          "Papua New Guinea"
+        ],
+        [
+          "160",
+          "Paraguay"
+        ],
+        [
+          "161",
+          "Peru"
+        ],
+        [
+          "162",
+          "Philippines"
+        ],
+        [
+          "163",
+          "Poland"
+        ],
+        [
+          "164",
+          "Portugal"
+        ],
+        [
+          "165",
+          "Puerto Rico"
+        ],
+        [
+          "166",
+          "Qatar"
+        ],
+        [
+          "167",
+          "Romania"
+        ],
+        [
+          "168",
+          "Russian Federation"
+        ],
+        [
+          "169",
+          "Rwanda"
+        ],
+        [
+          "170",
+          "Saint Helena"
+        ],
+        [
+          "171",
+          "Saint Kitts-Nevis"
+        ],
+        [
+          "172",
+          "Saint Lucia"
+        ],
+        [
+          "173",
+          "Saint Pierre and Miquelon"
+        ],
+        [
+          "174",
+          "Saint Vincent and the Grenadines"
+        ],
+        [
+          "175",
+          "San Marino"
+        ],
+        [
+          "176",
+          "Saudi Arabia"
+        ],
+        [
+          "177",
+          "Senegal"
+        ],
+        [
+          "178",
+          "Seychelles"
+        ],
+        [
+          "179",
+          "Sierra Leone"
+        ],
+        [
+          "180",
+          "Singapore"
+        ],
+        [
+          "181",
+          "Slovakia"
+        ],
+        [
+          "182",
+          "Slovenia"
+        ],
+        [
+          "183",
+          "Solomon Islands"
+        ],
+        [
+          "184",
+          "Somalia"
+        ],
+        [
+          "185",
+          "South Africa"
+        ],
+        [
+          "186",
+          "Spain"
+        ],
+        [
+          "187",
+          "Sri Lanka"
+        ],
+        [
+          "189",
+          "Suriname"
+        ],
+        [
+          "190",
+          "Svalbard"
+        ],
+        [
+          "191",
+          "Swaziland"
+        ],
+        [
+          "192",
+          "Sweden"
+        ],
+        [
+          "193",
+          "Switzerland"
+        ],
+        [
+          "194",
+          "Syria"
+        ],
+        [
+          "196",
+          "Taiwan"
+        ],
+        [
+          "197",
+          "Tajikistan"
+        ],
+        [
+          "198",
+          "Tanzania"
+        ],
+        [
+          "199",
+          "Thailand"
+        ],
+        [
+          "200",
+          "Togo"
+        ],
+        [
+          "201",
+          "Tonga"
+        ],
+        [
+          "202",
+          "Trinidad and Tobago"
+        ],
+        [
+          "203",
+          "Tunisia"
+        ],
+        [
+          "204",
+          "Turkey"
+        ],
+        [
+          "205",
+          "Turkmenistan"
+        ],
+        [
+          "206",
+          "Turks and Caicos Islands"
+        ],
+        [
+          "207",
+          "Tuvalu"
+        ],
+        [
+          "208",
+          "Uganda"
+        ],
+        [
+          "209",
+          "Ukraine"
+        ],
+        [
+          "210",
+          "United Arab Emirates"
+        ],
+        [
+          "211",
+          "Uruguay"
+        ],
+        [
+          "212",
+          "Uzbekistan"
+        ],
+        [
+          "213",
+          "Vanuatu"
+        ],
+        [
+          "214",
+          "Vatican City State"
+        ],
+        [
+          "215",
+          "Venezuela"
+        ],
+        [
+          "216",
+          "Vietnam"
+        ],
+        [
+          "217",
+          "Virgin Islands (U.S.)"
+        ],
+        [
+          "218",
+          "Wallis and Futuna"
+        ],
+        [
+          "219",
+          "Western Sahara"
+        ],
+        [
+          "220",
+          "Western Samoa"
+        ],
+        [
+          "221",
+          "Yemen"
+        ],
+        [
+          "223",
+          "Zambia"
+        ],
+        [
+          "224",
+          "Zimbabwe"
+        ],
+        [
+          "226",
+          "Micronesia"
+        ],
+        [
+          "227",
+          "Reunion"
+        ],
+        [
+          "228",
+          "Montenegro"
+        ],
+        [
+          "229",
+          "Serbia"
+        ]
+      ],
+      "description": "Parameter defines the location based on country. Head to the eBay location options for a full list of supported countries.",
+      "group": "localization"
+    },
+    "_pgn": {
+      "type": "number",
+      "description": "Parameter defines the page number. It's used for pagination. (e.g., `1` (default) is the first page of results, `2` is the 2nd page of results, `3` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    },
+    "_ipg": {
+      "type": "select",
+      "options": [
+        [
+          50,
+          "50 - Items Per Page"
+        ],
+        [
+          25,
+          "25 - Items Per Page"
+        ],
+        [
+          100,
+          "100 - Items Per Page"
+        ],
+        [
+          200,
+          "200 - Items Per Page"
+        ]
+      ],
+      "description": "Parameter defines the maximum number of results to return. There are total of four options: `25`, `50` (default), `100` and `200` results.",
+      "group": "pagination"
+    },
+    "_blrs": {
+      "type": "checkbox",
+      "description": "Parameter defines the exclusion of results from an auto-corrected query when the original query is spelled wrong. The recommended value for this parameter is `spell_auto_correct`. Omit `_blrs` if you want the search to include results for an auto-corrected query. Note that this parameter may not prevent eBay from returning results for an auto-corrected query if no other results are available.",
+      "group": "advanced_filters"
+    },
+    "show_only": {
+      "description": "Parameter defines the list of filters you can apply to the results. Available options (case-sensitive): `Complete` - Completed items `Sold` - Sold items `FR` - Free returns `RPA` - Returns accepted `AS` - Authorized seller `Savings` - Deals and savings `SaleItems` - Sale items `Lots` - Listed as lots `Charity` - Benefits charity `AV` - Authenticity Guarantee `FS` - Free shipping `LPickup` - Local pickup You can also combine multiple filter values by joining them with a comma (`value` + `,` + `value`; eg: `Sold,FS`).",
+      "group": "advanced_filters"
+    },
+    "buying_format": {
+      "type": "select",
+      "options": [
+        "Auction",
+        "BIN",
+        "BO"
+      ],
+      "description": "Parameter defines the buying format you can apply to the results. Available options (case-sensitive): `Auction` - Auction `BIN` - Buy It Now `BO` - Accepts Offers",
+      "group": "advanced_filters"
+    },
+    "_udlo": {
+      "type": "number",
+      "description": "Parameter defines the lowest price of items that should be included in the results (e.g. `10` will only return items that have higher price than `10`).",
+      "group": "advanced_ebay_parameters"
+    },
+    "_udhi": {
+      "type": "number",
+      "description": "Parameter defines the highest price of items that should be included in the results (e.g. `20` will only return items that have lower price than `20`).",
+      "group": "advanced_ebay_parameters"
+    },
+    "_sop": {
+      "type": "select",
+      "options": [
+        [
+          "12",
+          "Best Match (default)"
+        ],
+        [
+          "1",
+          "Time: ending soonest"
+        ],
+        [
+          "10",
+          "Time: newly listed"
+        ],
+        [
+          "15",
+          "Price + Shipping: lowest first"
+        ],
+        [
+          "16",
+          "Price + Shipping: highest first"
+        ],
+        [
+          "7",
+          "Distance: nearest first"
+        ],
+        [
+          "3",
+          "Price: highest first"
+        ],
+        [
+          "2",
+          "Price: lowest first"
+        ],
+        [
+          "18",
+          "Condition: new first"
+        ],
+        [
+          "19",
+          "Condition: used first"
+        ]
+      ],
+      "description": "Parameter defines results sorted by different options in the eBay. The default option is 'Best Match'. Head to the eBay sort options for a full list of supported sort options.",
+      "group": "advanced_ebay_parameters"
+    },
+    "_dmd": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "List"
+        ],
+        [
+          "2",
+          "Grid"
+        ]
+      ],
+      "description": "Parameter defines the visual layout for displaying results. The available options are 'Grid' and 'List'.",
+      "group": "advanced_ebay_parameters"
+    },
+    "category_id": {
+      "description": "Parameter defines the ID of a category where you want your search to be concentrated. ID values are accessible inside `categories` array, located in our JSON output (e.g. `categories[1].id`). You can search using category_id parameter without specifying _nkw parameter.",
+      "group": "advanced_ebay_parameters"
+    },
+    "_stpos": {
+      "description": "Parameter defines the ZIP or Postal code. You can use it to filter the shipping products by a selected area.",
+      "group": "advanced_ebay_parameters"
+    },
+    "LH_ItemCondition": {
+      "description": "Parameter defines one or multiple product conditions to limit the search to. Condition is represented via numeric ID, e.g. `1000` for `New`. Multiple IDs should be joined with `|` delimiter, e.g. `1000|3000`. List of supported IDs can be found on eBay documentation page. There is also undocumented ID `10` for `Not Specified` condition.",
+      "group": "advanced_ebay_parameters"
+    },
+    "LH_PrefLoc": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "Domestic"
+        ],
+        [
+          "3",
+          "Regional"
+        ],
+        [
+          "2",
+          "Worldwide"
+        ]
+      ],
+      "description": "Parameter defines the preferred location. The available options are 'Domestic', 'Regional', and 'Worldwide'.",
+      "group": "advanced_ebay_parameters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `ebay` to use the Ebay API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Ebay results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

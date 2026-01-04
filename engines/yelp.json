@@ -1,0 +1,122 @@
+{
+  "engine": "yelp",
+  "params": {
+    "find_desc": {
+      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Yelp search.",
+      "group": "search_query"
+    },
+    "find_loc": {
+      "required": true,
+      "description": "Parameter defines from where you want the search to originate. You can use any location you would use in a regular Yelp search. Following location formats are acceptable: - 706 Mission St, San Francisco, CA - San Francisco, CA - San Francisco, CA 94103 - 94103",
+      "group": "geographic_location"
+    },
+    "l": {
+      "description": "Parameter defines the distance (map radius) or neighborhoods you want to search in. You can use our JSON endpoint to fetch values for either of them. Values for distance are accessible through `filters.distance` (e.g. value for 'Bird's-eye View' is `g:-97.86003112792969,30.21635515266855,-97.65541076660156,30.394199462058317`). You can also specify neighborhoods to search in. Values for neighborhoods are accessible through `filters.neighborhoods`. The value for a single neighborhood is formed in the next order: `filters.neighborhoods.value` + `filters.neighborhoods.list[0].value` (e.g. `p:TX:Austin::Downtown`). You can also set value for multiple neighborhoods: `filters.neighborhoods.value` + `[filters.neighborhoods.list[0].value,filters.neighborhoods.list[1].value]` (e.g. `p:TX:Austin::[Downtown,East_Austin]`). Distance and neighborhoods values can't be used together.",
+      "group": "geographic_location"
+    },
+    "yelp_domain": {
+      "type": "select",
+      "options": [
+        "ms.yelp.my",
+        "www.yelp.cz",
+        "www.yelp.dk",
+        "www.yelp.de",
+        "www.yelp.at",
+        "de.yelp.ch",
+        "www.yelp.com.au",
+        "en.yelp.be",
+        "www.yelp.ca",
+        "en.yelp.com.hk",
+        "en.yelp.my",
+        "www.yelp.co.nz",
+        "en.yelp.com.ph",
+        "www.yelp.ie",
+        "www.yelp.com.sg",
+        "en.yelp.ch",
+        "www.yelp.co.uk",
+        "www.yelp.com",
+        "www.yelp.com.ar",
+        "www.yelp.cl",
+        "www.yelp.es",
+        "www.yelp.com.mx",
+        "fil.yelp.com.ph",
+        "fr.yelp.be",
+        "fr.yelp.ca",
+        "www.yelp.fr",
+        "fr.yelp.ch",
+        "www.yelp.it",
+        "it.yelp.ch",
+        "nl.yelp.be",
+        "www.yelp.nl",
+        "www.yelp.no",
+        "www.yelp.pl",
+        "www.yelp.com.br",
+        "www.yelp.pt",
+        "fi.yelp.fi",
+        "sv.yelp.fi",
+        "www.yelp.com.tr",
+        "www.yelp.co.jp",
+        "zh.yelp.com.hk",
+        "www.yelp.com.tw"
+      ],
+      "description": "Parameter defines the Yelp domain to use. It defaults to `yelp.com`. Head to the Yelp domains for a full list of supported Yelp domains.",
+      "group": "localization"
+    },
+    "cflt": {
+      "description": "Parameter is used to define a category. It can be used alongside find_desc parameter to refine the search.",
+      "group": "advanced_yelp_parameters"
+    },
+    "sortby": {
+      "type": "select",
+      "options": [
+        "recommended",
+        "rating",
+        "review_count"
+      ],
+      "description": "Parameter is used for sorting results. Available options: `recommended` - Recommended (default) `rating` - Highest Rated `review_count` - Most Reviewed",
+      "group": "advanced_yelp_parameters"
+    },
+    "attrs": {
+      "description": "Parameter is used for refining results. You can add more filters like 'price', 'features', etc. to your search. You can use our JSON endpoint to fetch values. Values for filters are accessible through `filters` (e.g. value for filtering results by 'No Smoking' is `Smoking.no`). You can also use multiple values: `filters.features[0].value,filters.features[1].value` (e.g. `GoodForKids,DogsAllowed`)",
+      "group": "advanced_yelp_parameters"
+    },
+    "start": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yelp` to use the Yelp API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yelp results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

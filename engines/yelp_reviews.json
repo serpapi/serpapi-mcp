@@ -1,0 +1,157 @@
+{
+  "engine": "yelp_reviews",
+  "params": {
+    "place_id": {
+      "required": true,
+      "description": "Parameter defines the Yelp ID of a place. Each place has two unique IDs (e.g. `ED7A7vDdg8yLNKJTSVHHmg` and `arabica-brooklyn`). Only the first ID type is supported (e.g. `ED7A7vDdg8yLNKJTSVHHmg`). To extract the ID of a place, you can use our Yelp Search API.",
+      "group": "search_query"
+    },
+    "yelp_domain": {
+      "type": "select",
+      "options": [
+        "ms.yelp.my",
+        "www.yelp.cz",
+        "www.yelp.dk",
+        "www.yelp.de",
+        "www.yelp.at",
+        "de.yelp.ch",
+        "www.yelp.com.au",
+        "en.yelp.be",
+        "www.yelp.ca",
+        "en.yelp.com.hk",
+        "en.yelp.my",
+        "www.yelp.co.nz",
+        "en.yelp.com.ph",
+        "www.yelp.ie",
+        "www.yelp.com.sg",
+        "en.yelp.ch",
+        "www.yelp.co.uk",
+        "www.yelp.com",
+        "www.yelp.com.ar",
+        "www.yelp.cl",
+        "www.yelp.es",
+        "www.yelp.com.mx",
+        "fil.yelp.com.ph",
+        "fr.yelp.be",
+        "fr.yelp.ca",
+        "www.yelp.fr",
+        "fr.yelp.ch",
+        "www.yelp.it",
+        "it.yelp.ch",
+        "nl.yelp.be",
+        "www.yelp.nl",
+        "www.yelp.no",
+        "www.yelp.pl",
+        "www.yelp.com.br",
+        "www.yelp.pt",
+        "fi.yelp.fi",
+        "sv.yelp.fi",
+        "www.yelp.com.tr",
+        "www.yelp.co.jp",
+        "zh.yelp.com.hk",
+        "www.yelp.com.tw"
+      ],
+      "description": "Parameter defines the Yelp domain to use. It defaults to `yelp.com`. Head to the Yelp domains for a full list of supported Yelp domains.",
+      "group": "localization"
+    },
+    "hl": {
+      "type": "select",
+      "options": [
+        "ms",
+        "cs",
+        "da",
+        "de",
+        "en",
+        "es",
+        "fil",
+        "fr",
+        "it",
+        "nl",
+        "nb",
+        "pl",
+        "pt",
+        "fi",
+        "sv",
+        "tr",
+        "ja",
+        "zh"
+      ],
+      "description": "Parameter defines the language to use for sorting Yelp Reviews. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French) Head to the Yelp Reviews languages for a full list of supported Yelp Reviews languages.",
+      "group": "localization"
+    },
+    "q": {
+      "description": "Parameter defines the query you want to use to search through Yelp Reviews.",
+      "group": "advanced_yelp_parameters"
+    },
+    "sortby": {
+      "type": "select",
+      "options": [
+        "relevance_desc",
+        "date_desc",
+        "date_asc",
+        "rating_desc",
+        "rating_asc",
+        "elites_desc"
+      ],
+      "description": "Parameter is used for sorting results. Available options: `relevance_desc` - Yelp Sort (default) `date_desc` - Newest First `date_asc` - Oldest Rated `rating_desc` - Highest Rated `rating_asc` - Lowest Rated `elites_desc` - Elites",
+      "group": "advanced_yelp_parameters"
+    },
+    "rating": {
+      "description": "Parameter filters out the results by rating. Possible values are `5`, `4`, `3`, `2`, and `1`. All results are included by default. To only show results with the five star rating, the value should be set to `5` To include results with multiple ratings, the value should for example be set to `5,4,3` (each rating separated by comma `,`).",
+      "group": "advanced_yelp_parameters"
+    },
+    "not_recommended": {
+      "type": "checkbox",
+      "description": "Parameter fetches reviews that are not recommended by Yelp. It can be set to `true` to only show not recommended reviews, or `false` to show recommended reviews. By default, only recommended reviews are shown.",
+      "group": "advanced_yelp_parameters"
+    },
+    "start": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `49` is the 2nd page of results, `98` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    },
+    "num": {
+      "type": "number",
+      "description": "Parameter defines the maximum number of results to return. `49` (default) returns 49 results. Maximum number of results to return is `49`.",
+      "group": "pagination"
+    },
+    "not_recommended_start": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.). The not_recommended_start parameter can only be used with the not_recommended parameter set to `true`.",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yelp_reviews` to use the Yelp Reviews API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yelp Reviews results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

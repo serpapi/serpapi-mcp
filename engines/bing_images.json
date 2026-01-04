@@ -1,0 +1,240 @@
+{
+  "engine": "bing_images",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Bing Images search.",
+      "group": "search_query"
+    },
+    "mkt": {
+      "type": "select",
+      "options": [
+        "es-ar",
+        "en-au",
+        "de-at",
+        "nl-be",
+        "fr-be",
+        "pt-br",
+        "en-ca",
+        "fr-ca",
+        "es-cl",
+        "da-dk",
+        "fi-fi",
+        "fr-fr",
+        "de-de",
+        "zh-hk",
+        "en-in",
+        "en-id",
+        "it-it",
+        "ja-jp",
+        "ko-kr",
+        "en-my",
+        "es-mx",
+        "nl-nl",
+        "en-nz",
+        "no-no",
+        "zh-cn",
+        "pl-pl",
+        "en-ph",
+        "ru-ru",
+        "en-za",
+        "es-es",
+        "sv-se",
+        "fr-ch",
+        "de-ch",
+        "zh-tw",
+        "tr-tr",
+        "en-gb",
+        "en-us",
+        "es-us"
+      ],
+      "description": "The market where the results come from (e.g. `en-US`). Typically, mkt is the country where the user is making the request from. However, it could be a different country if the user is not located in a country where Bing Images API delivers results. The market must be in the form -. For example, en-US. The string is case insensitive. For a list of possible market values, see Market Codes. NOTE: If known, you are encouraged to always specify the market. Specifying the market helps Bing route the request and return an appropriate and optimal response. If you specify a market that is not listed in Market Codes, Bing Images API uses a best fit market code based on an internal mapping that is subject to change. This parameter and the cc query parameter are mutually exclusive\u2014do not specify both.",
+      "group": "geographic_location"
+    },
+    "cc": {
+      "type": "select",
+      "options": [
+        "AR",
+        "AU",
+        "AT",
+        "BE",
+        "BR",
+        "CA",
+        "CL",
+        "DK",
+        "FI",
+        "FR",
+        "DE",
+        "HK",
+        "IN",
+        "ID",
+        "IT",
+        "JP",
+        "KR",
+        "MY",
+        "MX",
+        "NL",
+        "NZ",
+        "NO",
+        "CN",
+        "PL",
+        "PT",
+        "PH",
+        "RU",
+        "SA",
+        "ZA",
+        "ES",
+        "SE",
+        "CH",
+        "TW",
+        "TR",
+        "GB",
+        "US"
+      ],
+      "description": "Parameter defines the country to search from. It follows the 2-character ISO_3166-1 format. (e.g., `us` for United States, `de` for Germany, `gb` for United Kingdom, etc.).",
+      "group": "localization"
+    },
+    "first": {
+      "type": "number",
+      "description": "Parameter controls the offset of the organic results. This parameter defaults to `1`. (e.g., `first=10` will move the 10th organic result to the first position).",
+      "group": "pagination"
+    },
+    "count": {
+      "type": "number",
+      "description": "Parameter controls the number of results per page. This parameter is only a suggestion and might not reflect the returned results.",
+      "group": "pagination"
+    },
+    "imagesize": {
+      "type": "select",
+      "options": [
+        "small",
+        "medium",
+        "large",
+        "wallpaper"
+      ],
+      "description": "Parameter is used for filtering images by size. It can be set to: `small` - Small `medium` - Medium `large` - Large `wallpaper` - Extra Large",
+      "group": "advanced_bing_images_parameters"
+    },
+    "color2": {
+      "type": "select",
+      "options": [
+        "color",
+        "bw",
+        "FGcls_RED",
+        "FGcls_ORGANGE",
+        "FGcls_YELLOW",
+        "FGcls_GREEN",
+        "FGcls_TEAL",
+        "FGcls_BLUE",
+        "FGcls_PURPLE",
+        "FGcls_PINK",
+        "FGcls_BROWN",
+        "FGcls_BLACK",
+        "FGcls_GRAY",
+        "FGcls_WHITE"
+      ],
+      "description": "Parameter is used for filtering images by color. It can be set to: `color` - Color Only `bw` - Black & white `FGcls_RED` - Red `FGcls_ORGANGE` - Orange `FGcls_YELLOW` - Yellow `FGcls_GREEN` - Green `FGcls_TEAL` - Teal `FGcls_BLUE` - Blue `FGcls_PURPLE` - Purple `FGcls_PINK` - Pink `FGcls_BROWN` - Brown `FGcls_BLACK` - Black `FGcls_GRAY` - Gray `FGcls_WHITE` - White",
+      "group": "advanced_bing_images_parameters"
+    },
+    "photo": {
+      "type": "select",
+      "options": [
+        "photo",
+        "clipart",
+        "linedrawing",
+        "animatedgif",
+        "animatedgifhttps",
+        "transparent",
+        "shopping"
+      ],
+      "description": "Parameter is used for filtering images by image type. It can be set to: `photo` - Photo `clipart` - Clipart `linedrawing` - Line Drawing `animatedgif` - Animated GIF `animatedgifhttps` - Animated GIF HTTPS `transparent` - Transparent `shopping` - Shopping, return only images that contain items where Bing knows of a merchant that is selling the items",
+      "group": "advanced_bing_images_parameters"
+    },
+    "aspect": {
+      "type": "select",
+      "options": [
+        "square",
+        "wide",
+        "tall"
+      ],
+      "description": "Parameter is used for filtering images by layout. It can be set to: `square` - Square `wide` - Wide `tall` - Tall",
+      "group": "advanced_bing_images_parameters"
+    },
+    "face": {
+      "type": "select",
+      "options": [
+        "face",
+        "portrait"
+      ],
+      "description": "Parameter is used for filtering images by people. It can be set to: `face` - Faces Only `portrait` - Head & Shoulders",
+      "group": "advanced_bing_images_parameters"
+    },
+    "age": {
+      "type": "select",
+      "options": [
+        "lt1440",
+        "lt10080",
+        "lt43200",
+        "lt525600"
+      ],
+      "description": "Parameter is used for filtering images by date. It can be set to: `lt1440` - Past 24 hours `lt10080` - Past week `lt43200` - Past month `lt525600` - Past year",
+      "group": "advanced_bing_images_parameters"
+    },
+    "license": {
+      "type": "select",
+      "options": [
+        "Type-Any",
+        "L1",
+        "L2_L3_L4_L5_L6_L7",
+        "L2_L3_L4",
+        "L2_L3_L5_L6",
+        "L2_L3"
+      ],
+      "description": "Parameter is used for filtering images by license. It can be set to: `Type-Any` - All Creative Commons `L1` - Public Domain `L2_L3_L4_L5_L6_L7` - Free to share and use `L2_L3_L4` - Free to share and use commercially `L2_L3_L5_L6` - Free to modify, share and use `L2_L3` - Free to modify, share, and use commercially",
+      "group": "advanced_bing_images_parameters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `bing_images` to use the Bing Images API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Bing Images results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

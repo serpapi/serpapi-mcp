@@ -1,0 +1,9028 @@
+{
+  "engine": "google_trends",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the query or queries you want to search. You can use anything that you would use in a regular Google Trends search. The maximum number of queries per search is `5` (this only applies to \"Interest over time\" and \"Compared breakdown by region\" data_type, other types of data will only accept `1` query per search). When passing multiple queries you need to use a comma (`,`) to separate them (e.g. `coffee,pizza,dark chocolate,/m/027lnzs,bread`). Query can be a \"Search term\" (e.g. `World Cup`, `Eminem`, `iPhone`, etc.) or a \"Topic\" (e.g. `/m/0663v`, `/m/027lnzs`, `/g/11mw8j71m4`, etc.). Queries that are \"Topics\" are encoded. To retrieve these values you can use our Google Trends Autocomplete API. Maximum length for each query is 100 characters.",
+      "group": "search_query"
+    },
+    "hl": {
+      "type": "select",
+      "options": [
+        "af",
+        "ak",
+        "sq",
+        "ws",
+        "am",
+        "ar",
+        "hy",
+        "az",
+        "eu",
+        "be",
+        "bem",
+        "bn",
+        "bh",
+        "xx-bork",
+        "bs",
+        "br",
+        "bg",
+        "bt",
+        "km",
+        "ca",
+        "chr",
+        "ny",
+        "zh-cn",
+        "zh-tw",
+        "co",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "xx-elmer",
+        "en",
+        "eo",
+        "et",
+        "ee",
+        "fo",
+        "tl",
+        "fi",
+        "fr",
+        "fy",
+        "gaa",
+        "gl",
+        "ka",
+        "de",
+        "el",
+        "kl",
+        "gn",
+        "gu",
+        "xx-hacker",
+        "ht",
+        "ha",
+        "haw",
+        "iw",
+        "he",
+        "hi",
+        "hu",
+        "is",
+        "ig",
+        "id",
+        "ia",
+        "ga",
+        "it",
+        "ja",
+        "jw",
+        "kn",
+        "kk",
+        "rw",
+        "rn",
+        "xx-klingon",
+        "kg",
+        "ko",
+        "kri",
+        "ku",
+        "ckb",
+        "ky",
+        "lo",
+        "la",
+        "lv",
+        "ln",
+        "lt",
+        "loz",
+        "lg",
+        "ach",
+        "mk",
+        "mg",
+        "ms",
+        "ml",
+        "mt",
+        "mv",
+        "mi",
+        "mr",
+        "mfe",
+        "mo",
+        "mn",
+        "sr-me",
+        "my",
+        "ne",
+        "pcm",
+        "nso",
+        "no",
+        "nn",
+        "oc",
+        "or",
+        "om",
+        "ps",
+        "fa",
+        "xx-pirate",
+        "pl",
+        "pt",
+        "pt-br",
+        "pt-pt",
+        "pa",
+        "qu",
+        "ro",
+        "rm",
+        "nyn",
+        "ru",
+        "gd",
+        "sr",
+        "sh",
+        "st",
+        "tn",
+        "crs",
+        "sn",
+        "sd",
+        "si",
+        "sk",
+        "sl",
+        "so",
+        "es",
+        "es-419",
+        "su",
+        "sw",
+        "sv",
+        "tg",
+        "ta",
+        "tt",
+        "te",
+        "th",
+        "ti",
+        "to",
+        "lua",
+        "tum",
+        "tr",
+        "tk",
+        "tw",
+        "ug",
+        "uk",
+        "ur",
+        "uz",
+        "vu",
+        "vi",
+        "cy",
+        "wo",
+        "xh",
+        "yi",
+        "yo",
+        "zu"
+      ],
+      "description": "Parameter defines the language to use for the Google Trends search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
+      "group": "geographic_location"
+    },
+    "geo": {
+      "type": "select",
+      "options": [
+        "",
+        "AF",
+        "AF-BDS",
+        "AF-BDG",
+        "AF-BGL",
+        "AF-BAL",
+        "AF-BAM",
+        "AF-DAY",
+        "AF-FRA",
+        "AF-FYB",
+        "AF-GHA",
+        "AF-GHO",
+        "AF-HEL",
+        "AF-HER",
+        "AF-JOW",
+        "AF-KAB",
+        "AF-KAN",
+        "AF-KAP",
+        "AF-KHO",
+        "AF-KNR",
+        "AF-KDZ",
+        "AF-LAG",
+        "AF-LOG",
+        "AF-NAN",
+        "AF-NIM",
+        "AF-NUR",
+        "AF-URU",
+        "AF-PIA",
+        "AF-PKA",
+        "AF-PAN",
+        "AF-PAR",
+        "AF-SAM",
+        "AF-SAR",
+        "AF-TAK",
+        "AF-WAR",
+        "AF-ZAB",
+        "AX",
+        "AL",
+        "AL-01",
+        "AL-09",
+        "AL-02",
+        "AL-03",
+        "AL-04",
+        "AL-05",
+        "AL-06",
+        "AL-07",
+        "AL-08",
+        "AL-10",
+        "AL-11",
+        "AL-12",
+        "DZ",
+        "DZ-01",
+        "DZ-44",
+        "DZ-46",
+        "DZ-16",
+        "DZ-23",
+        "DZ-05",
+        "DZ-08",
+        "DZ-06",
+        "DZ-07",
+        "DZ-09",
+        "DZ-34",
+        "DZ-10",
+        "DZ-35",
+        "DZ-02",
+        "DZ-25",
+        "DZ-17",
+        "DZ-32",
+        "DZ-39",
+        "DZ-36",
+        "DZ-47",
+        "DZ-24",
+        "DZ-33",
+        "DZ-18",
+        "DZ-40",
+        "DZ-03",
+        "DZ-28",
+        "DZ-29",
+        "DZ-26",
+        "DZ-43",
+        "DZ-27",
+        "DZ-45",
+        "DZ-31",
+        "DZ-30",
+        "DZ-04",
+        "DZ-11",
+        "DZ-48",
+        "DZ-20",
+        "DZ-19",
+        "DZ-22",
+        "DZ-21",
+        "DZ-41",
+        "DZ-12",
+        "DZ-14",
+        "DZ-37",
+        "DZ-42",
+        "DZ-38",
+        "DZ-15",
+        "DZ-13",
+        "AS",
+        "AD",
+        "AD-07",
+        "AD-02",
+        "AD-03",
+        "AD-08",
+        "AD-04",
+        "AD-05",
+        "AD-06",
+        "AO",
+        "AO-BGO",
+        "AO-BGU",
+        "AO-BIE",
+        "AO-CAB",
+        "AO-CCU",
+        "AO-CNO",
+        "AO-CUS",
+        "AO-CNN",
+        "AO-HUA",
+        "AO-HUI",
+        "AO-LUA",
+        "AO-LNO",
+        "AO-LSU",
+        "AO-MAL",
+        "AO-MOX",
+        "AO-NAM",
+        "AO-UIG",
+        "AO-ZAI",
+        "AI",
+        "AQ",
+        "AG",
+        "AG-10",
+        "AG-11",
+        "AG-03",
+        "AG-04",
+        "AG-05",
+        "AG-06",
+        "AG-07",
+        "AG-08",
+        "AR",
+        "AR-C",
+        "AR-B",
+        "AR-K",
+        "AR-H",
+        "AR-U",
+        "AR-X",
+        "AR-W",
+        "AR-E",
+        "AR-P",
+        "AR-Y",
+        "AR-L",
+        "AR-F",
+        "AR-M",
+        "AR-N",
+        "AR-Q",
+        "AR-R",
+        "AR-A",
+        "AR-J",
+        "AR-D",
+        "AR-Z",
+        "AR-S",
+        "AR-G",
+        "AR-V",
+        "AR-T",
+        "AM",
+        "AM-AG",
+        "AM-AR",
+        "AM-AV",
+        "AM-GR",
+        "AM-KT",
+        "AM-LO",
+        "AM-SH",
+        "AM-SU",
+        "AM-TV",
+        "AM-VD",
+        "AM-ER",
+        "AW",
+        "AU",
+        "AU-ACT",
+        "AU-NSW",
+        "AU-NT",
+        "AU-QLD",
+        "AU-SA",
+        "AU-TAS",
+        "AU-VIC",
+        "AU-WA",
+        "AT",
+        "AT-1",
+        "AT-2",
+        "AT-3",
+        "AT-5",
+        "AT-6",
+        "AT-7",
+        "AT-4",
+        "AT-9",
+        "AT-8",
+        "AZ",
+        "AZ-NX",
+        "BS",
+        "BS-AK",
+        "BS-BY",
+        "BS-BI",
+        "BS-BP",
+        "BS-CI",
+        "BS-CO",
+        "BS-CS",
+        "BS-CE",
+        "BS-CK",
+        "BS-EG",
+        "BS-EX",
+        "BS-FP",
+        "BS-GC",
+        "BS-HI",
+        "BS-HT",
+        "BS-IN",
+        "BS-LI",
+        "BS-MC",
+        "BS-MG",
+        "BS-MI",
+        "BS-NO",
+        "BS-NS",
+        "BS-NE",
+        "BS-RI",
+        "BS-RC",
+        "BS-SS",
+        "BS-SO",
+        "BS-SA",
+        "BS-SE",
+        "BS-SW",
+        "BS-WG",
+        "BH",
+        "BH-13",
+        "BH-16",
+        "BH-15",
+        "BH-17",
+        "BH-14",
+        "BD",
+        "BD-A",
+        "BD-B",
+        "BD-C",
+        "BD-D",
+        "BD-E",
+        "BD-F",
+        "BD-G",
+        "BB",
+        "BB-01",
+        "BB-02",
+        "BB-03",
+        "BB-04",
+        "BB-05",
+        "BB-06",
+        "BB-07",
+        "BB-08",
+        "BB-09",
+        "BB-10",
+        "BB-11",
+        "BY",
+        "BY-BR",
+        "BY-HO",
+        "BY-HR",
+        "BY-MI",
+        "BY-MA",
+        "BY-VI",
+        "BE",
+        "BE-BRU",
+        "BE-VLG",
+        "BE-WAL",
+        "BZ",
+        "BZ-BZ",
+        "BZ-CY",
+        "BZ-CZL",
+        "BZ-OW",
+        "BZ-SC",
+        "BZ-TOL",
+        "BJ",
+        "BJ-AL",
+        "BJ-AK",
+        "BJ-AQ",
+        "BJ-BO",
+        "BJ-CO",
+        "BJ-DO",
+        "BJ-KO",
+        "BJ-LI",
+        "BJ-MO",
+        "BJ-OU",
+        "BJ-PL",
+        "BJ-ZO",
+        "BM",
+        "BT",
+        "BT-33",
+        "BT-12",
+        "BT-22",
+        "BT-GA",
+        "BT-13",
+        "BT-44",
+        "BT-42",
+        "BT-11",
+        "BT-43",
+        "BT-23",
+        "BT-45",
+        "BT-14",
+        "BT-31",
+        "BT-15",
+        "BT-41",
+        "BT-TY",
+        "BT-32",
+        "BT-21",
+        "BT-24",
+        "BT-34",
+        "BO",
+        "BO-B",
+        "BO-H",
+        "BO-C",
+        "BO-L",
+        "BO-O",
+        "BO-N",
+        "BO-P",
+        "BO-S",
+        "BO-T",
+        "BA",
+        "BA-BRC",
+        "BA-BIH",
+        "BA-SRP",
+        "BW",
+        "BW-CE",
+        "BW-GH",
+        "BW-KG",
+        "BW-KL",
+        "BW-KW",
+        "BW-NW",
+        "BW-NE",
+        "BW-SE",
+        "BW-SO",
+        "BV",
+        "BR",
+        "BR-DF",
+        "BR-AC",
+        "BR-AL",
+        "BR-AP",
+        "BR-AM",
+        "BR-BA",
+        "BR-CE",
+        "BR-ES",
+        "BR-GO",
+        "BR-MA",
+        "BR-MT",
+        "BR-MS",
+        "BR-MG",
+        "BR-PA",
+        "BR-PB",
+        "BR-PR",
+        "BR-PE",
+        "BR-PI",
+        "BR-RJ",
+        "BR-RN",
+        "BR-RS",
+        "BR-RO",
+        "BR-RR",
+        "BR-SC",
+        "BR-SP",
+        "BR-SE",
+        "BR-TO",
+        "IO",
+        "VG",
+        "BN",
+        "BN-BE",
+        "BN-BM",
+        "BN-TE",
+        "BN-TU",
+        "BG",
+        "BG-01",
+        "BG-02",
+        "BG-08",
+        "BG-07",
+        "BG-26",
+        "BG-28",
+        "BG-09",
+        "BG-10",
+        "BG-11",
+        "BG-12",
+        "BG-13",
+        "BG-14",
+        "BG-15",
+        "BG-16",
+        "BG-17",
+        "BG-18",
+        "BG-27",
+        "BG-19",
+        "BG-20",
+        "BG-21",
+        "BG-22",
+        "BG-23",
+        "BG-24",
+        "BG-25",
+        "BG-03",
+        "BG-04",
+        "BG-05",
+        "BG-06",
+        "BF",
+        "BF-01",
+        "BF-02",
+        "BF-03",
+        "BF-04",
+        "BF-05",
+        "BF-06",
+        "BF-07",
+        "BF-08",
+        "BF-09",
+        "BF-10",
+        "BF-11",
+        "BF-12",
+        "BF-13",
+        "BI",
+        "BI-BB",
+        "BI-BM",
+        "BI-BL",
+        "BI-BR",
+        "BI-CA",
+        "BI-CI",
+        "BI-GI",
+        "BI-KR",
+        "BI-KY",
+        "BI-KI",
+        "BI-MA",
+        "BI-MU",
+        "BI-MY",
+        "BI-MW",
+        "BI-NG",
+        "BI-RT",
+        "BI-RY",
+        "KH",
+        "KH-1",
+        "KH-2",
+        "KH-3",
+        "KH-4",
+        "KH-5",
+        "KH-6",
+        "KH-7",
+        "KH-8",
+        "KH-23",
+        "KH-9",
+        "KH-10",
+        "KH-11",
+        "KH-22",
+        "KH-24",
+        "KH-12",
+        "KH-18",
+        "KH-13",
+        "KH-14",
+        "KH-15",
+        "KH-16",
+        "KH-17",
+        "KH-19",
+        "KH-20",
+        "KH-21",
+        "KH-25",
+        "CM",
+        "CM-AD",
+        "CM-CE",
+        "CM-ES",
+        "CM-EN",
+        "CM-LT",
+        "CM-NO",
+        "CM-NW",
+        "CM-SU",
+        "CM-SW",
+        "CM-OU",
+        "CA",
+        "CA-AB",
+        "CA-BC",
+        "CA-MB",
+        "CA-NB",
+        "CA-NL",
+        "CA-NT",
+        "CA-NS",
+        "CA-NU",
+        "CA-ON",
+        "CA-PE",
+        "CA-QC",
+        "CA-SK",
+        "CA-YT",
+        "CV",
+        "CV-BV",
+        "CV-BR",
+        "CV-MA",
+        "CV-MO",
+        "CV-PA",
+        "CV-PN",
+        "CV-PR",
+        "CV-RB",
+        "CV-RG",
+        "CV-RS",
+        "CV-SL",
+        "CV-CA",
+        "CV-CF",
+        "CV-CR",
+        "CV-SD",
+        "CV-SF",
+        "CV-SO",
+        "CV-SM",
+        "CV-SS",
+        "CV-SV",
+        "CV-TA",
+        "CV-TS",
+        "BQ",
+        "BQ-BO",
+        "BQ-SA",
+        "BQ-SE",
+        "KY",
+        "CF",
+        "CF-BB",
+        "CF-BGF",
+        "CF-BK",
+        "CF-HM",
+        "CF-HK",
+        "CF-KG",
+        "CF-LB",
+        "CF-HS",
+        "CF-MB",
+        "CF-KB",
+        "CF-NM",
+        "CF-MP",
+        "CF-UK",
+        "CF-AC",
+        "CF-OP",
+        "CF-SE",
+        "CF-VK",
+        "TD",
+        "TD-BG",
+        "TD-BA",
+        "TD-BO",
+        "TD-CB",
+        "TD-EN",
+        "TD-GR",
+        "TD-HL",
+        "TD-KA",
+        "TD-LC",
+        "TD-LO",
+        "TD-LR",
+        "TD-MA",
+        "TD-ME",
+        "TD-MO",
+        "TD-MC",
+        "TD-ND",
+        "TD-OD",
+        "TD-SI",
+        "TD-TA",
+        "TD-TI",
+        "TD-WF",
+        "TD-SA",
+        "CL",
+        "CL-AN",
+        "CL-AR",
+        "CL-AP",
+        "CL-AT",
+        "CL-BI",
+        "CL-CO",
+        "CL-LL",
+        "CL-LR",
+        "CL-MA",
+        "CL-ML",
+        "CL-LI",
+        "CL-RM",
+        "CL-TA",
+        "CL-VS",
+        "CL-AI",
+        "CN",
+        "CN-34",
+        "CN-11",
+        "CN-50",
+        "CN-35",
+        "CN-62",
+        "CN-44",
+        "CN-45",
+        "CN-52",
+        "CN-46",
+        "CN-13",
+        "CN-23",
+        "CN-41",
+        "CN-42",
+        "CN-43",
+        "CN-15",
+        "CN-32",
+        "CN-36",
+        "CN-22",
+        "CN-21",
+        "CN-64",
+        "CN-63",
+        "CN-61",
+        "CN-37",
+        "CN-31",
+        "CN-14",
+        "CN-51",
+        "CN-12",
+        "CN-54",
+        "CN-65",
+        "CN-53",
+        "CN-33",
+        "CX",
+        "CC",
+        "CO",
+        "CO-AMA",
+        "CO-ANT",
+        "CO-ARA",
+        "CO-ATL",
+        "CO-DC",
+        "CO-BOL",
+        "CO-BOY",
+        "CO-CAL",
+        "CO-CAQ",
+        "CO-CAS",
+        "CO-CAU",
+        "CO-CES",
+        "CO-CHO",
+        "CO-COR",
+        "CO-CUN",
+        "CO-GUA",
+        "CO-GUV",
+        "CO-HUI",
+        "CO-LAG",
+        "CO-MAG",
+        "CO-MET",
+        "CO-NAR",
+        "CO-NSA",
+        "CO-PUT",
+        "CO-QUI",
+        "CO-RIS",
+        "CO-SAP",
+        "CO-SAN",
+        "CO-SUC",
+        "CO-TOL",
+        "CO-VAC",
+        "CO-VAU",
+        "CO-VID",
+        "KM",
+        "KM-M",
+        "KM-G",
+        "KM-A",
+        "CG",
+        "CG-11",
+        "CG-BZV",
+        "CG-8",
+        "CG-15",
+        "CG-5",
+        "CG-2",
+        "CG-7",
+        "CG-9",
+        "CG-14",
+        "CG-16",
+        "CG-12",
+        "CG-13",
+        "CD",
+        "CD-BN",
+        "CD-BC",
+        "CD-EQ",
+        "CD-KW",
+        "CD-KE",
+        "CD-KA",
+        "CD-KN",
+        "CD-MA",
+        "CD-NK",
+        "CD-OR",
+        "CD-SK",
+        "CK",
+        "CR",
+        "CR-A",
+        "CR-G",
+        "CR-H",
+        "CR-L",
+        "CR-C",
+        "CR-P",
+        "CR-SJ",
+        "CI",
+        "CI-16",
+        "CI-17",
+        "CI-09",
+        "CI-10",
+        "CI-06",
+        "CI-18",
+        "CI-02",
+        "CI-07",
+        "CI-01",
+        "CI-12",
+        "CI-19",
+        "CI-05",
+        "CI-11",
+        "CI-03",
+        "CI-15",
+        "CI-13",
+        "CI-04",
+        "CI-14",
+        "CI-08",
+        "HR",
+        "HR-07",
+        "HR-12",
+        "HR-21",
+        "HR-19",
+        "HR-18",
+        "HR-04",
+        "HR-06",
+        "HR-02",
+        "HR-09",
+        "HR-20",
+        "HR-14",
+        "HR-11",
+        "HR-08",
+        "HR-15",
+        "HR-03",
+        "HR-17",
+        "HR-05",
+        "HR-10",
+        "HR-16",
+        "HR-13",
+        "HR-01",
+        "CU",
+        "CU-15",
+        "CU-09",
+        "CU-08",
+        "CU-06",
+        "CU-12",
+        "CU-14",
+        "CU-03",
+        "CU-11",
+        "CU-99",
+        "CU-10",
+        "CU-04",
+        "CU-16",
+        "CU-01",
+        "CU-07",
+        "CU-13",
+        "CU-05",
+        "CW",
+        "CY",
+        "CY-04",
+        "CY-06",
+        "CY-03",
+        "CY-02",
+        "CY-01",
+        "CY-05",
+        "CZ",
+        "CZ-ST",
+        "CZ-KR",
+        "CZ-KA",
+        "CZ-LI",
+        "CZ-MO",
+        "CZ-OL",
+        "CZ-PA",
+        "CZ-PL",
+        "CZ-PR",
+        "CZ-JC",
+        "CZ-JM",
+        "CZ-US",
+        "CZ-VY",
+        "CZ-ZL",
+        "DK",
+        "DK-84",
+        "DK-82",
+        "DK-81",
+        "DK-83",
+        "DK-85",
+        "DJ",
+        "DJ-AS",
+        "DJ-AR",
+        "DJ-DI",
+        "DJ-DJ",
+        "DJ-OB",
+        "DJ-TA",
+        "DM",
+        "DM-02",
+        "DM-03",
+        "DM-04",
+        "DM-05",
+        "DM-06",
+        "DM-07",
+        "DM-08",
+        "DM-09",
+        "DM-10",
+        "DM-11",
+        "DO",
+        "DO-02",
+        "DO-03",
+        "DO-04",
+        "DO-05",
+        "DO-01",
+        "DO-06",
+        "DO-08",
+        "DO-07",
+        "DO-09",
+        "DO-30",
+        "DO-19",
+        "DO-10",
+        "DO-11",
+        "DO-12",
+        "DO-13",
+        "DO-14",
+        "DO-28",
+        "DO-15",
+        "DO-29",
+        "DO-16",
+        "DO-17",
+        "DO-18",
+        "DO-20",
+        "DO-21",
+        "DO-31",
+        "DO-22",
+        "DO-23",
+        "DO-24",
+        "DO-25",
+        "DO-26",
+        "DO-32",
+        "DO-27",
+        "EC",
+        "EC-A",
+        "EC-B",
+        "EC-F",
+        "EC-C",
+        "EC-H",
+        "EC-X",
+        "EC-O",
+        "EC-E",
+        "EC-W",
+        "EC-G",
+        "EC-I",
+        "EC-L",
+        "EC-R",
+        "EC-M",
+        "EC-S",
+        "EC-D",
+        "EC-Y",
+        "EC-P",
+        "EC-N",
+        "EC-SE",
+        "EC-SD",
+        "EC-U",
+        "EC-T",
+        "EC-Z",
+        "EG",
+        "EG-KB",
+        "EG-ALX",
+        "EG-SHR",
+        "EG-AST",
+        "EG-ASN",
+        "EG-BNS",
+        "EG-C",
+        "EG-DK",
+        "EG-DT",
+        "EG-BH",
+        "EG-FYM",
+        "EG-GH",
+        "EG-GZ",
+        "EG-IS",
+        "EG-KFS",
+        "EG-LX",
+        "EG-MT",
+        "EG-MN",
+        "EG-MNF",
+        "EG-WAD",
+        "EG-SIN",
+        "EG-PTS",
+        "EG-KN",
+        "EG-BA",
+        "EG-SHG",
+        "EG-JS",
+        "EG-SUZ",
+        "SV",
+        "SV-AH",
+        "SV-CA",
+        "SV-CH",
+        "SV-CU",
+        "SV-LI",
+        "SV-PA",
+        "SV-UN",
+        "SV-MO",
+        "SV-SM",
+        "SV-SS",
+        "SV-SV",
+        "SV-SA",
+        "SV-SO",
+        "SV-US",
+        "GQ",
+        "GQ-AN",
+        "GQ-BN",
+        "GQ-BS",
+        "GQ-CS",
+        "GQ-KN",
+        "GQ-LI",
+        "GQ-WN",
+        "ER",
+        "ER-AN",
+        "ER-MA",
+        "ER-GB",
+        "ER-SK",
+        "ER-DU",
+        "ER-DK",
+        "EE",
+        "EE-37",
+        "EE-39",
+        "EE-44",
+        "EE-51",
+        "EE-49",
+        "EE-57",
+        "EE-59",
+        "EE-67",
+        "EE-65",
+        "EE-70",
+        "EE-74",
+        "EE-78",
+        "EE-82",
+        "EE-84",
+        "EE-86",
+        "SZ",
+        "SZ-HH",
+        "SZ-LU",
+        "SZ-MA",
+        "SZ-SH",
+        "ET",
+        "ET-AA",
+        "ET-AF",
+        "ET-AM",
+        "ET-BE",
+        "ET-DD",
+        "ET-GA",
+        "ET-HA",
+        "ET-OR",
+        "ET-SO",
+        "ET-SN",
+        "ET-TI",
+        "FK",
+        "FO",
+        "FJ",
+        "FJ-C",
+        "FJ-E",
+        "FJ-N",
+        "FJ-R",
+        "FJ-W",
+        "FI",
+        "FI-08",
+        "FI-07",
+        "FI-05",
+        "FI-09",
+        "FI-10",
+        "FI-13",
+        "FI-14",
+        "FI-15",
+        "FI-12",
+        "FI-16",
+        "FI-11",
+        "FI-17",
+        "FI-02",
+        "FI-03",
+        "FI-04",
+        "FI-19",
+        "FI-06",
+        "FI-18",
+        "FR",
+        "FR-A",
+        "FR-B",
+        "FR-C",
+        "FR-E",
+        "FR-D",
+        "FR-F",
+        "FR-G",
+        "FR-H",
+        "FR-I",
+        "FR-J",
+        "FR-K",
+        "FR-L",
+        "FR-M",
+        "FR-P",
+        "FR-N",
+        "FR-O",
+        "FR-R",
+        "FR-S",
+        "FR-T",
+        "FR-U",
+        "FR-V",
+        "FR-Q",
+        "GF",
+        "PF",
+        "TF",
+        "GA",
+        "GA-1",
+        "GA-2",
+        "GA-3",
+        "GA-4",
+        "GA-5",
+        "GA-6",
+        "GA-7",
+        "GA-8",
+        "GA-9",
+        "GM",
+        "GM-B",
+        "GM-M",
+        "GM-L",
+        "GM-N",
+        "GM-U",
+        "GM-W",
+        "GE",
+        "GE-AB",
+        "GE-AJ",
+        "GE-GU",
+        "GE-IM",
+        "GE-KA",
+        "GE-KK",
+        "GE-MM",
+        "GE-RL",
+        "GE-SZ",
+        "GE-SJ",
+        "GE-SK",
+        "GE-TB",
+        "DE",
+        "DE-BW",
+        "DE-BY",
+        "DE-BE",
+        "DE-BB",
+        "DE-HB",
+        "DE-HH",
+        "DE-HE",
+        "DE-NI",
+        "DE-MV",
+        "DE-NW",
+        "DE-RP",
+        "DE-SL",
+        "DE-SN",
+        "DE-ST",
+        "DE-SH",
+        "DE-TH",
+        "GH",
+        "GH-AH",
+        "GH-BA",
+        "GH-CP",
+        "GH-EP",
+        "GH-AA",
+        "GH-NP",
+        "GH-UE",
+        "GH-UW",
+        "GH-TV",
+        "GH-WP",
+        "GI",
+        "GR",
+        "GL",
+        "GL-KU",
+        "GL-QA",
+        "GL-QE",
+        "GL-SM",
+        "GD",
+        "GD-10",
+        "GD-01",
+        "GD-02",
+        "GD-03",
+        "GD-04",
+        "GD-05",
+        "GD-06",
+        "GP",
+        "GU",
+        "GT",
+        "GT-AV",
+        "GT-BV",
+        "GT-CM",
+        "GT-CQ",
+        "GT-PR",
+        "GT-ES",
+        "GT-GU",
+        "GT-HU",
+        "GT-IZ",
+        "GT-JA",
+        "GT-JU",
+        "GT-PE",
+        "GT-QZ",
+        "GT-QC",
+        "GT-RE",
+        "GT-SA",
+        "GT-SM",
+        "GT-SR",
+        "GT-SO",
+        "GT-SU",
+        "GT-TO",
+        "GT-ZA",
+        "GG",
+        "GN",
+        "GN-B",
+        "GN-C",
+        "GN-F",
+        "GN-K",
+        "GN-D",
+        "GN-L",
+        "GN-M",
+        "GN-N",
+        "GW",
+        "GW-BA",
+        "GW-BM",
+        "GW-BS",
+        "GW-BL",
+        "GW-CA",
+        "GW-GA",
+        "GW-OI",
+        "GW-QU",
+        "GW-TO",
+        "GY",
+        "GY-BA",
+        "GY-CU",
+        "GY-DE",
+        "GY-EB",
+        "GY-ES",
+        "GY-MA",
+        "GY-PM",
+        "GY-PT",
+        "GY-UD",
+        "GY-UT",
+        "HT",
+        "HT-AR",
+        "HT-CE",
+        "HT-GA",
+        "HT-NI",
+        "HT-ND",
+        "HT-NE",
+        "HT-NO",
+        "HT-OU",
+        "HT-SD",
+        "HT-SE",
+        "HM",
+        "HN",
+        "HN-AT",
+        "HN-IB",
+        "HN-CH",
+        "HN-CL",
+        "HN-CM",
+        "HN-CP",
+        "HN-CR",
+        "HN-EP",
+        "HN-FM",
+        "HN-GD",
+        "HN-IN",
+        "HN-LP",
+        "HN-LE",
+        "HN-OC",
+        "HN-OL",
+        "HN-SB",
+        "HN-VA",
+        "HN-YO",
+        "HK",
+        "HU",
+        "HU-BK",
+        "HU-BA",
+        "HU-BE",
+        "HU-BZ",
+        "HU-BU",
+        "HU-CS",
+        "HU-FE",
+        "HU-GS",
+        "HU-HB",
+        "HU-HE",
+        "HU-JN",
+        "HU-KE",
+        "HU-NO",
+        "HU-PE",
+        "HU-SO",
+        "HU-SZ",
+        "HU-TO",
+        "HU-VA",
+        "HU-VE",
+        "HU-ZA",
+        "IS",
+        "IS-1",
+        "IS-7",
+        "IS-6",
+        "IS-5",
+        "IS-8",
+        "IS-2",
+        "IS-3",
+        "IS-4",
+        "IN",
+        "IN-AN",
+        "IN-AP",
+        "IN-AR",
+        "IN-AS",
+        "IN-BR",
+        "IN-CH",
+        "IN-CT",
+        "IN-DN",
+        "IN-DD",
+        "IN-DL",
+        "IN-GA",
+        "IN-GJ",
+        "IN-HR",
+        "IN-HP",
+        "IN-JK",
+        "IN-JH",
+        "IN-KA",
+        "IN-KL",
+        "IN-LD",
+        "IN-MP",
+        "IN-MH",
+        "IN-MN",
+        "IN-ML",
+        "IN-MZ",
+        "IN-NL",
+        "IN-OR",
+        "IN-PY",
+        "IN-PB",
+        "IN-RJ",
+        "IN-SK",
+        "IN-TN",
+        "IN-TG",
+        "IN-TR",
+        "IN-UP",
+        "IN-UT",
+        "IN-WB",
+        "ID",
+        "ID-AC",
+        "ID-BA",
+        "ID-BB",
+        "ID-BT",
+        "ID-BE",
+        "ID-JT",
+        "ID-KT",
+        "ID-ST",
+        "ID-JI",
+        "ID-KI",
+        "ID-NT",
+        "ID-GO",
+        "ID-JA",
+        "ID-LA",
+        "ID-MA",
+        "ID-KU",
+        "ID-MU",
+        "ID-SA",
+        "ID-SU",
+        "ID-PA",
+        "ID-RI",
+        "ID-KR",
+        "ID-SG",
+        "ID-KS",
+        "ID-SN",
+        "ID-SS",
+        "ID-JK",
+        "ID-YO",
+        "ID-JB",
+        "ID-KB",
+        "ID-NB",
+        "ID-PB",
+        "ID-SR",
+        "ID-SB",
+        "IR",
+        "IR-32",
+        "IR-03",
+        "IR-06",
+        "IR-08",
+        "IR-01",
+        "IR-14",
+        "IR-19",
+        "IR-27",
+        "IR-24",
+        "IR-23",
+        "IR-05",
+        "IR-04",
+        "IR-15",
+        "IR-17",
+        "IR-30",
+        "IR-10",
+        "IR-18",
+        "IR-16",
+        "IR-20",
+        "IR-22",
+        "IR-21",
+        "IR-31",
+        "IR-28",
+        "IR-26",
+        "IR-12",
+        "IR-13",
+        "IR-29",
+        "IR-07",
+        "IR-02",
+        "IR-25",
+        "IR-11",
+        "IQ",
+        "IQ-AN",
+        "IQ-MU",
+        "IQ-QA",
+        "IQ-NA",
+        "IQ-BB",
+        "IQ-BG",
+        "IQ-BA",
+        "IQ-DQ",
+        "IQ-DI",
+        "IQ-DA",
+        "IQ-AR",
+        "IQ-KA",
+        "IQ-TS",
+        "IQ-MA",
+        "IQ-NI",
+        "IQ-SD",
+        "IQ-SU",
+        "IQ-WA",
+        "IE",
+        "IM",
+        "IL",
+        "IL-M",
+        "IL-HA",
+        "IL-JM",
+        "IL-Z",
+        "IL-D",
+        "IL-TA",
+        "IT",
+        "IT-65",
+        "IT-23",
+        "IT-75",
+        "IT-77",
+        "IT-78",
+        "IT-72",
+        "IT-45",
+        "IT-36",
+        "IT-62",
+        "IT-42",
+        "IT-25",
+        "IT-57",
+        "IT-67",
+        "IT-21",
+        "IT-88",
+        "IT-82",
+        "IT-32",
+        "IT-52",
+        "IT-55",
+        "IT-34",
+        "JM",
+        "JM-13",
+        "JM-09",
+        "JM-01",
+        "JM-12",
+        "JM-04",
+        "JM-02",
+        "JM-06",
+        "JM-14",
+        "JM-11",
+        "JM-08",
+        "JM-05",
+        "JM-03",
+        "JM-07",
+        "JM-10",
+        "JP",
+        "JP-23",
+        "JP-05",
+        "JP-02",
+        "JP-12",
+        "JP-38",
+        "JP-18",
+        "JP-40",
+        "JP-07",
+        "JP-21",
+        "JP-10",
+        "JP-34",
+        "JP-01",
+        "JP-28",
+        "JP-08",
+        "JP-17",
+        "JP-03",
+        "JP-37",
+        "JP-46",
+        "JP-14",
+        "JP-39",
+        "JP-43",
+        "JP-26",
+        "JP-24",
+        "JP-04",
+        "JP-45",
+        "JP-20",
+        "JP-42",
+        "JP-29",
+        "JP-15",
+        "JP-44",
+        "JP-33",
+        "JP-47",
+        "JP-27",
+        "JP-41",
+        "JP-11",
+        "JP-25",
+        "JP-32",
+        "JP-22",
+        "JP-09",
+        "JP-36",
+        "JP-13",
+        "JP-31",
+        "JP-16",
+        "JP-30",
+        "JP-06",
+        "JP-35",
+        "JP-19",
+        "JE",
+        "JO",
+        "JO-AJ",
+        "JO-AM",
+        "JO-AQ",
+        "JO-BA",
+        "JO-IR",
+        "JO-JA",
+        "JO-KA",
+        "JO-MN",
+        "JO-MD",
+        "JO-MA",
+        "JO-AT",
+        "JO-AZ",
+        "KZ",
+        "KZ-AKM",
+        "KZ-AKT",
+        "KZ-ALM",
+        "KZ-ATY",
+        "KZ-VOS",
+        "KZ-ZHA",
+        "KZ-KAR",
+        "KZ-KUS",
+        "KZ-KZY",
+        "KZ-MAN",
+        "KZ-SEV",
+        "KZ-PAV",
+        "KZ-YUZ",
+        "KZ-ZAP",
+        "KE",
+        "KI",
+        "KI-G",
+        "KI-L",
+        "KI-P",
+        "XK",
+        "KW",
+        "KW-AH",
+        "KW-KU",
+        "KW-FA",
+        "KW-JA",
+        "KW-HA",
+        "KW-MU",
+        "KG",
+        "KG-B",
+        "KG-C",
+        "KG-J",
+        "KG-N",
+        "KG-O",
+        "KG-T",
+        "KG-Y",
+        "LA",
+        "LA-AT",
+        "LA-BK",
+        "LA-BL",
+        "LA-CH",
+        "LA-HO",
+        "LA-KH",
+        "LA-LP",
+        "LA-LM",
+        "LA-OU",
+        "LA-PH",
+        "LA-SL",
+        "LA-SV",
+        "LA-XA",
+        "LA-VI",
+        "LA-VT",
+        "LA-XE",
+        "LA-XI",
+        "LV",
+        "LV-011",
+        "LV-001",
+        "LV-002",
+        "LV-003",
+        "LV-004",
+        "LV-005",
+        "LV-006",
+        "LV-007",
+        "LV-008",
+        "LV-009",
+        "LV-010",
+        "LV-012",
+        "LV-013",
+        "LV-014",
+        "LV-015",
+        "LV-016",
+        "LV-017",
+        "LV-018",
+        "LV-019",
+        "LV-020",
+        "LV-022",
+        "LV-021",
+        "LV-023",
+        "LV-024",
+        "LV-DGV",
+        "LV-025",
+        "LV-026",
+        "LV-027",
+        "LV-028",
+        "LV-029",
+        "LV-030",
+        "LV-031",
+        "LV-032",
+        "LV-033",
+        "LV-034",
+        "LV-035",
+        "LV-036",
+        "LV-037",
+        "LV-038",
+        "LV-039",
+        "LV-040",
+        "LV-JKB",
+        "LV-042",
+        "LV-JEL",
+        "LV-041",
+        "LV-JUR",
+        "LV-043",
+        "LV-044",
+        "LV-051",
+        "LV-052",
+        "LV-045",
+        "LV-046",
+        "LV-047",
+        "LV-048",
+        "LV-049",
+        "LV-050",
+        "LV-053",
+        "LV-LPX",
+        "LV-055",
+        "LV-054",
+        "LV-056",
+        "LV-057",
+        "LV-058",
+        "LV-059",
+        "LV-061",
+        "LV-062",
+        "LV-060",
+        "LV-063",
+        "LV-064",
+        "LV-065",
+        "LV-066",
+        "LV-067",
+        "LV-068",
+        "LV-069",
+        "LV-070",
+        "LV-071",
+        "LV-072",
+        "LV-073",
+        "LV-074",
+        "LV-075",
+        "LV-076",
+        "LV-077",
+        "LV-REZ",
+        "LV-078",
+        "LV-RIX",
+        "LV-079",
+        "LV-080",
+        "LV-081",
+        "LV-082",
+        "LV-084",
+        "LV-083",
+        "LV-085",
+        "LV-086",
+        "LV-087",
+        "LV-088",
+        "LV-089",
+        "LV-090",
+        "LV-091",
+        "LV-092",
+        "LV-093",
+        "LV-094",
+        "LV-095",
+        "LV-096",
+        "LV-097",
+        "LV-098",
+        "LV-099",
+        "LV-100",
+        "LV-101",
+        "LV-VMR",
+        "LV-102",
+        "LV-103",
+        "LV-104",
+        "LV-105",
+        "LV-VEN",
+        "LV-106",
+        "LV-107",
+        "LV-108",
+        "LV-109",
+        "LV-110",
+        "LB",
+        "LB-BA",
+        "LB-BI",
+        "LB-JL",
+        "LB-NA",
+        "LB-AS",
+        "LB-JA",
+        "LS",
+        "LS-D",
+        "LS-B",
+        "LS-C",
+        "LS-E",
+        "LS-A",
+        "LS-F",
+        "LS-J",
+        "LS-H",
+        "LS-G",
+        "LS-K",
+        "LR",
+        "LR-BM",
+        "LR-BG",
+        "LR-GP",
+        "LR-GB",
+        "LR-CM",
+        "LR-GG",
+        "LR-GK",
+        "LR-LO",
+        "LR-MG",
+        "LR-MY",
+        "LR-MO",
+        "LR-NI",
+        "LR-RI",
+        "LR-RG",
+        "LR-SI",
+        "LY",
+        "LY-BU",
+        "LY-JA",
+        "LY-JG",
+        "LY-JI",
+        "LY-JU",
+        "LY-KF",
+        "LY-MJ",
+        "LY-MB",
+        "LY-WA",
+        "LY-NQ",
+        "LY-ZA",
+        "LY-BA",
+        "LY-DR",
+        "LY-GT",
+        "LY-MI",
+        "LY-MQ",
+        "LY-NL",
+        "LY-SB",
+        "LY-SR",
+        "LY-TB",
+        "LY-WD",
+        "LY-WS",
+        "LI",
+        "LI-01",
+        "LI-02",
+        "LI-03",
+        "LI-04",
+        "LI-05",
+        "LI-06",
+        "LI-07",
+        "LI-08",
+        "LI-09",
+        "LI-10",
+        "LI-11",
+        "LT",
+        "LT-AL",
+        "LT-KU",
+        "LT-KL",
+        "LT-MR",
+        "LT-PN",
+        "LT-SA",
+        "LT-TA",
+        "LT-TE",
+        "LT-UT",
+        "LT-VL",
+        "LU",
+        "LU-D",
+        "LU-G",
+        "LU-L",
+        "MO",
+        "MG",
+        "MG-T",
+        "MG-D",
+        "MG-F",
+        "MG-M",
+        "MG-A",
+        "MG-U",
+        "MW",
+        "MW-C",
+        "MW-N",
+        "MW-S",
+        "MY",
+        "MY-14",
+        "MY-01",
+        "MY-02",
+        "MY-03",
+        "MY-15",
+        "MY-04",
+        "MY-05",
+        "MY-06",
+        "MY-07",
+        "MY-08",
+        "MY-09",
+        "MY-16",
+        "MY-12",
+        "MY-13",
+        "MY-10",
+        "MY-11",
+        "MV",
+        "MV-CE",
+        "MV-MLE",
+        "MV-NC",
+        "MV-NO",
+        "MV-SC",
+        "MV-SU",
+        "MV-UN",
+        "MV-US",
+        "ML",
+        "ML-BKO",
+        "ML-7",
+        "ML-1",
+        "ML-8",
+        "ML-2",
+        "ML-5",
+        "ML-4",
+        "ML-3",
+        "ML-6",
+        "MT",
+        "MH",
+        "MH-ALL",
+        "MH-ALK",
+        "MH-ARN",
+        "MH-AUR",
+        "MH-EBO",
+        "MH-ENI",
+        "MH-JAB",
+        "MH-JAL",
+        "MH-KIL",
+        "MH-KWA",
+        "MH-LAE",
+        "MH-LIB",
+        "MH-LIK",
+        "MH-MAJ",
+        "MH-MAL",
+        "MH-MEJ",
+        "MH-MIL",
+        "MH-NMK",
+        "MH-NMU",
+        "MH-RON",
+        "MH-UJA",
+        "MH-UTI",
+        "MH-WTH",
+        "MH-WTJ",
+        "MQ",
+        "MR",
+        "MR-07",
+        "MR-03",
+        "MR-05",
+        "MR-08",
+        "MR-04",
+        "MR-10",
+        "MR-01",
+        "MR-02",
+        "MR-12",
+        "MR-NKC",
+        "MR-09",
+        "MR-11",
+        "MR-06",
+        "MU",
+        "MU-AG",
+        "MU-BL",
+        "MU-CC",
+        "MU-FL",
+        "MU-GP",
+        "MU-MO",
+        "MU-PA",
+        "MU-PW",
+        "MU-PL",
+        "MU-RR",
+        "MU-RO",
+        "MU-SA",
+        "YT",
+        "MX",
+        "MX-AGU",
+        "MX-BCN",
+        "MX-BCS",
+        "MX-CAM",
+        "MX-CHP",
+        "MX-CHH",
+        "MX-COA",
+        "MX-COL",
+        "MX-DUR",
+        "MX-GUA",
+        "MX-GRO",
+        "MX-HID",
+        "MX-JAL",
+        "MX-DIF",
+        "MX-MIC",
+        "MX-MOR",
+        "MX-NAY",
+        "MX-NLE",
+        "MX-OAX",
+        "MX-PUE",
+        "MX-QUE",
+        "MX-ROO",
+        "MX-SLP",
+        "MX-SIN",
+        "MX-SON",
+        "MX-MEX",
+        "MX-TAB",
+        "MX-TAM",
+        "MX-TLA",
+        "MX-VER",
+        "MX-YUC",
+        "MX-ZAC",
+        "FM",
+        "FM-TRK",
+        "FM-KSA",
+        "FM-PNI",
+        "FM-YAP",
+        "MD",
+        "MD-AN",
+        "MD-BA",
+        "MD-BS",
+        "MD-BD",
+        "MD-BR",
+        "MD-CA",
+        "MD-CL",
+        "MD-CT",
+        "MD-CS",
+        "MD-CU",
+        "MD-CM",
+        "MD-CR",
+        "MD-DO",
+        "MD-DR",
+        "MD-DU",
+        "MD-ED",
+        "MD-FA",
+        "MD-FL",
+        "MD-GA",
+        "MD-GL",
+        "MD-HI",
+        "MD-IA",
+        "MD-LE",
+        "MD-NI",
+        "MD-OC",
+        "MD-OR",
+        "MD-RE",
+        "MD-RI",
+        "MD-SI",
+        "MD-SD",
+        "MD-SO",
+        "MD-SV",
+        "MD-ST",
+        "MD-TA",
+        "MD-TE",
+        "MD-SN",
+        "MD-UN",
+        "MC",
+        "MN",
+        "MN-073",
+        "MN-071",
+        "MN-069",
+        "MN-067",
+        "MN-037",
+        "MN-061",
+        "MN-063",
+        "MN-059",
+        "MN-065",
+        "MN-064",
+        "MN-039",
+        "MN-043",
+        "MN-041",
+        "MN-035",
+        "MN-049",
+        "MN-051",
+        "MN-047",
+        "MN-1",
+        "MN-053",
+        "MN-046",
+        "MN-055",
+        "MN-057",
+        "ME",
+        "ME-01",
+        "ME-02",
+        "ME-03",
+        "ME-04",
+        "ME-05",
+        "ME-06",
+        "ME-07",
+        "ME-08",
+        "ME-09",
+        "ME-10",
+        "ME-11",
+        "ME-12",
+        "ME-13",
+        "ME-14",
+        "ME-15",
+        "ME-16",
+        "ME-17",
+        "ME-18",
+        "ME-19",
+        "ME-20",
+        "ME-21",
+        "MS",
+        "MA",
+        "MA-09",
+        "MA-10",
+        "MA-05",
+        "MA-02",
+        "MA-08",
+        "MA-14",
+        "MA-15",
+        "MA-11",
+        "MA-06",
+        "MA-04",
+        "MA-07",
+        "MA-13",
+        "MA-12",
+        "MA-01",
+        "MA-03",
+        "MZ",
+        "MZ-P",
+        "MZ-G",
+        "MZ-I",
+        "MZ-B",
+        "MZ-MPM",
+        "MZ-L",
+        "MZ-N",
+        "MZ-A",
+        "MZ-S",
+        "MZ-T",
+        "MZ-Q",
+        "MM",
+        "MM-07",
+        "MM-02",
+        "MM-14",
+        "MM-11",
+        "MM-12",
+        "MM-13",
+        "MM-03",
+        "MM-04",
+        "MM-15",
+        "MM-18",
+        "MM-16",
+        "MM-01",
+        "MM-17",
+        "MM-05",
+        "MM-06",
+        "NA",
+        "NA-ER",
+        "NA-HA",
+        "NA-KA",
+        "NA-OK",
+        "NA-KH",
+        "NA-KU",
+        "NA-OW",
+        "NA-OH",
+        "NA-OS",
+        "NA-ON",
+        "NA-OT",
+        "NA-OD",
+        "NA-CA",
+        "NR",
+        "NR-01",
+        "NR-02",
+        "NR-03",
+        "NR-04",
+        "NR-05",
+        "NR-06",
+        "NR-07",
+        "NR-08",
+        "NR-09",
+        "NR-10",
+        "NR-11",
+        "NR-12",
+        "NR-13",
+        "NR-14",
+        "NP",
+        "NP-1",
+        "NP-4",
+        "NP-5",
+        "NP-2",
+        "NP-3",
+        "NL",
+        "NL-DR",
+        "NL-FL",
+        "NL-FR",
+        "NL-GE",
+        "NL-GR",
+        "NL-LI",
+        "NL-NB",
+        "NL-NH",
+        "NL-OV",
+        "NL-ZH",
+        "NL-UT",
+        "NL-ZE",
+        "NC",
+        "NZ",
+        "NZ-AUK",
+        "NZ-BOP",
+        "NZ-CAN",
+        "NZ-CIT",
+        "NZ-GIS",
+        "NZ-HKB",
+        "NZ-MWT",
+        "NZ-MBH",
+        "NZ-NSN",
+        "NZ-NTL",
+        "NZ-OTA",
+        "NZ-STL",
+        "NZ-TKI",
+        "NZ-TAS",
+        "NZ-WKO",
+        "NZ-WGN",
+        "NZ-WTC",
+        "NI",
+        "NI-AN",
+        "NI-AS",
+        "NI-BO",
+        "NI-CA",
+        "NI-CI",
+        "NI-CO",
+        "NI-ES",
+        "NI-GR",
+        "NI-JI",
+        "NI-LE",
+        "NI-MD",
+        "NI-MN",
+        "NI-MS",
+        "NI-MT",
+        "NI-NS",
+        "NI-SJ",
+        "NI-RI",
+        "NE",
+        "NE-1",
+        "NE-2",
+        "NE-3",
+        "NE-4",
+        "NE-8",
+        "NE-5",
+        "NE-6",
+        "NE-7",
+        "NG",
+        "NG-AB",
+        "NG-AD",
+        "NG-AK",
+        "NG-AN",
+        "NG-BA",
+        "NG-BY",
+        "NG-BE",
+        "NG-BO",
+        "NG-CR",
+        "NG-DE",
+        "NG-EB",
+        "NG-ED",
+        "NG-EK",
+        "NG-EN",
+        "NG-FC",
+        "NG-GO",
+        "NG-IM",
+        "NG-JI",
+        "NG-KD",
+        "NG-KN",
+        "NG-KT",
+        "NG-KE",
+        "NG-KO",
+        "NG-KW",
+        "NG-LA",
+        "NG-NA",
+        "NG-NI",
+        "NG-OG",
+        "NG-ON",
+        "NG-OS",
+        "NG-OY",
+        "NG-PL",
+        "NG-RI",
+        "NG-SO",
+        "NG-TA",
+        "NG-YO",
+        "NG-ZA",
+        "NU",
+        "NU-TOI",
+        "NF",
+        "KP",
+        "KP-04",
+        "KP-07",
+        "KP-09",
+        "KP-06",
+        "KP-03",
+        "KP-01",
+        "KP-13",
+        "KP-10",
+        "KP-08",
+        "KP-05",
+        "KP-02",
+        "MK",
+        "MK-07",
+        "MK-08",
+        "MK-78",
+        "MK-80",
+        "MK-23",
+        "MK-26",
+        "MK-19",
+        "MK-51",
+        "MK-53",
+        "MK-02",
+        "MK-03",
+        "MK-04",
+        "MK-05",
+        "MK-06",
+        "MK-81",
+        "MK-82",
+        "MK-21",
+        "MK-22",
+        "MK-25",
+        "MK-24",
+        "MK-27",
+        "MK-18",
+        "MK-20",
+        "MK-34",
+        "MK-35",
+        "MK-37",
+        "MK-36",
+        "MK-40",
+        "MK-42",
+        "MK-41",
+        "MK-43",
+        "MK-44",
+        "MK-45",
+        "MK-46",
+        "MK-47",
+        "MK-48",
+        "MK-49",
+        "MK-52",
+        "MK-50",
+        "MK-54",
+        "MK-55",
+        "MK-56",
+        "MK-60",
+        "MK-59",
+        "MK-61",
+        "MK-62",
+        "MK-65",
+        "MK-66",
+        "MK-67",
+        "MK-83",
+        "MK-70",
+        "MK-72",
+        "MK-11",
+        "MK-13",
+        "MK-12",
+        "MK-14",
+        "MK-31",
+        "MK-30",
+        "MK-33",
+        "MK-58",
+        "MK-63",
+        "MK-64",
+        "MK-85",
+        "MK-71",
+        "MK-73",
+        "MK-74",
+        "MK-69",
+        "MK-75",
+        "MK-76",
+        "MK-10",
+        "MK-16",
+        "MK-32",
+        "MP",
+        "NO",
+        "NO-02",
+        "NO-09",
+        "NO-06",
+        "NO-20",
+        "NO-04",
+        "NO-12",
+        "NO-15",
+        "NO-17",
+        "NO-18",
+        "NO-05",
+        "NO-03",
+        "NO-01",
+        "NO-11",
+        "NO-14",
+        "NO-16",
+        "NO-08",
+        "NO-19",
+        "NO-10",
+        "NO-07",
+        "OM",
+        "OM-DA",
+        "OM-ZA",
+        "OM-BS",
+        "OM-BJ",
+        "OM-BU",
+        "OM-WU",
+        "OM-SS",
+        "OM-SJ",
+        "OM-ZU",
+        "OM-MU",
+        "OM-MA",
+        "PK",
+        "PK-JK",
+        "PK-BA",
+        "PK-TA",
+        "PK-GB",
+        "PK-IS",
+        "PK-KP",
+        "PK-PB",
+        "PK-SD",
+        "PW",
+        "PW-002",
+        "PW-004",
+        "PW-010",
+        "PW-050",
+        "PW-100",
+        "PW-150",
+        "PW-212",
+        "PW-214",
+        "PW-218",
+        "PW-222",
+        "PW-227",
+        "PW-224",
+        "PW-226",
+        "PW-228",
+        "PW-350",
+        "PW-370",
+        "PS",
+        "PA",
+        "PA-1",
+        "PA-4",
+        "PA-2",
+        "PA-3",
+        "PA-5",
+        "PA-EM",
+        "PA-KY",
+        "PA-6",
+        "PA-7",
+        "PA-NB",
+        "PA-8",
+        "PA-9",
+        "PG",
+        "PG-NSB",
+        "PG-CPM",
+        "PG-CPK",
+        "PG-EBR",
+        "PG-ESW",
+        "PG-EHG",
+        "PG-EPW",
+        "PG-GPK",
+        "PG-JWK",
+        "PG-MPM",
+        "PG-MRL",
+        "PG-MBA",
+        "PG-MPL",
+        "PG-NCD",
+        "PG-NIK",
+        "PG-NPP",
+        "PG-SHM",
+        "PG-WBK",
+        "PG-SAN",
+        "PG-WHM",
+        "PG-WPD",
+        "PY",
+        "PY-16",
+        "PY-10",
+        "PY-13",
+        "PY-ASU",
+        "PY-19",
+        "PY-5",
+        "PY-6",
+        "PY-14",
+        "PY-11",
+        "PY-1",
+        "PY-3",
+        "PY-4",
+        "PY-7",
+        "PY-8",
+        "PY-12",
+        "PY-9",
+        "PY-15",
+        "PY-2",
+        "PE",
+        "PE-AMA",
+        "PE-ANC",
+        "PE-APU",
+        "PE-ARE",
+        "PE-AYA",
+        "PE-CAJ",
+        "PE-CAL",
+        "PE-CUS",
+        "PE-HUV",
+        "PE-HUC",
+        "PE-ICA",
+        "PE-JUN",
+        "PE-LAL",
+        "PE-LAM",
+        "PE-LIM",
+        "PE-LOR",
+        "PE-MDD",
+        "PE-MOQ",
+        "PE-PAS",
+        "PE-PIU",
+        "PE-PUN",
+        "PE-SAM",
+        "PE-TAC",
+        "PE-TUM",
+        "PE-UCA",
+        "PH",
+        "PH-14",
+        "PH-05",
+        "PH-02",
+        "PH-40",
+        "PH-13",
+        "PH-03",
+        "PH-07",
+        "PH-15",
+        "PH-11",
+        "PH-08",
+        "PH-01",
+        "PH-00",
+        "PH-41",
+        "PH-10",
+        "PH-12",
+        "PH-06",
+        "PH-09",
+        "PN",
+        "PL",
+        "PL-WP",
+        "PL-KP",
+        "PL-MA",
+        "PL-LD",
+        "PL-DS",
+        "PL-LU",
+        "PL-LB",
+        "PL-MZ",
+        "PL-OP",
+        "PL-PK",
+        "PL-PD",
+        "PL-PM",
+        "PL-SL",
+        "PL-SK",
+        "PL-WN",
+        "PL-ZP",
+        "PT",
+        "PT-01",
+        "PT-20",
+        "PT-02",
+        "PT-03",
+        "PT-04",
+        "PT-05",
+        "PT-06",
+        "PT-07",
+        "PT-08",
+        "PT-09",
+        "PT-10",
+        "PT-11",
+        "PT-30",
+        "PT-12",
+        "PT-13",
+        "PT-14",
+        "PT-15",
+        "PT-16",
+        "PT-17",
+        "PT-18",
+        "PR",
+        "QA",
+        "QA-ZA",
+        "QA-KH",
+        "QA-RA",
+        "QA-WA",
+        "QA-DA",
+        "QA-MS",
+        "QA-US",
+        "RE",
+        "RO",
+        "RO-AB",
+        "RO-AR",
+        "RO-AG",
+        "RO-BC",
+        "RO-BH",
+        "RO-BN",
+        "RO-BT",
+        "RO-BR",
+        "RO-BV",
+        "RO-B",
+        "RO-BZ",
+        "RO-CL",
+        "RO-CS",
+        "RO-CJ",
+        "RO-CT",
+        "RO-CV",
+        "RO-DB",
+        "RO-DJ",
+        "RO-GL",
+        "RO-GR",
+        "RO-GJ",
+        "RO-HR",
+        "RO-HD",
+        "RO-IL",
+        "RO-IS",
+        "RO-IF",
+        "RO-MM",
+        "RO-MH",
+        "RO-MS",
+        "RO-NT",
+        "RO-OT",
+        "RO-PH",
+        "RO-SJ",
+        "RO-SM",
+        "RO-SB",
+        "RO-SV",
+        "RO-TR",
+        "RO-TM",
+        "RO-TL",
+        "RO-VL",
+        "RO-VS",
+        "RO-VN",
+        "RU",
+        "RU-AD",
+        "RU-ALT",
+        "RU-AL",
+        "RU-AMU",
+        "RU-ARK",
+        "RU-AST",
+        "RU-BEL",
+        "RU-BRY",
+        "RU-BU",
+        "RU-CE",
+        "RU-CHE",
+        "RU-CHU",
+        "RU-CU",
+        "RU-DA",
+        "RU-IN",
+        "RU-IRK",
+        "RU-IVA",
+        "RU-YEV",
+        "RU-KB",
+        "RU-KGD",
+        "RU-KL",
+        "RU-KLU",
+        "RU-KAM",
+        "RU-KC",
+        "RU-KEM",
+        "RU-KHA",
+        "RU-KHM",
+        "RU-KIR",
+        "RU-KO",
+        "RU-KOS",
+        "RU-KDA",
+        "RU-KYA",
+        "RU-KGN",
+        "RU-KRS",
+        "RU-LEN",
+        "RU-LIP",
+        "RU-MAG",
+        "RU-ME",
+        "RU-MO",
+        "RU-MOW",
+        "RU-MOS",
+        "RU-MUR",
+        "RU-NEN",
+        "RU-NIZ",
+        "RU-SE",
+        "RU-NGR",
+        "RU-NVS",
+        "RU-OMS",
+        "RU-ORE",
+        "RU-ORL",
+        "RU-PNZ",
+        "RU-PER",
+        "RU-PRI",
+        "RU-PSK",
+        "RU-BA",
+        "RU-KR",
+        "RU-KK",
+        "RU-ROS",
+        "RU-RYA",
+        "RU-SPE",
+        "RU-SA",
+        "RU-SAK",
+        "RU-SAM",
+        "RU-SAR",
+        "RU-SMO",
+        "RU-STA",
+        "RU-SVE",
+        "RU-TAM",
+        "RU-TA",
+        "RU-TOM",
+        "RU-TUL",
+        "RU-TY",
+        "RU-TVE",
+        "RU-TYU",
+        "RU-UD",
+        "RU-ULY",
+        "RU-VLA",
+        "RU-VGG",
+        "RU-VLG",
+        "RU-VOR",
+        "RU-YAN",
+        "RU-YAR",
+        "RU-ZAB",
+        "RW",
+        "RW-02",
+        "RW-01",
+        "RW-03",
+        "RW-05",
+        "RW-04",
+        "WS",
+        "WS-AA",
+        "WS-AL",
+        "WS-AT",
+        "WS-FA",
+        "WS-GE",
+        "WS-GI",
+        "WS-PA",
+        "WS-SA",
+        "WS-TU",
+        "WS-VF",
+        "WS-VS",
+        "SM",
+        "SM-01",
+        "SM-06",
+        "SM-02",
+        "SM-03",
+        "SM-04",
+        "SM-05",
+        "SM-08",
+        "SM-07",
+        "SM-09",
+        "ST",
+        "ST-P",
+        "ST-S",
+        "SA",
+        "SA-11",
+        "SA-12",
+        "SA-03",
+        "SA-05",
+        "SA-14",
+        "SA-04",
+        "SA-06",
+        "SA-09",
+        "SA-02",
+        "SA-10",
+        "SA-08",
+        "SA-01",
+        "SA-07",
+        "SN",
+        "SN-DK",
+        "SN-DB",
+        "SN-FK",
+        "SN-KA",
+        "SN-KL",
+        "SN-KE",
+        "SN-KD",
+        "SN-LG",
+        "SN-MT",
+        "SN-SL",
+        "SN-SE",
+        "SN-TC",
+        "SN-TH",
+        "SN-ZG",
+        "RS",
+        "RS-VO",
+        "SC",
+        "SC-01",
+        "SC-02",
+        "SC-03",
+        "SC-05",
+        "SC-04",
+        "SC-06",
+        "SC-07",
+        "SC-08",
+        "SC-09",
+        "SC-10",
+        "SC-11",
+        "SC-12",
+        "SC-13",
+        "SC-14",
+        "SC-15",
+        "SC-16",
+        "SC-24",
+        "SC-17",
+        "SC-18",
+        "SC-19",
+        "SC-20",
+        "SC-21",
+        "SC-25",
+        "SC-22",
+        "SC-23",
+        "SL",
+        "SL-E",
+        "SL-N",
+        "SL-S",
+        "SL-W",
+        "SG",
+        "SX",
+        "SK",
+        "SK-BC",
+        "SK-BL",
+        "SK-KI",
+        "SK-NI",
+        "SK-PV",
+        "SK-TC",
+        "SK-TA",
+        "SK-ZI",
+        "SI",
+        "SB",
+        "SB-CT",
+        "SB-CE",
+        "SB-CH",
+        "SB-GU",
+        "SB-IS",
+        "SB-MK",
+        "SB-ML",
+        "SB-RB",
+        "SB-TE",
+        "SB-WE",
+        "SO",
+        "SO-AW",
+        "SO-BK",
+        "SO-BN",
+        "SO-BR",
+        "SO-BY",
+        "SO-GA",
+        "SO-GE",
+        "SO-HI",
+        "SO-JD",
+        "SO-JH",
+        "SO-MU",
+        "SO-NU",
+        "SO-SA",
+        "SO-SD",
+        "SO-SH",
+        "SO-SO",
+        "SO-TO",
+        "SO-WO",
+        "ZA",
+        "ZA-EC",
+        "ZA-FS",
+        "ZA-GT",
+        "ZA-NL",
+        "ZA-LP",
+        "ZA-MP",
+        "ZA-NW",
+        "ZA-NC",
+        "ZA-WC",
+        "GS",
+        "KR",
+        "KR-26",
+        "KR-43",
+        "KR-44",
+        "KR-27",
+        "KR-30",
+        "KR-42",
+        "KR-29",
+        "KR-41",
+        "KR-47",
+        "KR-48",
+        "KR-28",
+        "KR-49",
+        "KR-45",
+        "KR-46",
+        "KR-11",
+        "KR-31",
+        "SS",
+        "SS-UY",
+        "SS-LK",
+        "SS-EC",
+        "SS-EE",
+        "SS-JG",
+        "SS-BN",
+        "SS-NU",
+        "SS-WR",
+        "SS-BW",
+        "SS-EW",
+        "ES",
+        "ES-AN",
+        "ES-AR",
+        "ES-AS",
+        "ES-IB",
+        "ES-PV",
+        "ES-CN",
+        "ES-CB",
+        "ES-CL",
+        "ES-CM",
+        "ES-CT",
+        "ES-CE",
+        "ES-MD",
+        "ES-EX",
+        "ES-GA",
+        "ES-RI",
+        "ES-ML",
+        "ES-NC",
+        "ES-MC",
+        "ES-VC",
+        "LK",
+        "LK-2",
+        "LK-5",
+        "LK-7",
+        "LK-6",
+        "LK-4",
+        "LK-9",
+        "LK-3",
+        "LK-8",
+        "LK-1",
+        "BL",
+        "SH",
+        "SH-AC",
+        "SH-HL",
+        "SH-TA",
+        "KN",
+        "KN-01",
+        "KN-02",
+        "KN-03",
+        "KN-04",
+        "KN-05",
+        "KN-06",
+        "KN-07",
+        "KN-08",
+        "KN-09",
+        "KN-10",
+        "KN-11",
+        "KN-12",
+        "KN-13",
+        "KN-15",
+        "LC",
+        "LC-01",
+        "LC-02",
+        "LC-03",
+        "LC-04",
+        "LC-05",
+        "LC-06",
+        "LC-07",
+        "LC-08",
+        "LC-09",
+        "LC-10",
+        "LC-11",
+        "MF",
+        "PM",
+        "VC",
+        "VC-01",
+        "VC-06",
+        "VC-02",
+        "VC-03",
+        "VC-04",
+        "VC-05",
+        "SD",
+        "SD-GZ",
+        "SD-GD",
+        "SD-NB",
+        "SD-DW",
+        "SD-DS",
+        "SD-KA",
+        "SD-KH",
+        "SD-KN",
+        "SD-NO",
+        "SD-RS",
+        "SD-NR",
+        "SD-SI",
+        "SD-DN",
+        "SD-KS",
+        "SD-NW",
+        "SR",
+        "SR-BR",
+        "SR-CM",
+        "SR-CR",
+        "SR-MA",
+        "SR-NI",
+        "SR-PR",
+        "SR-PM",
+        "SR-SA",
+        "SR-SI",
+        "SR-WA",
+        "SJ",
+        "SE",
+        "SE-K",
+        "SE-W",
+        "SE-X",
+        "SE-I",
+        "SE-N",
+        "SE-Z",
+        "SE-F",
+        "SE-H",
+        "SE-G",
+        "SE-BD",
+        "SE-T",
+        "SE-E",
+        "SE-M",
+        "SE-D",
+        "SE-AB",
+        "SE-C",
+        "SE-S",
+        "SE-AC",
+        "SE-Y",
+        "SE-U",
+        "SE-O",
+        "CH",
+        "CH-AG",
+        "CH-AI",
+        "CH-AR",
+        "CH-BL",
+        "CH-BS",
+        "CH-BE",
+        "CH-FR",
+        "CH-GL",
+        "CH-JU",
+        "CH-NE",
+        "CH-OW",
+        "CH-SH",
+        "CH-SZ",
+        "CH-SO",
+        "CH-UR",
+        "CH-ZG",
+        "CH-GE",
+        "CH-GR",
+        "CH-LU",
+        "CH-NW",
+        "CH-SG",
+        "CH-TG",
+        "CH-TI",
+        "CH-VS",
+        "CH-VD",
+        "CH-ZH",
+        "SY",
+        "SY-HA",
+        "SY-HL",
+        "SY-RA",
+        "SY-SU",
+        "SY-DI",
+        "SY-DR",
+        "SY-DY",
+        "SY-HM",
+        "SY-HI",
+        "SY-ID",
+        "SY-LA",
+        "SY-QU",
+        "SY-RD",
+        "SY-TA",
+        "TW",
+        "TW-KHH",
+        "TW-TPQ",
+        "TW-TXG",
+        "TW-TNN",
+        "TW-TPE",
+        "TW-TAO",
+        "TJ",
+        "TJ-RR",
+        "TJ-GB",
+        "TJ-KT",
+        "TJ-SU",
+        "TZ",
+        "TZ-01",
+        "TZ-03",
+        "TZ-04",
+        "TZ-05",
+        "TZ-08",
+        "TZ-09",
+        "TZ-12",
+        "TZ-26",
+        "TZ-13",
+        "TZ-14",
+        "TZ-16",
+        "TZ-17",
+        "TZ-18",
+        "TZ-06",
+        "TZ-10",
+        "TZ-19",
+        "TZ-20",
+        "TZ-21",
+        "TZ-22",
+        "TZ-23",
+        "TZ-24",
+        "TZ-25",
+        "TZ-11",
+        "TZ-07",
+        "TZ-15",
+        "TH",
+        "TH-37",
+        "TH-15",
+        "TH-10",
+        "TH-38",
+        "TH-31",
+        "TH-24",
+        "TH-18",
+        "TH-36",
+        "TH-22",
+        "TH-50",
+        "TH-57",
+        "TH-20",
+        "TH-86",
+        "TH-46",
+        "TH-62",
+        "TH-71",
+        "TH-40",
+        "TH-81",
+        "TH-52",
+        "TH-51",
+        "TH-42",
+        "TH-16",
+        "TH-58",
+        "TH-44",
+        "TH-49",
+        "TH-26",
+        "TH-73",
+        "TH-48",
+        "TH-30",
+        "TH-60",
+        "TH-80",
+        "TH-55",
+        "TH-96",
+        "TH-39",
+        "TH-43",
+        "TH-12",
+        "TH-13",
+        "TH-94",
+        "TH-82",
+        "TH-93",
+        "TH-56",
+        "TH-67",
+        "TH-76",
+        "TH-66",
+        "TH-65",
+        "TH-14",
+        "TH-54",
+        "TH-83",
+        "TH-25",
+        "TH-77",
+        "TH-85",
+        "TH-70",
+        "TH-21",
+        "TH-45",
+        "TH-27",
+        "TH-47",
+        "TH-11",
+        "TH-74",
+        "TH-75",
+        "TH-19",
+        "TH-91",
+        "TH-33",
+        "TH-17",
+        "TH-90",
+        "TH-64",
+        "TH-72",
+        "TH-84",
+        "TH-32",
+        "TH-63",
+        "TH-92",
+        "TH-23",
+        "TH-34",
+        "TH-41",
+        "TH-61",
+        "TH-53",
+        "TH-95",
+        "TH-35",
+        "TL",
+        "TL-AL",
+        "TL-AN",
+        "TL-BA",
+        "TL-BO",
+        "TL-CO",
+        "TL-DI",
+        "TL-ER",
+        "TL-LA",
+        "TL-LI",
+        "TL-MT",
+        "TL-MF",
+        "TL-OE",
+        "TL-VI",
+        "TG",
+        "TG-C",
+        "TG-K",
+        "TG-M",
+        "TG-P",
+        "TG-S",
+        "TK",
+        "TO",
+        "TO-01",
+        "TO-02",
+        "TO-03",
+        "TO-04",
+        "TO-05",
+        "TT",
+        "TT-ARI",
+        "TT-CHA",
+        "TT-CTT",
+        "TT-DMN",
+        "TT-ETO",
+        "TT-PED",
+        "TT-PTF",
+        "TT-POS",
+        "TT-PRT",
+        "TT-RCM",
+        "TT-SFO",
+        "TT-SJL",
+        "TT-SGE",
+        "TT-SIP",
+        "TT-TUP",
+        "TT-WTO",
+        "TN",
+        "TN-12",
+        "TN-31",
+        "TN-13",
+        "TN-23",
+        "TN-81",
+        "TN-71",
+        "TN-32",
+        "TN-41",
+        "TN-42",
+        "TN-73",
+        "TN-33",
+        "TN-14",
+        "TN-53",
+        "TN-82",
+        "TN-52",
+        "TN-21",
+        "TN-61",
+        "TN-43",
+        "TN-34",
+        "TN-51",
+        "TN-83",
+        "TN-72",
+        "TN-11",
+        "TN-22",
+        "TR",
+        "TR-01",
+        "TR-02",
+        "TR-03",
+        "TR-04",
+        "TR-68",
+        "TR-05",
+        "TR-06",
+        "TR-07",
+        "TR-75",
+        "TR-08",
+        "TR-09",
+        "TR-10",
+        "TR-74",
+        "TR-72",
+        "TR-69",
+        "TR-11",
+        "TR-12",
+        "TR-13",
+        "TR-14",
+        "TR-15",
+        "TR-16",
+        "TR-17",
+        "TR-18",
+        "TR-19",
+        "TR-20",
+        "TR-21",
+        "TR-81",
+        "TR-22",
+        "TR-23",
+        "TR-24",
+        "TR-25",
+        "TR-26",
+        "TR-27",
+        "TR-28",
+        "TR-29",
+        "TR-30",
+        "TR-31",
+        "TR-76",
+        "TR-32",
+        "TR-34",
+        "TR-35",
+        "TR-46",
+        "TR-78",
+        "TR-70",
+        "TR-36",
+        "TR-37",
+        "TR-38",
+        "TR-79",
+        "TR-71",
+        "TR-39",
+        "TR-40",
+        "TR-41",
+        "TR-42",
+        "TR-43",
+        "TR-44",
+        "TR-45",
+        "TR-47",
+        "TR-33",
+        "TR-48",
+        "TR-49",
+        "TR-50",
+        "TR-51",
+        "TR-52",
+        "TR-80",
+        "TR-53",
+        "TR-54",
+        "TR-55",
+        "TR-63",
+        "TR-56",
+        "TR-57",
+        "TR-58",
+        "TR-73",
+        "TR-59",
+        "TR-60",
+        "TR-61",
+        "TR-62",
+        "TR-64",
+        "TR-65",
+        "TR-77",
+        "TR-66",
+        "TR-67",
+        "TM",
+        "TM-A",
+        "TM-S",
+        "TM-B",
+        "TM-D",
+        "TM-L",
+        "TM-M",
+        "TC",
+        "TV",
+        "TV-FUN",
+        "TV-NMG",
+        "TV-NMA",
+        "TV-NIT",
+        "TV-NIU",
+        "TV-NKF",
+        "TV-NKL",
+        "TV-VAI",
+        "UM",
+        "VI",
+        "UG",
+        "UG-C",
+        "UG-E",
+        "UG-N",
+        "UG-W",
+        "UA",
+        "UA-71",
+        "UA-74",
+        "UA-77",
+        "UA-43",
+        "UA-12",
+        "UA-14",
+        "UA-26",
+        "UA-63",
+        "UA-65",
+        "UA-68",
+        "UA-35",
+        "UA-30",
+        "UA-32",
+        "UA-09",
+        "UA-46",
+        "UA-48",
+        "UA-51",
+        "UA-53",
+        "UA-56",
+        "UA-40",
+        "UA-59",
+        "UA-61",
+        "UA-05",
+        "UA-07",
+        "UA-21",
+        "UA-23",
+        "UA-18",
+        "AE",
+        "AE-AZ",
+        "AE-AJ",
+        "AE-DU",
+        "AE-FU",
+        "AE-RK",
+        "AE-SH",
+        "AE-UQ",
+        "GB",
+        "GB-ENG",
+        "GB-NIR",
+        "GB-SCT",
+        "GB-WLS",
+        "US",
+        "US-AL",
+        [
+          "630",
+          "Birmingham AL"
+        ],
+        [
+          "522",
+          "Columbus GA"
+        ],
+        [
+          "606",
+          "Dothan AL"
+        ],
+        [
+          "691",
+          "Huntsville-Decatur (Florence) AL"
+        ],
+        [
+          "711",
+          "Meridian MS"
+        ],
+        [
+          "686",
+          "Mobile AL-Pensacola (Ft. Walton Beach) FL"
+        ],
+        [
+          "698",
+          "Montgomery (Selma) AL"
+        ],
+        "US-AK",
+        [
+          "743",
+          "Anchorage AK"
+        ],
+        [
+          "745",
+          "Fairbanks AK"
+        ],
+        [
+          "747",
+          "Juneau AK"
+        ],
+        "US-AZ",
+        [
+          "753",
+          "Phoenix AZ"
+        ],
+        [
+          "789",
+          "Tucson (Sierra Vista) AZ"
+        ],
+        [
+          "771",
+          "Yuma AZ-El Centro CA"
+        ],
+        "US-AR",
+        [
+          "670",
+          "Ft. Smith-Fayetteville-Springdale-Rogers AR"
+        ],
+        [
+          "734",
+          "Jonesboro AR"
+        ],
+        [
+          "693",
+          "Little Rock-Pine Bluff AR"
+        ],
+        [
+          "640",
+          "Memphis TN"
+        ],
+        [
+          "628",
+          "Monroe LA-El Dorado AR"
+        ],
+        [
+          "612",
+          "Shreveport LA"
+        ],
+        [
+          "619",
+          "Springfield MO"
+        ],
+        "US-CA",
+        [
+          "800",
+          "Bakersfield CA"
+        ],
+        [
+          "868",
+          "Chico-Redding CA"
+        ],
+        [
+          "802",
+          "Eureka CA"
+        ],
+        [
+          "866",
+          "Fresno-Visalia CA"
+        ],
+        [
+          "803",
+          "Los Angeles CA"
+        ],
+        [
+          "813",
+          "Medford-Klamath Falls OR"
+        ],
+        [
+          "828",
+          "Monterey-Salinas CA"
+        ],
+        [
+          "804",
+          "Palm Springs CA"
+        ],
+        [
+          "811",
+          "Reno NV"
+        ],
+        [
+          "862",
+          "Sacramento-Stockton-Modesto CA"
+        ],
+        [
+          "825",
+          "San Diego CA"
+        ],
+        [
+          "807",
+          "San Francisco-Oakland-San Jose CA"
+        ],
+        [
+          "855",
+          "Santa Barbara-Santa Maria-San Luis Obispo CA"
+        ],
+        "US-CO",
+        [
+          "752",
+          "Colorado Springs-Pueblo CO"
+        ],
+        [
+          "751",
+          "Denver CO"
+        ],
+        [
+          "773",
+          "Grand Junction-Montrose CO"
+        ],
+        "US-CT",
+        [
+          "533",
+          "Hartford & New Haven CT"
+        ],
+        "US-DE",
+        [
+          "504",
+          "Philadelphia PA"
+        ],
+        [
+          "576",
+          "Salisbury MD"
+        ],
+        "US-DC",
+        "US-FL",
+        [
+          "571",
+          "Ft. Myers-Naples FL"
+        ],
+        [
+          "592",
+          "Gainesville FL"
+        ],
+        [
+          "561",
+          "Jacksonville FL"
+        ],
+        [
+          "528",
+          "Miami-Ft. Lauderdale FL"
+        ],
+        [
+          "534",
+          "Orlando-Daytona Beach-Melbourne FL"
+        ],
+        [
+          "656",
+          "Panama City FL"
+        ],
+        [
+          "530",
+          "Tallahassee FL-Thomasville GA"
+        ],
+        [
+          "539",
+          "Tampa-St. Petersburg (Sarasota) FL"
+        ],
+        [
+          "548",
+          "West Palm Beach-Ft. Pierce FL"
+        ],
+        "US-GA",
+        [
+          "525",
+          "Albany GA"
+        ],
+        [
+          "524",
+          "Atlanta GA"
+        ],
+        [
+          "520",
+          "Augusta GA"
+        ],
+        [
+          "575",
+          "Chattanooga TN"
+        ],
+        [
+          "503",
+          "Macon GA"
+        ],
+        [
+          "507",
+          "Savannah GA"
+        ],
+        "US-HI",
+        [
+          "744",
+          "Honolulu HI"
+        ],
+        "US-ID",
+        [
+          "757",
+          "Boise ID"
+        ],
+        [
+          "758",
+          "Idaho Falls-Pocatello ID"
+        ],
+        [
+          "881",
+          "Spokane WA"
+        ],
+        [
+          "760",
+          "Twin Falls ID"
+        ],
+        "US-IL",
+        [
+          "648",
+          "Champaign & Springfield-Decatur IL"
+        ],
+        [
+          "602",
+          "Chicago IL"
+        ],
+        [
+          "682",
+          "Davenport IA-Rock Island-Moline IL"
+        ],
+        [
+          "649",
+          "Evansville IN"
+        ],
+        [
+          "632",
+          "Paducah KY-Cape Girardeau MO-Harrisburg-Mount Vernon IL"
+        ],
+        [
+          "675",
+          "Peoria-Bloomington IL"
+        ],
+        [
+          "717",
+          "Quincy IL-Hannibal MO-Keokuk IA"
+        ],
+        [
+          "610",
+          "Rockford IL"
+        ],
+        [
+          "609",
+          "St. Louis MO"
+        ],
+        [
+          "581",
+          "Terre Haute IN"
+        ],
+        "US-IN",
+        [
+          "515",
+          "Cincinnati OH"
+        ],
+        [
+          "509",
+          "Ft. Wayne IN"
+        ],
+        [
+          "527",
+          "Indianapolis IN"
+        ],
+        [
+          "582",
+          "Lafayette IN"
+        ],
+        [
+          "529",
+          "Louisville KY"
+        ],
+        [
+          "588",
+          "South Bend-Elkhart IN"
+        ],
+        "US-IA",
+        [
+          "637",
+          "Cedar Rapids-Waterloo-Iowa City & Dubuque IA"
+        ],
+        [
+          "679",
+          "Des Moines-Ames IA"
+        ],
+        [
+          "652",
+          "Omaha NE"
+        ],
+        [
+          "631",
+          "Ottumwa IA-Kirksville MO"
+        ],
+        [
+          "611",
+          "Rochester MN-Mason City IA-Austin MN"
+        ],
+        [
+          "624",
+          "Sioux City IA"
+        ],
+        "US-KS",
+        [
+          "603",
+          "Joplin MO-Pittsburg KS"
+        ],
+        [
+          "616",
+          "Kansas City MO"
+        ],
+        [
+          "638",
+          "St. Joseph MO"
+        ],
+        [
+          "605",
+          "Topeka KS"
+        ],
+        [
+          "678",
+          "Wichita-Hutchinson KS"
+        ],
+        "US-KY",
+        [
+          "736",
+          "Bowling Green KY"
+        ],
+        [
+          "564",
+          "Charleston-Huntington WV"
+        ],
+        [
+          "557",
+          "Knoxville TN"
+        ],
+        [
+          "541",
+          "Lexington KY"
+        ],
+        [
+          "659",
+          "Nashville TN"
+        ],
+        [
+          "531",
+          "Tri-Cities TN-VA"
+        ],
+        "US-LA",
+        [
+          "644",
+          "Alexandria LA"
+        ],
+        [
+          "716",
+          "Baton Rouge LA"
+        ],
+        [
+          "642",
+          "Lafayette LA"
+        ],
+        [
+          "643",
+          "Lake Charles LA"
+        ],
+        [
+          "622",
+          "New Orleans LA"
+        ],
+        "US-ME",
+        [
+          "537",
+          "Bangor ME"
+        ],
+        [
+          "500",
+          "Portland-Auburn ME"
+        ],
+        [
+          "552",
+          "Presque Isle ME"
+        ],
+        "US-MD",
+        [
+          "512",
+          "Baltimore MD"
+        ],
+        [
+          "511",
+          "Washington DC (Hagerstown MD)"
+        ],
+        "US-MA",
+        [
+          "506",
+          "Boston MA-Manchester NH"
+        ],
+        [
+          "521",
+          "Providence RI-New Bedford MA"
+        ],
+        [
+          "543",
+          "Springfield-Holyoke MA"
+        ],
+        "US-MI",
+        [
+          "583",
+          "Alpena MI"
+        ],
+        [
+          "505",
+          "Detroit MI"
+        ],
+        [
+          "513",
+          "Flint-Saginaw-Bay City MI"
+        ],
+        [
+          "563",
+          "Grand Rapids-Kalamazoo-Battle Creek MI"
+        ],
+        [
+          "551",
+          "Lansing MI"
+        ],
+        [
+          "553",
+          "Marquette MI"
+        ],
+        [
+          "547",
+          "Toledo OH"
+        ],
+        [
+          "540",
+          "Traverse City-Cadillac MI"
+        ],
+        "US-MN",
+        [
+          "676",
+          "Duluth MN-Superior WI"
+        ],
+        [
+          "724",
+          "Fargo-Valley City ND"
+        ],
+        [
+          "702",
+          "La Crosse-Eau Claire WI"
+        ],
+        [
+          "737",
+          "Mankato MN"
+        ],
+        [
+          "613",
+          "Minneapolis-St. Paul MN"
+        ],
+        "US-MS",
+        [
+          "746",
+          "Biloxi-Gulfport MS"
+        ],
+        [
+          "673",
+          "Columbus-Tupelo-West Point MS"
+        ],
+        [
+          "647",
+          "Greenwood-Greenville MS"
+        ],
+        [
+          "710",
+          "Hattiesburg-Laurel MS"
+        ],
+        [
+          "718",
+          "Jackson MS"
+        ],
+        "US-MO",
+        [
+          "604",
+          "Columbia-Jefferson City MO"
+        ],
+        "US-MT",
+        [
+          "756",
+          "Billings, MT"
+        ],
+        [
+          "754",
+          "Butte-Bozeman MT"
+        ],
+        [
+          "798",
+          "Glendive MT"
+        ],
+        [
+          "755",
+          "Great Falls MT"
+        ],
+        [
+          "766",
+          "Helena MT"
+        ],
+        [
+          "687",
+          "Minot-Bismarck-Dickinson(Williston) ND"
+        ],
+        [
+          "762",
+          "Missoula MT"
+        ],
+        "US-NE",
+        [
+          "759",
+          "Cheyenne WY-Scottsbluff NE"
+        ],
+        [
+          "722",
+          "Lincoln & Hastings-Kearney NE"
+        ],
+        [
+          "740",
+          "North Platte NE"
+        ],
+        [
+          "725",
+          "Sioux Falls(Mitchell) SD"
+        ],
+        "US-NV",
+        [
+          "839",
+          "Las Vegas NV"
+        ],
+        [
+          "770",
+          "Salt Lake City UT"
+        ],
+        "US-NH",
+        [
+          "523",
+          "Burlington VT-Plattsburgh NY"
+        ],
+        "US-NJ",
+        [
+          "501",
+          "New York NY"
+        ],
+        "US-NM",
+        [
+          "790",
+          "Albuquerque-Santa Fe NM"
+        ],
+        [
+          "634",
+          "Amarillo TX"
+        ],
+        [
+          "765",
+          "El Paso TX"
+        ],
+        "US-NY",
+        [
+          "532",
+          "Albany-Schenectady-Troy NY"
+        ],
+        [
+          "502",
+          "Binghamton NY"
+        ],
+        [
+          "514",
+          "Buffalo NY"
+        ],
+        [
+          "565",
+          "Elmira NY"
+        ],
+        [
+          "538",
+          "Rochester NY"
+        ],
+        [
+          "555",
+          "Syracuse NY"
+        ],
+        [
+          "526",
+          "Utica NY"
+        ],
+        [
+          "549",
+          "Watertown NY"
+        ],
+        "US-NC",
+        [
+          "517",
+          "Charlotte NC"
+        ],
+        [
+          "570",
+          "Florence-Myrtle Beach SC"
+        ],
+        [
+          "518",
+          "Greensboro-High Point-Winston Salem NC"
+        ],
+        [
+          "545",
+          "Greenville-New Bern-Washington NC"
+        ],
+        [
+          "567",
+          "Greenville-Spartanburg SC-Asheville NC-Anderson SC"
+        ],
+        [
+          "544",
+          "Norfolk-Portsmouth-Newport News VA"
+        ],
+        [
+          "560",
+          "Raleigh-Durham (Fayetteville) NC"
+        ],
+        [
+          "550",
+          "Wilmington NC"
+        ],
+        "US-ND",
+        "US-OH",
+        [
+          "510",
+          "Cleveland-Akron (Canton) OH"
+        ],
+        [
+          "535",
+          "Columbus OH"
+        ],
+        [
+          "542",
+          "Dayton OH"
+        ],
+        [
+          "558",
+          "Lima OH"
+        ],
+        [
+          "597",
+          "Parkersburg WV"
+        ],
+        [
+          "554",
+          "Wheeling WV-Steubenville OH"
+        ],
+        [
+          "536",
+          "Youngstown OH"
+        ],
+        [
+          "596",
+          "Zanesville OH"
+        ],
+        "US-OK",
+        [
+          "650",
+          "Oklahoma City OK"
+        ],
+        [
+          "657",
+          "Sherman TX-Ada OK"
+        ],
+        [
+          "671",
+          "Tulsa OK"
+        ],
+        [
+          "627",
+          "Wichita Falls TX & Lawton OK"
+        ],
+        "US-OR",
+        [
+          "821",
+          "Bend OR"
+        ],
+        [
+          "801",
+          "Eugene OR"
+        ],
+        [
+          "820",
+          "Portland OR"
+        ],
+        [
+          "810",
+          "Yakima-Pasco-Richland-Kennewick WA"
+        ],
+        "US-PA",
+        [
+          "516",
+          "Erie PA"
+        ],
+        [
+          "566",
+          "Harrisburg-Lancaster-Lebanon-York PA"
+        ],
+        [
+          "574",
+          "Johnstown-Altoona PA"
+        ],
+        [
+          "508",
+          "Pittsburgh PA"
+        ],
+        [
+          "577",
+          "Wilkes Barre-Scranton PA"
+        ],
+        "US-RI",
+        "US-SC",
+        [
+          "519",
+          "Charleston SC"
+        ],
+        [
+          "546",
+          "Columbia SC"
+        ],
+        "US-SD",
+        [
+          "764",
+          "Rapid City SD"
+        ],
+        "US-TN",
+        [
+          "639",
+          "Jackson TN"
+        ],
+        "US-TX",
+        [
+          "662",
+          "Abilene-Sweetwater TX"
+        ],
+        [
+          "635",
+          "Austin TX"
+        ],
+        [
+          "692",
+          "Beaumont-Port Arthur TX"
+        ],
+        [
+          "600",
+          "Corpus Christi TX"
+        ],
+        [
+          "623",
+          "Dallas-Ft. Worth TX"
+        ],
+        [
+          "636",
+          "Harlingen-Weslaco-Brownsville-McAllen TX"
+        ],
+        [
+          "618",
+          "Houston TX"
+        ],
+        [
+          "749",
+          "Laredo TX"
+        ],
+        [
+          "651",
+          "Lubbock TX"
+        ],
+        [
+          "633",
+          "Odessa-Midland TX"
+        ],
+        [
+          "661",
+          "San Angelo TX"
+        ],
+        [
+          "641",
+          "San Antonio TX"
+        ],
+        [
+          "709",
+          "Tyler-Longview(Lufkin & Nacogdoches) TX"
+        ],
+        [
+          "626",
+          "Victoria TX"
+        ],
+        [
+          "625",
+          "Waco-Temple-Bryan TX"
+        ],
+        "US-UT",
+        "US-VT",
+        "US-VA",
+        [
+          "559",
+          "Bluefield-Beckley-Oak Hill WV"
+        ],
+        [
+          "584",
+          "Charlottesville VA"
+        ],
+        [
+          "569",
+          "Harrisonburg VA"
+        ],
+        [
+          "556",
+          "Richmond-Petersburg VA"
+        ],
+        [
+          "573",
+          "Roanoke-Lynchburg VA"
+        ],
+        "US-WA",
+        [
+          "819",
+          "Seattle-Tacoma WA"
+        ],
+        "US-WV",
+        [
+          "598",
+          "Clarksburg-Weston WV"
+        ],
+        "US-WI",
+        [
+          "658",
+          "Green Bay-Appleton WI"
+        ],
+        [
+          "669",
+          "Madison WI"
+        ],
+        [
+          "617",
+          "Milwaukee WI"
+        ],
+        [
+          "705",
+          "Wausau-Rhinelander WI"
+        ],
+        "US-WY",
+        [
+          "767",
+          "Casper-Riverton WY"
+        ],
+        "UY",
+        "UY-AR",
+        "UY-CA",
+        "UY-CL",
+        "UY-CO",
+        "UY-DU",
+        "UY-FS",
+        "UY-FD",
+        "UY-LA",
+        "UY-MA",
+        "UY-MO",
+        "UY-PA",
+        "UY-RN",
+        "UY-RV",
+        "UY-RO",
+        "UY-SA",
+        "UY-SJ",
+        "UY-SO",
+        "UY-TA",
+        "UY-TT",
+        "UZ",
+        "UZ-AN",
+        "UZ-BU",
+        "UZ-FA",
+        "UZ-JI",
+        "UZ-QA",
+        "UZ-XO",
+        "UZ-NG",
+        "UZ-NW",
+        "UZ-QR",
+        "UZ-SA",
+        "UZ-SI",
+        "UZ-SU",
+        "UZ-TO",
+        "VU",
+        "VU-MAP",
+        "VU-PAM",
+        "VU-SAM",
+        "VU-SEE",
+        "VU-TAE",
+        "VU-TOB",
+        "VA",
+        "VE",
+        "VE-Z",
+        "VE-B",
+        "VE-C",
+        "VE-D",
+        "VE-E",
+        "VE-F",
+        "VE-A",
+        "VE-G",
+        "VE-H",
+        "VE-Y",
+        "VE-I",
+        "VE-W",
+        "VE-J",
+        "VE-K",
+        "VE-L",
+        "VE-M",
+        "VE-N",
+        "VE-O",
+        "VE-P",
+        "VE-R",
+        "VE-S",
+        "VE-T",
+        "VE-X",
+        "VE-U",
+        "VE-V",
+        "VN",
+        "VN-44",
+        "VN-43",
+        "VN-54",
+        "VN-53",
+        "VN-55",
+        "VN-56",
+        "VN-50",
+        "VN-31",
+        "VN-57",
+        "VN-58",
+        "VN-40",
+        "VN-59",
+        "VN-CT",
+        "VN-04",
+        "VN-DN",
+        "VN-33",
+        "VN-72",
+        "VN-71",
+        "VN-39",
+        "VN-45",
+        "VN-30",
+        "VN-03",
+        "VN-63",
+        "VN-23",
+        "VN-61",
+        "VN-HP",
+        "VN-HN",
+        "VN-73",
+        "VN-SG",
+        "VN-14",
+        "VN-66",
+        "VN-34",
+        "VN-47",
+        "VN-28",
+        "VN-01",
+        "VN-35",
+        "VN-09",
+        "VN-02",
+        "VN-41",
+        "VN-67",
+        "VN-22",
+        "VN-18",
+        "VN-36",
+        "VN-68",
+        "VN-32",
+        "VN-24",
+        "VN-27",
+        "VN-29",
+        "VN-13",
+        "VN-25",
+        "VN-52",
+        "VN-05",
+        "VN-37",
+        "VN-20",
+        "VN-69",
+        "VN-21",
+        "VN-26",
+        "VN-46",
+        "VN-51",
+        "VN-07",
+        "VN-49",
+        "VN-70",
+        "VN-06",
+        "WF",
+        "WF-ALO",
+        "EH",
+        "YE",
+        "YE-AM",
+        "YE-AB",
+        "YE-DA",
+        "YE-AD",
+        "YE-BA",
+        "YE-HU",
+        "YE-JA",
+        "YE-MR",
+        "YE-MW",
+        "YE-SA",
+        "YE-DH",
+        "YE-HD",
+        "YE-HJ",
+        "YE-IB",
+        "YE-LA",
+        "YE-MA",
+        "YE-RA",
+        "YE-SD",
+        "YE-SN",
+        "YE-SH",
+        "YE-TA",
+        "ZM",
+        "ZM-02",
+        "ZM-08",
+        "ZM-03",
+        "ZM-04",
+        "ZM-09",
+        "ZM-06",
+        "ZM-05",
+        "ZM-07",
+        "ZM-01",
+        "ZW",
+        "ZW-BU",
+        "ZW-HA",
+        "ZW-MA",
+        "ZW-MC",
+        "ZW-ME",
+        "ZW-MW",
+        "ZW-MV",
+        "ZW-MN",
+        "ZW-MS",
+        "ZW-MI"
+      ],
+      "description": "Parameter defines the location from where you want the search to originate. It defaults to `Worldwide` (activated when the value of geo parameter is not set or empty). Head to the Google Trends Locations for a full list of supported Google Trends locations.",
+      "group": "geographic_location"
+    },
+    "region": {
+      "type": "select",
+      "options": [
+        "COUNTRY",
+        "REGION",
+        "DMA",
+        "CITY"
+      ],
+      "description": "Parameter is used for getting more specific results when using \"Compared breakdown by region\" and \"Interest by region\" data_type charts. Other data_type charts do not accept region parameter. The default value depends on the geo location that is set. Available options: `COUNTRY` - Country `REGION` - Subregion `DMA` - Metro `CITY` - City Not all region options will return results for every geo location.",
+      "group": "geographic_location"
+    },
+    "data_type": {
+      "type": "select",
+      "options": [
+        "TIMESERIES",
+        "GEO_MAP",
+        "GEO_MAP_0",
+        "RELATED_TOPICS",
+        "RELATED_QUERIES"
+      ],
+      "description": "Parameter defines the type of search you want to do. Available options: `TIMESERIES` - Interest over time (default) - Accepts both single and multiple queries per search. `GEO_MAP` - Compared breakdown by region - Accepts only multiple queries per search. `GEO_MAP_0` - Interest by region - Accepts only single query per search. `RELATED_TOPICS` - Related topics - Accepts only single query per search. `RELATED_QUERIES` - Related queries - Accepts only single query per search.",
+      "group": "search_type"
+    },
+    "tz": {
+      "type": "number",
+      "description": "Parameter is used to define a time zone offset. The default value is set to `420` (Pacific Day Time(PDT): -07:00). Value is shown in minutes and can span from `-1439` to `1439`. tz can be calculated using the time difference between UTC +0 and desired timezone. Examples: `420` - PDT `600` - Pacific/Tahiti `-540` - Asia/Tokyo `-480` - Canada/Pacific. To make sure the value is correct, please refer to the time zone database and your programming language UTC offset calculation. You may visit the documentation to get more information.",
+      "group": "advanced_google_trends_parameters"
+    },
+    "cat": {
+      "type": "select",
+      "options": [
+        [
+          "0",
+          "All categories"
+        ],
+        [
+          "3",
+          "Arts & Entertainment"
+        ],
+        [
+          "5",
+          "Computers & Electronics"
+        ],
+        [
+          "7",
+          "Finance"
+        ],
+        [
+          "8",
+          "Games"
+        ],
+        [
+          "11",
+          "Home & Garden"
+        ],
+        [
+          "12",
+          "Business & Industrial"
+        ],
+        [
+          "13",
+          "Internet & Telecom"
+        ],
+        [
+          "14",
+          "People & Society"
+        ],
+        [
+          "16",
+          "News"
+        ],
+        [
+          "18",
+          "Shopping"
+        ],
+        [
+          "19",
+          "Law & Government"
+        ],
+        [
+          "20",
+          "Sports"
+        ],
+        [
+          "22",
+          "Books & Literature"
+        ],
+        [
+          "23",
+          "Performing Arts"
+        ],
+        [
+          "24",
+          "Visual Art & Design"
+        ],
+        [
+          "25",
+          "Advertising & Marketing"
+        ],
+        [
+          "28",
+          "Office Services"
+        ],
+        [
+          "29",
+          "Real Estate"
+        ],
+        [
+          "30",
+          "Computer Hardware"
+        ],
+        [
+          "31",
+          "Programming"
+        ],
+        [
+          "32",
+          "Software"
+        ],
+        [
+          "33",
+          "Offbeat"
+        ],
+        [
+          "34",
+          "Movies"
+        ],
+        [
+          "35",
+          "Music & Audio"
+        ],
+        [
+          "36",
+          "TV & Video"
+        ],
+        [
+          "37",
+          "Banking"
+        ],
+        [
+          "38",
+          "Insurance"
+        ],
+        [
+          "39",
+          "Card Games"
+        ],
+        [
+          "41",
+          "Computer & Video Games"
+        ],
+        [
+          "42",
+          "Jazz"
+        ],
+        [
+          "43",
+          "Online Goodies"
+        ],
+        [
+          "44",
+          "Beauty & Fitness"
+        ],
+        [
+          "45",
+          "Health"
+        ],
+        [
+          "46",
+          "Agriculture & Forestry"
+        ],
+        [
+          "47",
+          "Autos & Vehicles"
+        ],
+        [
+          "48",
+          "Construction & Maintenance"
+        ],
+        [
+          "49",
+          "Manufacturing"
+        ],
+        [
+          "50",
+          "Transportation & Logistics"
+        ],
+        [
+          "53",
+          "Web Hosting & Domain Registration"
+        ],
+        [
+          "54",
+          "Social Issues & Advocacy"
+        ],
+        [
+          "55",
+          "Dating & Personals"
+        ],
+        [
+          "56",
+          "Ethnic & Identity Groups"
+        ],
+        [
+          "57",
+          "Charity & Philanthropy"
+        ],
+        [
+          "58",
+          "Parenting"
+        ],
+        [
+          "59",
+          "Religion & Belief"
+        ],
+        [
+          "60",
+          "Jobs"
+        ],
+        [
+          "61",
+          "Classifieds"
+        ],
+        [
+          "63",
+          "Weather"
+        ],
+        [
+          "64",
+          "Antiques & Collectibles"
+        ],
+        [
+          "65",
+          "Hobbies & Leisure"
+        ],
+        [
+          "66",
+          "Pets & Animals"
+        ],
+        [
+          "67",
+          "Travel"
+        ],
+        [
+          "68",
+          "Apparel"
+        ],
+        [
+          "69",
+          "Consumer Resources"
+        ],
+        [
+          "70",
+          "Gifts & Special Event Items"
+        ],
+        [
+          "71",
+          "Food & Drink"
+        ],
+        [
+          "73",
+          "Mass Merchants & Department Stores"
+        ],
+        [
+          "74",
+          "Education"
+        ],
+        [
+          "75",
+          "Legal"
+        ],
+        [
+          "76",
+          "Government"
+        ],
+        [
+          "77",
+          "Enterprise Technology"
+        ],
+        [
+          "78",
+          "Consumer Electronics"
+        ],
+        [
+          "82",
+          "Environmental Issues"
+        ],
+        [
+          "83",
+          "Marketing Services"
+        ],
+        [
+          "84",
+          "Search Engine Optimization & Marketing"
+        ],
+        [
+          "89",
+          "Vehicle Parts & Accessories"
+        ],
+        [
+          "91",
+          "Stereo Systems & Components"
+        ],
+        [
+          "93",
+          "Skin & Nail Care"
+        ],
+        [
+          "94",
+          "Fitness"
+        ],
+        [
+          "95",
+          "Office Supplies"
+        ],
+        [
+          "96",
+          "Real Estate Agencies"
+        ],
+        [
+          "97",
+          "Consumer Advocacy & Protection"
+        ],
+        [
+          "98",
+          "Fashion Designers & Collections"
+        ],
+        [
+          "99",
+          "Gifts"
+        ],
+        [
+          "100",
+          "Cards & Greetings"
+        ],
+        [
+          "101",
+          "Spirituality"
+        ],
+        [
+          "102",
+          "Personals"
+        ],
+        [
+          "104",
+          "ISPs"
+        ],
+        [
+          "105",
+          "Online Games"
+        ],
+        [
+          "107",
+          "Investing"
+        ],
+        [
+          "108",
+          "Language Resources"
+        ],
+        [
+          "112",
+          "Broadcast & Network News"
+        ],
+        [
+          "113",
+          "Gay-Lesbian-Bisexual-Transgender"
+        ],
+        [
+          "115",
+          "Baby Care & Hygiene"
+        ],
+        [
+          "118",
+          "Water Sports"
+        ],
+        [
+          "119",
+          "Wildlife"
+        ],
+        [
+          "120",
+          "Cookware & Diningware"
+        ],
+        [
+          "121",
+          "Grocery & Food Retailers"
+        ],
+        [
+          "122",
+          "Cooking & Recipes"
+        ],
+        [
+          "123",
+          "Tobacco Products"
+        ],
+        [
+          "124",
+          "Clothing Accessories"
+        ],
+        [
+          "137",
+          "Homemaking & Interior Decor"
+        ],
+        [
+          "138",
+          "Vehicle Maintenance"
+        ],
+        [
+          "143",
+          "Face & Body Care"
+        ],
+        [
+          "144",
+          "Unwanted Body & Facial Hair Removal"
+        ],
+        [
+          "145",
+          "Spas & Beauty Services"
+        ],
+        [
+          "146",
+          "Hair Care"
+        ],
+        [
+          "147",
+          "Cosmetology & Beauty Professionals"
+        ],
+        [
+          "148",
+          "Off-Road Vehicles"
+        ],
+        [
+          "154",
+          "Kids & Teens"
+        ],
+        [
+          "157",
+          "Human Resources"
+        ],
+        [
+          "158",
+          "Home Improvement"
+        ],
+        [
+          "166",
+          "Public Safety"
+        ],
+        [
+          "168",
+          "Emergency Services"
+        ],
+        [
+          "170",
+          "Vehicle Licensing & Registration"
+        ],
+        [
+          "171",
+          "Native Americans"
+        ],
+        [
+          "174",
+          "Science"
+        ],
+        [
+          "179",
+          "Hotels & Accommodations"
+        ],
+        [
+          "180",
+          "Motor Sports"
+        ],
+        [
+          "182",
+          "Humor"
+        ],
+        [
+          "184",
+          "Celebrities & Entertainment News"
+        ],
+        [
+          "185",
+          "Fashion & Style"
+        ],
+        [
+          "188",
+          "Clubs & Nightlife"
+        ],
+        [
+          "189",
+          "Clubs & Organizations"
+        ],
+        [
+          "191",
+          "Forum & Chat Providers"
+        ],
+        [
+          "195",
+          "Reproductive Health"
+        ],
+        [
+          "198",
+          "Birth Control"
+        ],
+        [
+          "202",
+          "Erectile Dysfunction"
+        ],
+        [
+          "203",
+          "Air Travel"
+        ],
+        [
+          "205",
+          "Car Rental & Taxi Services"
+        ],
+        [
+          "206",
+          "Cruises & Charters"
+        ],
+        [
+          "208",
+          "Tourist Destinations"
+        ],
+        [
+          "210",
+          "DVD & Video Shopping"
+        ],
+        [
+          "211",
+          "Online Video"
+        ],
+        [
+          "213",
+          "Movie Memorabilia"
+        ],
+        [
+          "215",
+          "Radio"
+        ],
+        [
+          "216",
+          "Musical Instruments"
+        ],
+        [
+          "217",
+          "CD & Audio Shopping"
+        ],
+        [
+          "218",
+          "Music Art & Memorabilia"
+        ],
+        [
+          "220",
+          "Music Streams & Downloads"
+        ],
+        [
+          "224",
+          "Software Utilities"
+        ],
+        [
+          "225",
+          "Device Drivers"
+        ],
+        [
+          "226",
+          "Computer Memory"
+        ],
+        [
+          "227",
+          "MP3 & Portable Media Players"
+        ],
+        [
+          "228",
+          "PDAs & Handhelds"
+        ],
+        [
+          "229",
+          "TV & Video Equipment"
+        ],
+        [
+          "230",
+          "Car Audio"
+        ],
+        [
+          "231",
+          "Engineering & Technology"
+        ],
+        [
+          "233",
+          "Energy & Utilities"
+        ],
+        [
+          "234",
+          "Make-Up & Cosmetics"
+        ],
+        [
+          "235",
+          "Hair Loss"
+        ],
+        [
+          "236",
+          "Weight Loss"
+        ],
+        [
+          "237",
+          "Vitamins & Supplements"
+        ],
+        [
+          "238",
+          "Cosmetic Surgery"
+        ],
+        [
+          "239",
+          "Body Art"
+        ],
+        [
+          "241",
+          "Bodybuilding"
+        ],
+        [
+          "242",
+          "Perfumes & Fragrances"
+        ],
+        [
+          "244",
+          "Hygiene & Toiletries"
+        ],
+        [
+          "245",
+          "Oral & Dental Care"
+        ],
+        [
+          "246",
+          "Vision Care"
+        ],
+        [
+          "248",
+          "Pharmacy"
+        ],
+        [
+          "249",
+          "Health Insurance"
+        ],
+        [
+          "250",
+          "Hospitals & Treatment Centers"
+        ],
+        [
+          "251",
+          "Medical Devices & Equipment"
+        ],
+        [
+          "252",
+          "Health Foundations & Medical Research"
+        ],
+        [
+          "253",
+          "Medical Literature & Resources"
+        ],
+        [
+          "254",
+          "Health Education & Medical Training"
+        ],
+        [
+          "255",
+          "Pharmaceuticals & Biotech"
+        ],
+        [
+          "256",
+          "Medical Facilities & Services"
+        ],
+        [
+          "257",
+          "Substance Abuse"
+        ],
+        [
+          "258",
+          "American Football"
+        ],
+        [
+          "259",
+          "Baseball"
+        ],
+        [
+          "260",
+          "Hockey"
+        ],
+        [
+          "261",
+          "Golf"
+        ],
+        [
+          "262",
+          "Racquet Sports"
+        ],
+        [
+          "263",
+          "Sporting Goods"
+        ],
+        [
+          "264",
+          "Basketball"
+        ],
+        [
+          "265",
+          "Winter Sports"
+        ],
+        [
+          "268",
+          "Maps"
+        ],
+        [
+          "269",
+          "Gardening & Landscaping"
+        ],
+        [
+          "270",
+          "Home Furnishings"
+        ],
+        [
+          "271",
+          "Home Appliances"
+        ],
+        [
+          "272",
+          "Lamps & Lighting"
+        ],
+        [
+          "273",
+          "Motorcycles"
+        ],
+        [
+          "275",
+          "Photo & Video Sharing"
+        ],
+        [
+          "276",
+          "Restaurants"
+        ],
+        [
+          "277",
+          "Alcoholic Beverages"
+        ],
+        [
+          "278",
+          "Accounting & Auditing"
+        ],
+        [
+          "279",
+          "Credit & Lending"
+        ],
+        [
+          "280",
+          "Merchant Services & Payment Systems"
+        ],
+        [
+          "284",
+          "Crafts"
+        ],
+        [
+          "287",
+          "Industrial Materials & Equipment"
+        ],
+        [
+          "288",
+          "Chemicals Industry"
+        ],
+        [
+          "289",
+          "Freight & Trucking"
+        ],
+        [
+          "290",
+          "Packaging"
+        ],
+        [
+          "291",
+          "Moving & Relocation"
+        ],
+        [
+          "292",
+          "Auctions"
+        ],
+        [
+          "293",
+          "Weddings"
+        ],
+        [
+          "294",
+          "Soccer"
+        ],
+        [
+          "296",
+          "Cricket"
+        ],
+        [
+          "297",
+          "Culinary Training"
+        ],
+        [
+          "298",
+          "Seniors & Retirement"
+        ],
+        [
+          "299",
+          "Online Communities"
+        ],
+        [
+          "301",
+          "Web Portals"
+        ],
+        [
+          "302",
+          "Web Services"
+        ],
+        [
+          "303",
+          "Operating Systems"
+        ],
+        [
+          "304",
+          "Internet Clients & Browsers"
+        ],
+        [
+          "305",
+          "Televisions"
+        ],
+        [
+          "306",
+          "Cameras & Camcorders"
+        ],
+        [
+          "307",
+          "Cameras"
+        ],
+        [
+          "308",
+          "Camcorders"
+        ],
+        [
+          "309",
+          "Desktop Computers"
+        ],
+        [
+          "310",
+          "Laptops & Notebooks"
+        ],
+        [
+          "311",
+          "Networking"
+        ],
+        [
+          "312",
+          "Computer Peripherals"
+        ],
+        [
+          "313",
+          "Open Source"
+        ],
+        [
+          "314",
+          "Computer Security"
+        ],
+        [
+          "315",
+          "Antivirus & Malware"
+        ],
+        [
+          "316",
+          "Comics & Animation"
+        ],
+        [
+          "317",
+          "Anime & Manga"
+        ],
+        [
+          "318",
+          "Comics"
+        ],
+        [
+          "319",
+          "Cartoons"
+        ],
+        [
+          "320",
+          "Photo Rating Sites"
+        ],
+        [
+          "321",
+          "File Sharing & Hosting"
+        ],
+        [
+          "323",
+          "Flowers"
+        ],
+        [
+          "324",
+          "Party & Holiday Supplies"
+        ],
+        [
+          "326",
+          "Affiliate Programs"
+        ],
+        [
+          "327",
+          "Public Relations"
+        ],
+        [
+          "328",
+          "Telemarketing"
+        ],
+        [
+          "329",
+          "Business Services"
+        ],
+        [
+          "330",
+          "Recruitment & Staffing"
+        ],
+        [
+          "331",
+          "Corporate Training"
+        ],
+        [
+          "332",
+          "Document & Printing Services"
+        ],
+        [
+          "333",
+          "Office Furniture"
+        ],
+        [
+          "334",
+          "Corporate Events"
+        ],
+        [
+          "335",
+          "Trade Shows & Conventions"
+        ],
+        [
+          "336",
+          "Business Plans & Presentations"
+        ],
+        [
+          "337",
+          "Office & Facilities Management"
+        ],
+        [
+          "338",
+          "Management"
+        ],
+        [
+          "340",
+          "E-Commerce Services"
+        ],
+        [
+          "341",
+          "Customer Relationship Management (CRM)"
+        ],
+        [
+          "342",
+          "Enterprise Resource Planning (ERP)"
+        ],
+        [
+          "343",
+          "Data Management"
+        ],
+        [
+          "344",
+          "Network Security"
+        ],
+        [
+          "346",
+          "Networking Equipment"
+        ],
+        [
+          "347",
+          "Network Monitoring & Management"
+        ],
+        [
+          "350",
+          "Gems & Jewelry"
+        ],
+        [
+          "352",
+          "Price Comparisons"
+        ],
+        [
+          "353",
+          "Product Reviews & Price Comparisons"
+        ],
+        [
+          "354",
+          "Import & Export"
+        ],
+        [
+          "355",
+          "Book Retailers"
+        ],
+        [
+          "356",
+          "Aerospace & Defense"
+        ],
+        [
+          "357",
+          "TV Soap Operas"
+        ],
+        [
+          "358",
+          "TV Shows & Programs"
+        ],
+        [
+          "359",
+          "TV Networks & Stations"
+        ],
+        [
+          "360",
+          "Bollywood & South Asian Film"
+        ],
+        [
+          "361",
+          "Audio Equipment"
+        ],
+        [
+          "362",
+          "Gadgets & Portable Electronics"
+        ],
+        [
+          "364",
+          "Lottery & Sweepstakes"
+        ],
+        [
+          "365",
+          "Coupons & Discount Offers"
+        ],
+        [
+          "366",
+          "Military"
+        ],
+        [
+          "367",
+          "Distance Learning"
+        ],
+        [
+          "369",
+          "Vocational & Continuing Education"
+        ],
+        [
+          "371",
+          "Primary & Secondary Schooling (K-12)"
+        ],
+        [
+          "372",
+          "Colleges & Universities"
+        ],
+        [
+          "373",
+          "Standardized & Admissions Tests"
+        ],
+        [
+          "374",
+          "Educational Resources"
+        ],
+        [
+          "375",
+          "Libraries & Museums"
+        ],
+        [
+          "377",
+          "Business & Personal Listings"
+        ],
+        [
+          "378",
+          "Apartments & Residential Rentals"
+        ],
+        [
+          "379",
+          "Pet Food & Supplies"
+        ],
+        [
+          "380",
+          "Veterinarians"
+        ],
+        [
+          "381",
+          "Game Cheats & Hints"
+        ],
+        [
+          "382",
+          "Mobile & Wireless"
+        ],
+        [
+          "383",
+          "Service Providers"
+        ],
+        [
+          "384",
+          "Phone Service Providers"
+        ],
+        [
+          "385",
+          "Communications Equipment"
+        ],
+        [
+          "386",
+          "Voice & Video Chat"
+        ],
+        [
+          "389",
+          "Calling Cards"
+        ],
+        [
+          "390",
+          "Mobile Phones"
+        ],
+        [
+          "392",
+          "Teleconferencing"
+        ],
+        [
+          "394",
+          "Email & Messaging"
+        ],
+        [
+          "396",
+          "Politics"
+        ],
+        [
+          "398",
+          "Campaigns & Elections"
+        ],
+        [
+          "400",
+          "Ancestry & Genealogy"
+        ],
+        [
+          "401",
+          "Pregnancy & Maternity"
+        ],
+        [
+          "402",
+          "Youth Camps"
+        ],
+        [
+          "403",
+          "Child Care"
+        ],
+        [
+          "404",
+          "Beer"
+        ],
+        [
+          "405",
+          "Wine"
+        ],
+        [
+          "406",
+          "Liquor"
+        ],
+        [
+          "408",
+          "Newspapers"
+        ],
+        [
+          "409",
+          "Right-Wing Politics"
+        ],
+        [
+          "410",
+          "Left-Wing Politics"
+        ],
+        [
+          "412",
+          "Magazines"
+        ],
+        [
+          "418",
+          "Nursing"
+        ],
+        [
+          "419",
+          "Health Conditions"
+        ],
+        [
+          "420",
+          "Skin Conditions"
+        ],
+        [
+          "421",
+          "Sexually Transmitted Diseases"
+        ],
+        [
+          "422",
+          "Web Design & Development"
+        ],
+        [
+          "423",
+          "Bankruptcy"
+        ],
+        [
+          "424",
+          "Criminal Law"
+        ],
+        [
+          "425",
+          "Property Management"
+        ],
+        [
+          "426",
+          "Intellectual Property"
+        ],
+        [
+          "427",
+          "Accident & Personal Injury Law"
+        ],
+        [
+          "428",
+          "T-Shirts"
+        ],
+        [
+          "429",
+          "Cancer"
+        ],
+        [
+          "432",
+          "Toys"
+        ],
+        [
+          "433",
+          "History"
+        ],
+        [
+          "434",
+          "Electronics & Electrical"
+        ],
+        [
+          "435",
+          "Astronomy"
+        ],
+        [
+          "436",
+          "Mathematics"
+        ],
+        [
+          "437",
+          "Mental Health"
+        ],
+        [
+          "438",
+          "Vehicle Wheels & Tires"
+        ],
+        [
+          "439",
+          "Photographic & Digital Arts"
+        ],
+        [
+          "440",
+          "Biological Sciences"
+        ],
+        [
+          "441",
+          "Water & Marine Sciences"
+        ],
+        [
+          "442",
+          "Ecology & Environment"
+        ],
+        [
+          "443",
+          "Geology"
+        ],
+        [
+          "444",
+          "Physics"
+        ],
+        [
+          "445",
+          "Scientific Equipment"
+        ],
+        [
+          "446",
+          "Scientific Institutions"
+        ],
+        [
+          "447",
+          "Flash-Based Entertainment"
+        ],
+        [
+          "448",
+          "Astrology & Divination"
+        ],
+        [
+          "449",
+          "Occult & Paranormal"
+        ],
+        [
+          "450",
+          "Customer Services"
+        ],
+        [
+          "451",
+          "Warranties & Service Contracts"
+        ],
+        [
+          "456",
+          "Nutrition"
+        ],
+        [
+          "457",
+          "Special & Restricted Diets"
+        ],
+        [
+          "458",
+          "Cycling"
+        ],
+        [
+          "459",
+          "Boating"
+        ],
+        [
+          "461",
+          "Hunting & Shooting"
+        ],
+        [
+          "462",
+          "Fishing"
+        ],
+        [
+          "463",
+          "Property Inspections & Appraisals"
+        ],
+        [
+          "465",
+          "Home Insurance"
+        ],
+        [
+          "466",
+          "Home Financing"
+        ],
+        [
+          "467",
+          "Auto Insurance"
+        ],
+        [
+          "468",
+          "Auto Financing"
+        ],
+        [
+          "471",
+          "Pest Control"
+        ],
+        [
+          "472",
+          "Domestic Services"
+        ],
+        [
+          "473",
+          "Vehicle Shopping"
+        ],
+        [
+          "474",
+          "Humanities"
+        ],
+        [
+          "477",
+          "Architecture"
+        ],
+        [
+          "485",
+          "Search Engines"
+        ],
+        [
+          "486",
+          "Graphics & Animation Software"
+        ],
+        [
+          "487",
+          "Computer Monitors & Displays"
+        ],
+        [
+          "488",
+          "Data Formats & Protocols"
+        ],
+        [
+          "492",
+          "Video Players & Recorders"
+        ],
+        [
+          "493",
+          "Input Devices"
+        ],
+        [
+          "494",
+          "Printers"
+        ],
+        [
+          "495",
+          "Scanners"
+        ],
+        [
+          "496",
+          "Computer Drives & Storage"
+        ],
+        [
+          "497",
+          "Multimedia Software"
+        ],
+        [
+          "498",
+          "Business & Productivity Software"
+        ],
+        [
+          "499",
+          "Alternative & Natural Medicine"
+        ],
+        [
+          "500",
+          "Physical Therapy"
+        ],
+        [
+          "501",
+          "Cable & Satellite Providers"
+        ],
+        [
+          "502",
+          "Subcultures & Niche Interests"
+        ],
+        [
+          "503",
+          "Goth Subculture"
+        ],
+        [
+          "504",
+          "Blogging Resources & Services"
+        ],
+        [
+          "505",
+          "Chemistry"
+        ],
+        [
+          "507",
+          "Gossip & Tabloid News"
+        ],
+        [
+          "508",
+          "Social Services"
+        ],
+        [
+          "509",
+          "Social Sciences"
+        ],
+        [
+          "510",
+          "Demographics"
+        ],
+        [
+          "511",
+          "Counseling Services"
+        ],
+        [
+          "512",
+          "Wrestling"
+        ],
+        [
+          "513",
+          "Olympics"
+        ],
+        [
+          "514",
+          "Combat Sports"
+        ],
+        [
+          "515",
+          "Boxing"
+        ],
+        [
+          "516",
+          "Martial Arts"
+        ],
+        [
+          "517",
+          "Rugby"
+        ],
+        [
+          "518",
+          "Track & Field"
+        ],
+        [
+          "519",
+          "Gymnastics"
+        ],
+        [
+          "520",
+          "Economics"
+        ],
+        [
+          "521",
+          "International Relations"
+        ],
+        [
+          "522",
+          "Family Law"
+        ],
+        [
+          "527",
+          "Directories & Listings"
+        ],
+        [
+          "528",
+          "South Asians & Diaspora"
+        ],
+        [
+          "529",
+          "Social Networks"
+        ],
+        [
+          "530",
+          "Undergarments"
+        ],
+        [
+          "531",
+          "Shopping Portals & Search Engines"
+        ],
+        [
+          "532",
+          "Ringtones & Mobile Goodies"
+        ],
+        [
+          "533",
+          "Reference"
+        ],
+        [
+          "534",
+          "Cheerleading"
+        ],
+        [
+          "535",
+          "Law Enforcement"
+        ],
+        [
+          "536",
+          "Sex Education & Counseling"
+        ],
+        [
+          "538",
+          "Edgy & Bizarre"
+        ],
+        [
+          "539",
+          "Fun & Trivia"
+        ],
+        [
+          "540",
+          "Fan Fiction"
+        ],
+        [
+          "541",
+          "Running & Walking"
+        ],
+        [
+          "542",
+          "Hiking & Camping"
+        ],
+        [
+          "543",
+          "Psychology"
+        ],
+        [
+          "546",
+          "Matrimonial Services"
+        ],
+        [
+          "547",
+          "African-Americans"
+        ],
+        [
+          "548",
+          "Latinos & Latin-Americans"
+        ],
+        [
+          "549",
+          "East Asians & Diaspora"
+        ],
+        [
+          "550",
+          "Jewish Culture"
+        ],
+        [
+          "551",
+          "Small Business"
+        ],
+        [
+          "552",
+          "MLM & Business Opportunities"
+        ],
+        [
+          "554",
+          "Extreme Sports"
+        ],
+        [
+          "555",
+          "Visa & Immigration"
+        ],
+        [
+          "556",
+          "Arabs & Middle Easterners"
+        ],
+        [
+          "557",
+          "Massage Therapy"
+        ],
+        [
+          "558",
+          "OBGYN"
+        ],
+        [
+          "559",
+          "Heart & Hypertension"
+        ],
+        [
+          "560",
+          "Non-Alcoholic Beverages"
+        ],
+        [
+          "563",
+          "Pets"
+        ],
+        [
+          "565",
+          "Poetry"
+        ],
+        [
+          "566",
+          "Textiles & Nonwovens"
+        ],
+        [
+          "567",
+          "Technical Support"
+        ],
+        [
+          "568",
+          "Equestrian"
+        ],
+        [
+          "569",
+          "Events & Listings"
+        ],
+        [
+          "571",
+          "Eating Disorders"
+        ],
+        [
+          "572",
+          "Local News"
+        ],
+        [
+          "573",
+          "Camera & Photo Equipment"
+        ],
+        [
+          "574",
+          "Stock Photography"
+        ],
+        [
+          "575",
+          "Webcams & Virtual Tours"
+        ],
+        [
+          "576",
+          "Photo & Video Services"
+        ],
+        [
+          "577",
+          "Photo & Video Software"
+        ],
+        [
+          "578",
+          "Skins Themes & Wallpapers"
+        ],
+        [
+          "579",
+          "Africans & Diaspora"
+        ],
+        [
+          "580",
+          "Southeast Asians & Pacific Islanders"
+        ],
+        [
+          "581",
+          "Dance"
+        ],
+        [
+          "582",
+          "Online Journals & Personal Sites"
+        ],
+        [
+          "585",
+          "Christian & Gospel Music"
+        ],
+        [
+          "586",
+          "Classical Music"
+        ],
+        [
+          "587",
+          "Country Music"
+        ],
+        [
+          "588",
+          "Dance & Electronic Music"
+        ],
+        [
+          "589",
+          "Jazz & Blues"
+        ],
+        [
+          "590",
+          "Rock Music"
+        ],
+        [
+          "591",
+          "Latin American Music"
+        ],
+        [
+          "592",
+          "Urban & Hip-Hop"
+        ],
+        [
+          "593",
+          "World Music"
+        ],
+        [
+          "606",
+          "Metals & Mining"
+        ],
+        [
+          "607",
+          "Exotic Pets"
+        ],
+        [
+          "608",
+          "E-Books"
+        ],
+        [
+          "609",
+          "Myth & Folklore"
+        ],
+        [
+          "610",
+          "Trucks & SUVs"
+        ],
+        [
+          "611",
+          "Yoga & Pilates"
+        ],
+        [
+          "612",
+          "Entertainment Industry"
+        ],
+        [
+          "613",
+          "Online Media"
+        ],
+        [
+          "614",
+          "Ticket Sales"
+        ],
+        [
+          "615",
+          "Horror Films"
+        ],
+        [
+          "616",
+          "Science Fiction & Fantasy Films"
+        ],
+        [
+          "617",
+          "Song Lyrics & Tabs"
+        ],
+        [
+          "618",
+          "Vocals & Show Tunes"
+        ],
+        [
+          "619",
+          "Retirement & Pension"
+        ],
+        [
+          "620",
+          "Risk Management"
+        ],
+        [
+          "621",
+          "Food Production"
+        ],
+        [
+          "622",
+          "Roleplaying Games"
+        ],
+        [
+          "623",
+          "Aging & Geriatrics"
+        ],
+        [
+          "624",
+          "Alzheimer's Disease"
+        ],
+        [
+          "625",
+          "AIDS & HIV"
+        ],
+        [
+          "626",
+          "Allergies"
+        ],
+        [
+          "627",
+          "Asthma"
+        ],
+        [
+          "628",
+          "Arthritis"
+        ],
+        [
+          "629",
+          "Cold & Flu"
+        ],
+        [
+          "630",
+          "Diabetes"
+        ],
+        [
+          "631",
+          "Headaches & Migraines"
+        ],
+        [
+          "632",
+          "Infectious Diseases"
+        ],
+        [
+          "633",
+          "Sleep Disorders"
+        ],
+        [
+          "634",
+          "Doctors' Offices"
+        ],
+        [
+          "635",
+          "Medical Procedures"
+        ],
+        [
+          "636",
+          "Men's Health"
+        ],
+        [
+          "638",
+          "GERD & Digestive Disorders"
+        ],
+        [
+          "639",
+          "Anxiety & Stress"
+        ],
+        [
+          "640",
+          "Depression"
+        ],
+        [
+          "641",
+          "Learning & Developmental Disabilities"
+        ],
+        [
+          "642",
+          "ADD & ADHD"
+        ],
+        [
+          "643",
+          "Cholesterol Issues"
+        ],
+        [
+          "644",
+          "Occupational Health & Safety"
+        ],
+        [
+          "645",
+          "Pediatrics"
+        ],
+        [
+          "646",
+          "Drugs & Medications"
+        ],
+        [
+          "647",
+          "Infertility"
+        ],
+        [
+          "648",
+          "Women's Health"
+        ],
+        [
+          "649",
+          "Assisted Living & Long Term Care"
+        ],
+        [
+          "650",
+          "Building Materials & Supplies"
+        ],
+        [
+          "651",
+          "Civil Engineering"
+        ],
+        [
+          "652",
+          "Construction Consulting & Contracting"
+        ],
+        [
+          "653",
+          "Design"
+        ],
+        [
+          "654",
+          "Graphic Design"
+        ],
+        [
+          "655",
+          "Industrial & Product Design"
+        ],
+        [
+          "656",
+          "Interior Design"
+        ],
+        [
+          "657",
+          "Renewable & Alternative Energy"
+        ],
+        [
+          "658",
+          "Electricity"
+        ],
+        [
+          "659",
+          "Oil & Gas"
+        ],
+        [
+          "660",
+          "Waste Management"
+        ],
+        [
+          "661",
+          "Factory Automation"
+        ],
+        [
+          "662",
+          "Aviation"
+        ],
+        [
+          "663",
+          "Couriers & Messengers"
+        ],
+        [
+          "664",
+          "Distribution & Logistics"
+        ],
+        [
+          "665",
+          "Maritime Transport"
+        ],
+        [
+          "666",
+          "Rail Transport"
+        ],
+        [
+          "667",
+          "Urban Transport"
+        ],
+        [
+          "668",
+          "Space Technology"
+        ],
+        [
+          "669",
+          "Defense Industry"
+        ],
+        [
+          "670",
+          "Agrochemicals"
+        ],
+        [
+          "671",
+          "Cleaning Agents"
+        ],
+        [
+          "672",
+          "Coatings & Adhesives"
+        ],
+        [
+          "673",
+          "Dyes & Pigments"
+        ],
+        [
+          "674",
+          "Plastics & Polymers"
+        ],
+        [
+          "675",
+          "Web Stats & Analytics"
+        ],
+        [
+          "676",
+          "Science Fiction & Fantasy"
+        ],
+        [
+          "677",
+          "Disabled & Special Needs"
+        ],
+        [
+          "678",
+          "Holidays & Seasonal Events"
+        ],
+        [
+          "679",
+          "Children's Interests"
+        ],
+        [
+          "680",
+          "Teen Interests"
+        ],
+        [
+          "681",
+          "Indigenous Peoples"
+        ],
+        [
+          "682",
+          "Eastern Europeans"
+        ],
+        [
+          "683",
+          "Western Europeans"
+        ],
+        [
+          "685",
+          "Traffic & Public Transit"
+        ],
+        [
+          "686",
+          "Urban & Regional Planning"
+        ],
+        [
+          "687",
+          "Property Development"
+        ],
+        [
+          "688",
+          "Outdoors"
+        ],
+        [
+          "689",
+          "Surf & Swim"
+        ],
+        [
+          "690",
+          "Biographies & Quotations"
+        ],
+        [
+          "691",
+          "Calculators & Reference Tools"
+        ],
+        [
+          "692",
+          "Dictionaries & Encyclopedias"
+        ],
+        [
+          "693",
+          "Forms Guides & Templates"
+        ],
+        [
+          "694",
+          "How-To, DIY & Expert Content"
+        ],
+        [
+          "695",
+          "Time & Calendars"
+        ],
+        [
+          "696",
+          "Luxury Goods"
+        ],
+        [
+          "697",
+          "Footwear"
+        ],
+        [
+          "699",
+          "Volleyball"
+        ],
+        [
+          "700",
+          "Teaching & Classroom Resources"
+        ],
+        [
+          "701",
+          "Labor & Employment Law"
+        ],
+        [
+          "702",
+          "Royalty"
+        ],
+        [
+          "703",
+          "Work & Labor Issues"
+        ],
+        [
+          "704",
+          "Crime & Justice"
+        ],
+        [
+          "705",
+          "Security Products & Services"
+        ],
+        [
+          "706",
+          "Welfare & Unemployment"
+        ],
+        [
+          "707",
+          "Adventure Travel"
+        ],
+        [
+          "708",
+          "Bus & Rail"
+        ],
+        [
+          "717",
+          "Computer Components"
+        ],
+        [
+          "718",
+          "Outsourcing"
+        ],
+        [
+          "719",
+          "Physical Asset Management"
+        ],
+        [
+          "720",
+          "Quality Control & Tracking"
+        ],
+        [
+          "721",
+          "Business Process"
+        ],
+        [
+          "722",
+          "Strategic Planning"
+        ],
+        [
+          "723",
+          "Compensation & Benefits"
+        ],
+        [
+          "724",
+          "Payroll Services"
+        ],
+        [
+          "725",
+          "Writing & Editing Services"
+        ],
+        [
+          "726",
+          "Fire & Security Services"
+        ],
+        [
+          "727",
+          "Home Office"
+        ],
+        [
+          "728",
+          "Computer Servers"
+        ],
+        [
+          "729",
+          "Network Storage"
+        ],
+        [
+          "730",
+          "Development Tools"
+        ],
+        [
+          "731",
+          "C & C++"
+        ],
+        [
+          "732",
+          "Java"
+        ],
+        [
+          "733",
+          "Scripting Languages"
+        ],
+        [
+          "734",
+          "Windows & .NET"
+        ],
+        [
+          "735",
+          "Mac OS"
+        ],
+        [
+          "736",
+          "Linux & Unix"
+        ],
+        [
+          "737",
+          "Windows OS"
+        ],
+        [
+          "739",
+          "Hardware Modding & Tuning"
+        ],
+        [
+          "740",
+          "Sound & Video Cards"
+        ],
+        [
+          "741",
+          "Chips & Processors"
+        ],
+        [
+          "742",
+          "Electronic Components"
+        ],
+        [
+          "743",
+          "Electromechanical Devices"
+        ],
+        [
+          "744",
+          "Optoelectronics & Fiber"
+        ],
+        [
+          "745",
+          "Power Supplies"
+        ],
+        [
+          "746",
+          "Test & Measurement"
+        ],
+        [
+          "747",
+          "Aquaculture"
+        ],
+        [
+          "748",
+          "Agricultural Equipment"
+        ],
+        [
+          "749",
+          "Crops & Seed"
+        ],
+        [
+          "750",
+          "Forestry"
+        ],
+        [
+          "751",
+          "Horticulture"
+        ],
+        [
+          "752",
+          "Livestock"
+        ],
+        [
+          "784",
+          "Business News"
+        ],
+        [
+          "785",
+          "Technology News"
+        ],
+        [
+          "786",
+          "Paintball"
+        ],
+        [
+          "787",
+          "Radio Control & Modeling"
+        ],
+        [
+          "788",
+          "Anatomy"
+        ],
+        [
+          "791",
+          "Homeschooling"
+        ],
+        [
+          "792",
+          "Legal Education"
+        ],
+        [
+          "793",
+          "Veterans"
+        ],
+        [
+          "794",
+          "GPS & Navigation"
+        ],
+        [
+          "799",
+          "Business Education"
+        ],
+        [
+          "800",
+          "Knowledge Management"
+        ],
+        [
+          "801",
+          "Supply Chain Management"
+        ],
+        [
+          "802",
+          "Developer Jobs"
+        ],
+        [
+          "803",
+          "Vehicle Shows"
+        ],
+        [
+          "804",
+          "Educational Software"
+        ],
+        [
+          "805",
+          "Fonts"
+        ],
+        [
+          "806",
+          "Custom & Performance Vehicles"
+        ],
+        [
+          "807",
+          "Internet Software"
+        ],
+        [
+          "808",
+          "Content Management"
+        ],
+        [
+          "809",
+          "Podcasting"
+        ],
+        [
+          "810",
+          "Hybrid & Alternative Vehicles"
+        ],
+        [
+          "811",
+          "Credit Cards"
+        ],
+        [
+          "812",
+          "Debt Management"
+        ],
+        [
+          "813",
+          "College Financing"
+        ],
+        [
+          "814",
+          "Currencies & Foreign Exchange"
+        ],
+        [
+          "815",
+          "Vehicle Brands"
+        ],
+        [
+          "816",
+          "Restaurant Supply"
+        ],
+        [
+          "817",
+          "Injury"
+        ],
+        [
+          "818",
+          "Obesity"
+        ],
+        [
+          "819",
+          "Pain Management"
+        ],
+        [
+          "820",
+          "Acura"
+        ],
+        [
+          "821",
+          "Audi"
+        ],
+        [
+          "822",
+          "BMW"
+        ],
+        [
+          "823",
+          "Cadillac"
+        ],
+        [
+          "824",
+          "Respiratory Conditions"
+        ],
+        [
+          "825",
+          "Vegetarian Cuisine"
+        ],
+        [
+          "826",
+          "Chevrolet"
+        ],
+        [
+          "827",
+          "Doors & Windows"
+        ],
+        [
+          "828",
+          "HVAC & Climate Control"
+        ],
+        [
+          "829",
+          "Nails Screws & Fasteners"
+        ],
+        [
+          "830",
+          "Plumbing Fixtures & Equipment"
+        ],
+        [
+          "831",
+          "Wood & Plastics"
+        ],
+        [
+          "832",
+          "Flooring"
+        ],
+        [
+          "833",
+          "Chrysler"
+        ],
+        [
+          "834",
+          "Citro\u00ebn"
+        ],
+        [
+          "835",
+          "Generators"
+        ],
+        [
+          "836",
+          "Dodge"
+        ],
+        [
+          "837",
+          "Heavy Machinery"
+        ],
+        [
+          "838",
+          "Fiat"
+        ],
+        [
+          "839",
+          "Valves Hoses & Fittings"
+        ],
+        [
+          "840",
+          "Ford"
+        ],
+        [
+          "841",
+          "Retail Trade"
+        ],
+        [
+          "842",
+          "GMC"
+        ],
+        [
+          "843",
+          "Honda"
+        ],
+        [
+          "844",
+          "Retail Equipment & Technology"
+        ],
+        [
+          "845",
+          "Hyundai"
+        ],
+        [
+          "846",
+          "Jeep"
+        ],
+        [
+          "847",
+          "Social Network Apps & Add-Ons"
+        ],
+        [
+          "848",
+          "Kia"
+        ],
+        [
+          "849",
+          "Lexus"
+        ],
+        [
+          "850",
+          "Lincoln"
+        ],
+        [
+          "851",
+          "Mazda"
+        ],
+        [
+          "852",
+          "Mercedes-Benz"
+        ],
+        [
+          "853",
+          "Mercury"
+        ],
+        [
+          "854",
+          "Mitsubishi"
+        ],
+        [
+          "855",
+          "Nissan"
+        ],
+        [
+          "856",
+          "Peugeot"
+        ],
+        [
+          "857",
+          "Pontiac"
+        ],
+        [
+          "858",
+          "Porsche"
+        ],
+        [
+          "859",
+          "Renault-Samsung"
+        ],
+        [
+          "860",
+          "Saturn"
+        ],
+        [
+          "861",
+          "Subaru"
+        ],
+        [
+          "862",
+          "Buddhism"
+        ],
+        [
+          "863",
+          "Toyota"
+        ],
+        [
+          "864",
+          "Christianity"
+        ],
+        [
+          "865",
+          "Volkswagen"
+        ],
+        [
+          "866",
+          "Hinduism"
+        ],
+        [
+          "867",
+          "Volvo"
+        ],
+        [
+          "868",
+          "Islam"
+        ],
+        [
+          "869",
+          "Judaism"
+        ],
+        [
+          "870",
+          "Self-Help & Motivational"
+        ],
+        [
+          "882",
+          "Animal Products & Services"
+        ],
+        [
+          "883",
+          "Animal Welfare"
+        ],
+        [
+          "884",
+          "Birds"
+        ],
+        [
+          "885",
+          "Cats"
+        ],
+        [
+          "886",
+          "Dogs"
+        ],
+        [
+          "887",
+          "Fish & Aquaria"
+        ],
+        [
+          "888",
+          "Horses"
+        ],
+        [
+          "889",
+          "Rabbits & Rodents"
+        ],
+        [
+          "890",
+          "Reptiles & Amphibians"
+        ],
+        [
+          "891",
+          "Concerts & Music Festivals"
+        ],
+        [
+          "892",
+          "Sheet Music"
+        ],
+        [
+          "893",
+          "Soundtracks"
+        ],
+        [
+          "894",
+          "Acting & Theater"
+        ],
+        [
+          "895",
+          "Live Comedy"
+        ],
+        [
+          "896",
+          "GM-Daewoo"
+        ],
+        [
+          "897",
+          "Saab"
+        ],
+        [
+          "898",
+          "Vauxhall-Opel"
+        ],
+        [
+          "899",
+          "Game Systems & Consoles"
+        ],
+        [
+          "900",
+          "Data Sheets & Electronics Reference"
+        ],
+        [
+          "901",
+          "Freeware & Shareware"
+        ],
+        [
+          "902",
+          "Proxying & Filtering"
+        ],
+        [
+          "903",
+          "Financial Planning"
+        ],
+        [
+          "904",
+          "Commodities & Futures Trading"
+        ],
+        [
+          "905",
+          "Venture Capital"
+        ],
+        [
+          "906",
+          "Candy & Sweets"
+        ],
+        [
+          "907",
+          "Baked Goods"
+        ],
+        [
+          "908",
+          "Fruits & Vegetables"
+        ],
+        [
+          "909",
+          "Meat & Seafood"
+        ],
+        [
+          "910",
+          "Soups & Stews"
+        ],
+        [
+          "911",
+          "World Cuisines"
+        ],
+        [
+          "912",
+          "Asian Cuisine"
+        ],
+        [
+          "913",
+          "Latin American Cuisine"
+        ],
+        [
+          "914",
+          "Mediterranean Cuisine"
+        ],
+        [
+          "915",
+          "North American Cuisine"
+        ],
+        [
+          "916",
+          "Coffee & Tea"
+        ],
+        [
+          "917",
+          "Dining Guides"
+        ],
+        [
+          "918",
+          "Fast Food"
+        ],
+        [
+          "919",
+          "Arcade & Coin-Op Games"
+        ],
+        [
+          "920",
+          "Board Games"
+        ],
+        [
+          "921",
+          "Chess & Abstract Strategy Games"
+        ],
+        [
+          "922",
+          "Miniatures & Wargaming"
+        ],
+        [
+          "923",
+          "Collectible Card Games"
+        ],
+        [
+          "924",
+          "Poker & Casino Games"
+        ],
+        [
+          "925",
+          "Adventure Games"
+        ],
+        [
+          "926",
+          "Casual Games"
+        ],
+        [
+          "927",
+          "Driving & Racing Games"
+        ],
+        [
+          "928",
+          "Fighting Games"
+        ],
+        [
+          "929",
+          "Music & Dance Games"
+        ],
+        [
+          "930",
+          "Shooter Games"
+        ],
+        [
+          "931",
+          "Simulation Games"
+        ],
+        [
+          "932",
+          "Sports Games"
+        ],
+        [
+          "933",
+          "Strategy Games"
+        ],
+        [
+          "935",
+          "Massive Multiplayer"
+        ],
+        [
+          "936",
+          "Party Games"
+        ],
+        [
+          "937",
+          "Puzzles & Brainteasers"
+        ],
+        [
+          "938",
+          "Table Games"
+        ],
+        [
+          "939",
+          "Billiards"
+        ],
+        [
+          "940",
+          "Table Tennis"
+        ],
+        [
+          "941",
+          "Genetic Disorders"
+        ],
+        [
+          "942",
+          "Neurological Disorders"
+        ],
+        [
+          "943",
+          "Medical Tests & Exams"
+        ],
+        [
+          "944",
+          "Surgery"
+        ],
+        [
+          "945",
+          "Medical Photos & Illustration"
+        ],
+        [
+          "946",
+          "Poisons & Overdoses"
+        ],
+        [
+          "947",
+          "Public Health"
+        ],
+        [
+          "948",
+          "Bed & Bath"
+        ],
+        [
+          "949",
+          "Cleaning Supplies & Services"
+        ],
+        [
+          "950",
+          "Construction & Power Tools"
+        ],
+        [
+          "951",
+          "Kitchen & Dining"
+        ],
+        [
+          "952",
+          "Swimming Pools & Spas"
+        ],
+        [
+          "953",
+          "Yard & Patio"
+        ],
+        [
+          "954",
+          "Nuclear Energy"
+        ],
+        [
+          "955",
+          "Hospitality Industry"
+        ],
+        [
+          "956",
+          "Event Planning"
+        ],
+        [
+          "957",
+          "Food Service"
+        ],
+        [
+          "958",
+          "Jobs & Education"
+        ],
+        [
+          "959",
+          "Career Resources & Planning"
+        ],
+        [
+          "960",
+          "Job Listings"
+        ],
+        [
+          "961",
+          "Resumes & Portfolios"
+        ],
+        [
+          "962",
+          "Embassies & Consulates"
+        ],
+        [
+          "963",
+          "Executive Branch"
+        ],
+        [
+          "964",
+          "Legislative Branch"
+        ],
+        [
+          "965",
+          "Multilateral Organizations"
+        ],
+        [
+          "966",
+          "State & Local Government"
+        ],
+        [
+          "967",
+          "Constitutional Law & Civil Rights"
+        ],
+        [
+          "968",
+          "Drunk Driving Law"
+        ],
+        [
+          "969",
+          "Legal Services"
+        ],
+        [
+          "970",
+          "Product Liability"
+        ],
+        [
+          "972",
+          "Virtual Worlds"
+        ],
+        [
+          "973",
+          "Expatriate Communities"
+        ],
+        [
+          "974",
+          "Adoption"
+        ],
+        [
+          "975",
+          "Skeptics & Non-Believers"
+        ],
+        [
+          "976",
+          "Reproductive Rights"
+        ],
+        [
+          "977",
+          "Special Occasions"
+        ],
+        [
+          "978",
+          "Photo & Image Sharing"
+        ],
+        [
+          "979",
+          "Video Sharing"
+        ],
+        [
+          "980",
+          "General Reference"
+        ],
+        [
+          "981",
+          "Flora & Fauna"
+        ],
+        [
+          "982",
+          "Genetics"
+        ],
+        [
+          "983",
+          "Athletic Apparel"
+        ],
+        [
+          "984",
+          "Casual Apparel"
+        ],
+        [
+          "985",
+          "Children's Clothing"
+        ],
+        [
+          "986",
+          "Handbags & Purses"
+        ],
+        [
+          "987",
+          "Watches"
+        ],
+        [
+          "988",
+          "Costumes"
+        ],
+        [
+          "989",
+          "Eyewear"
+        ],
+        [
+          "990",
+          "Formal Wear"
+        ],
+        [
+          "991",
+          "Headwear"
+        ],
+        [
+          "992",
+          "Men's Clothing"
+        ],
+        [
+          "993",
+          "Outerwear"
+        ],
+        [
+          "994",
+          "Sleepwear"
+        ],
+        [
+          "995",
+          "Swimwear"
+        ],
+        [
+          "996",
+          "Uniforms & Workwear"
+        ],
+        [
+          "997",
+          "Women's Clothing"
+        ],
+        [
+          "998",
+          "Fantasy Sports"
+        ],
+        [
+          "999",
+          "Recreational Aviation"
+        ],
+        [
+          "1000",
+          "Individual Sports"
+        ],
+        [
+          "1001",
+          "Team Sports"
+        ],
+        [
+          "1002",
+          "Water Activities"
+        ],
+        [
+          "1003",
+          "Luggage & Travel Accessories"
+        ],
+        [
+          "1004",
+          "Specialty Travel"
+        ],
+        [
+          "1005",
+          "Ecotourism"
+        ],
+        [
+          "1006",
+          "Historical Sites & Buildings"
+        ],
+        [
+          "1007",
+          "Regional Parks & Gardens"
+        ],
+        [
+          "1008",
+          "Theme Parks"
+        ],
+        [
+          "1009",
+          "Zoos-Aquariums-Preserves"
+        ],
+        [
+          "1010",
+          "Travel Agencies & Services"
+        ],
+        [
+          "1011",
+          "Travel Guides & Travelogues"
+        ],
+        [
+          "1012",
+          "Early Childhood Education"
+        ],
+        [
+          "1013",
+          "Classic Vehicles"
+        ],
+        [
+          "1014",
+          "City & Local Guides"
+        ],
+        [
+          "1015",
+          "Alumni & Reunions"
+        ],
+        [
+          "1016",
+          "Bowling"
+        ],
+        [
+          "1017",
+          "Handball"
+        ],
+        [
+          "1019",
+          "Vacation Offers"
+        ],
+        [
+          "1020",
+          "Religious Music"
+        ],
+        [
+          "1021",
+          "Pop Music"
+        ],
+        [
+          "1022",
+          "Experimental & Industrial Music"
+        ],
+        [
+          "1023",
+          "Folk & Traditional Music"
+        ],
+        [
+          "1024",
+          "Music Equipment & Technology"
+        ],
+        [
+          "1025",
+          "DJ Resources & Equipment"
+        ],
+        [
+          "1026",
+          "Music Recording Technology"
+        ],
+        [
+          "1027",
+          "Music Reference"
+        ],
+        [
+          "1028",
+          "Music Composition & Theory"
+        ],
+        [
+          "1030",
+          "Rap & Hip-Hop"
+        ],
+        [
+          "1031",
+          "Reggae & Caribbean Music"
+        ],
+        [
+          "1032",
+          "South Asian Music"
+        ],
+        [
+          "1033",
+          "East Asian Music"
+        ],
+        [
+          "1034",
+          "Arab & Middle Eastern Music"
+        ],
+        [
+          "1035",
+          "Hard Rock & Progressive"
+        ],
+        [
+          "1036",
+          "Metal (Music)"
+        ],
+        [
+          "1037",
+          "Classic Rock & Oldies"
+        ],
+        [
+          "1038",
+          "Indie & Alternative Music"
+        ],
+        [
+          "1039",
+          "Soul & R&B"
+        ],
+        [
+          "1040",
+          "Blues"
+        ],
+        [
+          "1041",
+          "Punk (Music)"
+        ],
+        [
+          "1043",
+          "Nintendo"
+        ],
+        [
+          "1044",
+          "Sony PlayStation"
+        ],
+        [
+          "1045",
+          "Xbox"
+        ],
+        [
+          "1046",
+          "Handheld Game Consoles"
+        ],
+        [
+          "1047",
+          "TV Comedies"
+        ],
+        [
+          "1048",
+          "TV Talk Shows"
+        ],
+        [
+          "1049",
+          "TV Reality Shows"
+        ],
+        [
+          "1050",
+          "TV Game Shows"
+        ],
+        [
+          "1055",
+          "TV Commercials"
+        ],
+        [
+          "1056",
+          "Trucks"
+        ],
+        [
+          "1057",
+          "SUVs"
+        ],
+        [
+          "1058",
+          "Vans & Minivans"
+        ],
+        [
+          "1059",
+          "Bentley"
+        ],
+        [
+          "1060",
+          "Buick"
+        ],
+        [
+          "1061",
+          "Ferrari"
+        ],
+        [
+          "1062",
+          "Hummer"
+        ],
+        [
+          "1063",
+          "Jaguar"
+        ],
+        [
+          "1064",
+          "Lamborghini"
+        ],
+        [
+          "1065",
+          "Land Rover"
+        ],
+        [
+          "1066",
+          "Maserati"
+        ],
+        [
+          "1067",
+          "Mini"
+        ],
+        [
+          "1068",
+          "Rolls-Royce"
+        ],
+        [
+          "1069",
+          "Scion"
+        ],
+        [
+          "1070",
+          "Suzuki"
+        ],
+        [
+          "1071",
+          "Smart Phones"
+        ],
+        [
+          "1072",
+          "Documentary Films"
+        ],
+        [
+          "1073",
+          "College Sports"
+        ],
+        [
+          "1074",
+          "Beaches & Islands"
+        ],
+        [
+          "1075",
+          "Courts & Judiciary"
+        ],
+        [
+          "1076",
+          "Signage"
+        ],
+        [
+          "1077",
+          "Sports News"
+        ],
+        [
+          "1078",
+          "Christmas"
+        ],
+        [
+          "1079",
+          "Halloween & October 31st"
+        ],
+        [
+          "1080",
+          "Real Estate Listings"
+        ],
+        [
+          "1081",
+          "Timeshares & Vacation Properties"
+        ],
+        [
+          "1082",
+          "Sports Coaching & Training"
+        ],
+        [
+          "1083",
+          "Sports Memorabilia"
+        ],
+        [
+          "1084",
+          "Geographic Reference"
+        ],
+        [
+          "1085",
+          "Movie Listings & Theater Showtimes"
+        ],
+        [
+          "1086",
+          "Film Festivals"
+        ],
+        [
+          "1087",
+          "Music Education & Instruction"
+        ],
+        [
+          "1088",
+          "Desktop Publishing"
+        ],
+        [
+          "1089",
+          "Audio & Music Software"
+        ],
+        [
+          "1090",
+          "Media Players"
+        ],
+        [
+          "1091",
+          "Samples & Sound Libraries"
+        ],
+        [
+          "1092",
+          "Audio Files Formats & Codecs"
+        ],
+        [
+          "1093",
+          "Philosophy"
+        ],
+        [
+          "1094",
+          "Drama Films"
+        ],
+        [
+          "1095",
+          "Comedy Films"
+        ],
+        [
+          "1096",
+          "Thriller, Crime & Mystery Films"
+        ],
+        [
+          "1097",
+          "Action & Adventure Films"
+        ],
+        [
+          "1098",
+          "Silent Films"
+        ],
+        [
+          "1099",
+          "Western Films"
+        ],
+        [
+          "1100",
+          "Superhero Films"
+        ],
+        [
+          "1101",
+          "Martial Arts Films"
+        ],
+        [
+          "1102",
+          "Classic Films"
+        ],
+        [
+          "1103",
+          "Cult & Indie Films"
+        ],
+        [
+          "1104",
+          "Animated Films"
+        ],
+        [
+          "1105",
+          "Musical Films"
+        ],
+        [
+          "1106",
+          "Movie Reference"
+        ],
+        [
+          "1107",
+          "Movie Reviews & Previews"
+        ],
+        [
+          "1108",
+          "Film & TV Awards"
+        ],
+        [
+          "1109",
+          "Mobile Apps & Add-Ons"
+        ],
+        [
+          "1110",
+          "TV Family-Oriented Shows"
+        ],
+        [
+          "1111",
+          "TV Crime & Legal Shows"
+        ],
+        [
+          "1112",
+          "TV Sci-Fi & Fantasy Shows"
+        ],
+        [
+          "1113",
+          "Music Awards"
+        ],
+        [
+          "1114",
+          "Record Labels"
+        ],
+        [
+          "1115",
+          "Recording Industry"
+        ],
+        [
+          "1116",
+          "Film & TV Industry"
+        ],
+        [
+          "1117",
+          "Film & TV Production"
+        ],
+        [
+          "1118",
+          "Special Education"
+        ],
+        [
+          "1119",
+          "Mountain & Ski Resorts"
+        ],
+        [
+          "1120",
+          "Lakes & Rivers"
+        ],
+        [
+          "1121",
+          "Unions & Labor Movement"
+        ],
+        [
+          "1122",
+          "Valentine's Day"
+        ],
+        [
+          "1123",
+          "Easter"
+        ],
+        [
+          "1124",
+          "Jewish Holidays"
+        ],
+        [
+          "1125",
+          "Thanksgiving"
+        ],
+        [
+          "1126",
+          "Skate Sports"
+        ],
+        [
+          "1127",
+          "Poverty & Hunger"
+        ],
+        [
+          "1131",
+          "Family & Relationships"
+        ],
+        [
+          "1132",
+          "Family"
+        ],
+        [
+          "1133",
+          "Marriage"
+        ],
+        [
+          "1134",
+          "Friendship"
+        ],
+        [
+          "1135",
+          "Romance"
+        ],
+        [
+          "1136",
+          "Public Records"
+        ],
+        [
+          "1137",
+          "Legal Forms"
+        ],
+        [
+          "1138",
+          "Business Finance"
+        ],
+        [
+          "1139",
+          "Investment Banking"
+        ],
+        [
+          "1140",
+          "Boats & Watercraft"
+        ],
+        [
+          "1141",
+          "Robotics"
+        ],
+        [
+          "1142",
+          "Web Apps & Online Tools"
+        ],
+        [
+          "1143",
+          "Entertainment Media"
+        ],
+        [
+          "1144",
+          "Entertainment Media Rentals"
+        ],
+        [
+          "1145",
+          "DVD & Video Rentals"
+        ],
+        [
+          "1146",
+          "Video Game Retailers"
+        ],
+        [
+          "1147",
+          "Personal Aircraft"
+        ],
+        [
+          "1148",
+          "Skiing & Snowboarding"
+        ],
+        [
+          "1149",
+          "Ice Skating"
+        ],
+        [
+          "1150",
+          "Mail & Package Delivery"
+        ],
+        [
+          "1152",
+          "Fluid Handling"
+        ],
+        [
+          "1153",
+          "Plumbing"
+        ],
+        [
+          "1155",
+          "Fashion Modeling"
+        ],
+        [
+          "1157",
+          "Home Theater Systems"
+        ],
+        [
+          "1158",
+          "Speakers"
+        ],
+        [
+          "1159",
+          "Business Operations"
+        ],
+        [
+          "1160",
+          "Commercial Lending"
+        ],
+        [
+          "1161",
+          "Public Finance"
+        ],
+        [
+          "1162",
+          "Consulting"
+        ],
+        [
+          "1163",
+          "Financial Markets"
+        ],
+        [
+          "1164",
+          "Economy News"
+        ],
+        [
+          "1165",
+          "Fiscal Policy News"
+        ],
+        [
+          "1166",
+          "Housing & Development"
+        ],
+        [
+          "1167",
+          "Painting"
+        ],
+        [
+          "1168",
+          "Earth Sciences"
+        ],
+        [
+          "1169",
+          "Paleontology"
+        ],
+        [
+          "1170",
+          "Bluetooth Accessories"
+        ],
+        [
+          "1171",
+          "Mobile & Wireless Accessories"
+        ],
+        [
+          "1173",
+          "Dress-Up & Fashion Games"
+        ],
+        [
+          "1174",
+          "Fun Tests & Silly Surveys"
+        ],
+        [
+          "1175",
+          "Roofing"
+        ],
+        [
+          "1176",
+          "Printing & Publishing"
+        ],
+        [
+          "1177",
+          "Writers Resources"
+        ],
+        [
+          "1178",
+          "Commercial & Investment Real Estate"
+        ],
+        [
+          "1179",
+          "Company News"
+        ],
+        [
+          "1180",
+          "Political Humor"
+        ],
+        [
+          "1181",
+          "Corporate & Financial Crime"
+        ],
+        [
+          "1182",
+          "Radio Equipment"
+        ],
+        [
+          "1183",
+          "Children's Literature"
+        ],
+        [
+          "1184",
+          "Literary Classics"
+        ],
+        [
+          "1185",
+          "Opera"
+        ],
+        [
+          "1186",
+          "Talk Radio"
+        ],
+        [
+          "1187",
+          "TV Guides & Reference"
+        ],
+        [
+          "1188",
+          "Car Electronics"
+        ],
+        [
+          "1189",
+          "Car Video"
+        ],
+        [
+          "1190",
+          "Automotive Industry"
+        ],
+        [
+          "1191",
+          "Bicycles & Accessories"
+        ],
+        [
+          "1192",
+          "Electronic Accessories"
+        ],
+        [
+          "1193",
+          "TV Dramas"
+        ],
+        [
+          "1194",
+          "TV Medical Shows"
+        ],
+        [
+          "1195",
+          "Arts Education"
+        ],
+        [
+          "1198",
+          "World Sports Competitions"
+        ],
+        [
+          "1199",
+          "Professional & Trade Associations"
+        ],
+        [
+          "1200",
+          "Business Formation"
+        ],
+        [
+          "1201",
+          "Opinion & Commentary"
+        ],
+        [
+          "1202",
+          "Political Polls & Surveys"
+        ],
+        [
+          "1203",
+          "Media Critics & Watchdogs"
+        ],
+        [
+          "1204",
+          "Journalism & News Industry"
+        ],
+        [
+          "1205",
+          "Discrimination & Identity Relations"
+        ],
+        [
+          "1206",
+          "Drag & Street Racing"
+        ],
+        [
+          "1207",
+          "Stunts & Dangerous Feats"
+        ],
+        [
+          "1208",
+          "African Music"
+        ],
+        [
+          "1209",
+          "World News"
+        ],
+        [
+          "1210",
+          "Swap Meets & Outdoor Markets"
+        ],
+        [
+          "1211",
+          "Ear Nose & Throat"
+        ],
+        [
+          "1212",
+          "Scooters & Mopeds"
+        ],
+        [
+          "1213",
+          "Campers & RVs"
+        ],
+        [
+          "1214",
+          "Commercial Vehicles"
+        ],
+        [
+          "1215",
+          "Cargo Trucks & Trailers"
+        ],
+        [
+          "1216",
+          "Engine & Transmission"
+        ],
+        [
+          "1217",
+          "Auto Exterior"
+        ],
+        [
+          "1218",
+          "Auto Interior"
+        ],
+        [
+          "1219",
+          "Beauty Pageants"
+        ],
+        [
+          "1220",
+          "Cosmetic Procedures"
+        ],
+        [
+          "1221",
+          "Intelligence & Counterterrorism"
+        ],
+        [
+          "1222",
+          "Online Image Galleries"
+        ],
+        [
+          "1223",
+          "Clip Art & Animated GIFs"
+        ],
+        [
+          "1224",
+          "Eyeglasses & Contacts"
+        ],
+        [
+          "1225",
+          "Wholesalers & Liquidators"
+        ],
+        [
+          "1226",
+          "Neuroscience"
+        ],
+        [
+          "1227",
+          "Computer Science"
+        ],
+        [
+          "1228",
+          "Apparel Services"
+        ],
+        [
+          "1229",
+          "Computer Education"
+        ],
+        [
+          "1230",
+          "Fiber & Textile Arts"
+        ],
+        [
+          "1231",
+          "Baby & Pet Names"
+        ],
+        [
+          "1232",
+          "House Painting & Finishing"
+        ],
+        [
+          "1233",
+          "Technical Reference"
+        ],
+        [
+          "1234",
+          "People Search"
+        ],
+        [
+          "1235",
+          "Steroids & Performance-Enhancing Drugs"
+        ],
+        [
+          "1236",
+          "Sexual Enhancement"
+        ],
+        [
+          "1237",
+          "Smoking & Smoking Cessation"
+        ],
+        [
+          "1238",
+          "Cleansing & Detoxification"
+        ],
+        [
+          "1239",
+          "Acupuncture & Chinese Medicine"
+        ],
+        [
+          "1240",
+          "Company Earnings"
+        ],
+        [
+          "1241",
+          "Mergers & Acquisitions"
+        ],
+        [
+          "1242",
+          "Reggaeton"
+        ],
+        [
+          "1243",
+          "Broadway & Musical Theater"
+        ],
+        [
+          "1244",
+          "Spoofs & Satire"
+        ],
+        [
+          "1245",
+          "Airport Parking & Transportation"
+        ],
+        [
+          "1246",
+          "Carnival & Mardi Gras"
+        ],
+        [
+          "1247",
+          "Air Force"
+        ],
+        [
+          "1248",
+          "Army"
+        ],
+        [
+          "1249",
+          "Navy"
+        ],
+        [
+          "1250",
+          "Marines"
+        ],
+        [
+          "1251",
+          "Scientology"
+        ],
+        [
+          "1252",
+          "Statistics"
+        ],
+        [
+          "1253",
+          "Health News"
+        ],
+        [
+          "1254",
+          "Atmospheric Science"
+        ],
+        [
+          "1255",
+          "Climate Change & Global Warming"
+        ],
+        [
+          "1256",
+          "Health Policy"
+        ],
+        [
+          "1257",
+          "Asians & Diaspora"
+        ],
+        [
+          "1258",
+          "Pagan & Esoteric Traditions"
+        ],
+        [
+          "1259",
+          "Scandals & Investigations"
+        ],
+        [
+          "1260",
+          "Troubled Relationships"
+        ],
+        [
+          "1261",
+          "Divorce & Separation"
+        ],
+        [
+          "1262",
+          "Parasites & Parasitic Diseases"
+        ],
+        [
+          "1263",
+          "Vaccines & Immunizations"
+        ],
+        [
+          "1264",
+          "Foreign Language Resources"
+        ],
+        [
+          "1265",
+          "Translation Tools & Resources"
+        ],
+        [
+          "1266",
+          "Foreign Language Study"
+        ],
+        [
+          "1267",
+          "Vehicle Specs, Reviews & Comparisons"
+        ],
+        [
+          "1268",
+          "Fuel Economy & Gas Prices"
+        ],
+        [
+          "1269",
+          "Vehicle Fuels & Lubricants"
+        ],
+        [
+          "1270",
+          "Birthdays & Name Days"
+        ],
+        [
+          "1271",
+          "New Year"
+        ],
+        [
+          "1272",
+          "Business & Corporate Law"
+        ],
+        [
+          "1273",
+          "Live Sporting Events"
+        ],
+        [
+          "1274",
+          "Christian Holidays"
+        ],
+        [
+          "1275",
+          "Islamic Holidays"
+        ],
+        [
+          "1276",
+          "Contests, Awards & Prizes"
+        ],
+        [
+          "1277",
+          "Tablet PCs"
+        ],
+        [
+          "1278",
+          "Insects & Entomology"
+        ],
+        [
+          "1279",
+          "VPN & Remote Access"
+        ],
+        [
+          "1280",
+          "Human Rights & Liberties"
+        ],
+        [
+          "1281",
+          "Privacy Issues"
+        ],
+        [
+          "1282",
+          "Grants & Financial Assistance"
+        ],
+        [
+          "1283",
+          "Tax Preparation & Planning"
+        ],
+        [
+          "1284",
+          "Prisons & Corrections"
+        ],
+        [
+          "1285",
+          "Latin Pop"
+        ],
+        [
+          "1286",
+          "Salsa & Tropical Music"
+        ],
+        [
+          "1287",
+          "Brazilian Music"
+        ],
+        [
+          "1288",
+          "Military History"
+        ],
+        [
+          "1289",
+          "Academic Conferences & Publications"
+        ],
+        [
+          "1290",
+          "Family-Oriented Games & Activities"
+        ],
+        [
+          "1291",
+          "Family Films"
+        ],
+        [
+          "1292",
+          "Small Kitchen Appliances"
+        ],
+        [
+          "1293",
+          "Major Kitchen Appliances"
+        ],
+        [
+          "1294",
+          "Vehicle Codes & Driving Laws"
+        ],
+        [
+          "1296",
+          "Places of Worship"
+        ],
+        [
+          "1298",
+          "Distributed & Parallel Computing"
+        ],
+        [
+          "1299",
+          "Machine Learning & Artificial Intelligence"
+        ],
+        [
+          "1300",
+          "CAD & CAM"
+        ],
+        [
+          "1301",
+          "Same-Sex Marriage"
+        ],
+        [
+          "1302",
+          "Communications & Media Studies"
+        ],
+        [
+          "1303",
+          "Public Speaking"
+        ],
+        [
+          "1304",
+          "Etiquette"
+        ],
+        [
+          "1305",
+          "Diving & Underwater Activities"
+        ],
+        [
+          "1306",
+          "Parking"
+        ],
+        [
+          "1307",
+          "Recycling"
+        ],
+        [
+          "1308",
+          "Study Abroad"
+        ],
+        [
+          "1309",
+          "Loyalty Cards & Programs"
+        ],
+        [
+          "1310",
+          "Romance Films"
+        ],
+        [
+          "1311",
+          "Action & Platform Games"
+        ],
+        [
+          "1312",
+          "Gangs & Organized Crime"
+        ],
+        [
+          "1313",
+          "Immigration Policy & Border Issues"
+        ],
+        [
+          "1314",
+          "Drug Laws & Policy"
+        ],
+        [
+          "1315",
+          "Video File Formats & Codecs"
+        ],
+        [
+          "1316",
+          "Public Policy"
+        ],
+        [
+          "1317",
+          "Microcars & City Cars"
+        ],
+        [
+          "1318",
+          "Flash Drives & Memory Cards"
+        ],
+        [
+          "1319",
+          "Memory Card Readers"
+        ],
+        [
+          "1320",
+          "Hard Drives"
+        ],
+        [
+          "1321",
+          "CD & DVD Drives & Burners"
+        ],
+        [
+          "1322",
+          "CD & DVD Storage Media"
+        ],
+        [
+          "1323",
+          "Data Backup & Recovery"
+        ],
+        [
+          "1324",
+          "E-Book Readers"
+        ],
+        [
+          "1325",
+          "Guitars"
+        ],
+        [
+          "1326",
+          "Pianos & Keyboards"
+        ],
+        [
+          "1327",
+          "Drums & Percussion"
+        ],
+        [
+          "1328",
+          "Endocrine Conditions"
+        ],
+        [
+          "1329",
+          "Thyroid Conditions"
+        ],
+        [
+          "1330",
+          "Printers, Copiers & Fax"
+        ],
+        [
+          "1331",
+          "Copiers"
+        ],
+        [
+          "1332",
+          "Fax Machines"
+        ],
+        [
+          "1333",
+          "Ink & Toner"
+        ],
+        [
+          "1334",
+          "Projectors & Screens"
+        ],
+        [
+          "1339",
+          "Carpooling & Ridesharing"
+        ],
+        [
+          "1340",
+          "Theology & Religious Study"
+        ],
+        [
+          "1341",
+          "Accounting & Financial Software"
+        ],
+        [
+          "1342",
+          "Video Game Emulation"
+        ],
+        [
+          "1343",
+          "Gaming Media & Reference"
+        ],
+        [
+          "1344",
+          "Spreadsheet Software"
+        ],
+        [
+          "1345",
+          "Word Processing Software"
+        ],
+        [
+          "1346",
+          "Presentation Software"
+        ],
+        [
+          "1347",
+          "Public Storage"
+        ],
+        [
+          "1348",
+          "Home Storage & Shelving"
+        ],
+        [
+          "1349",
+          "Water Supply & Treatment"
+        ],
+        [
+          "1350",
+          "Drug & Alcohol Treatment"
+        ],
+        [
+          "1351",
+          "Drug & Alcohol Testing"
+        ],
+        [
+          "1352",
+          "Assistive Technology"
+        ],
+        [
+          "1353",
+          "Mobility Equipment & Accessories"
+        ],
+        [
+          "1354",
+          "HDTVs"
+        ],
+        [
+          "1355",
+          "Plasma TVs"
+        ],
+        [
+          "1356",
+          "LCD TVs"
+        ],
+        [
+          "1357",
+          "Projection TVs"
+        ],
+        [
+          "1358",
+          "Calendar & Scheduling Software"
+        ],
+        [
+          "1359",
+          "Project Management Software"
+        ],
+        [
+          "1360",
+          "Project Management"
+        ],
+        [
+          "1361",
+          "Art & Craft Supplies"
+        ],
+        [
+          "1362",
+          "Rugs & Carpets"
+        ],
+        [
+          "1363",
+          "Clocks"
+        ],
+        [
+          "1364",
+          "Laundry"
+        ],
+        [
+          "1365",
+          "Bathroom"
+        ],
+        [
+          "1366",
+          "Bedroom"
+        ],
+        [
+          "1367",
+          "Beds & Headboards"
+        ],
+        [
+          "1368",
+          "Mattresses"
+        ],
+        [
+          "1369",
+          "Bedding & Bed Linens"
+        ],
+        [
+          "1370",
+          "Sofas & Chairs"
+        ],
+        [
+          "1371",
+          "Water Filters & Purifiers"
+        ],
+        [
+          "1372",
+          "Nursery & Playroom"
+        ],
+        [
+          "1373",
+          "Cutlery & Cutting Accessories"
+        ],
+        [
+          "1374",
+          "Babies & Toddlers"
+        ],
+        [
+          "1375",
+          "Business Cards & Stationary"
+        ],
+        [
+          "1376",
+          "Tennis"
+        ],
+        [
+          "1377",
+          "Infiniti"
+        ],
+        [
+          "1378",
+          "Isuzu"
+        ],
+        [
+          "1379",
+          "Text & Instant Messaging"
+        ],
+        [
+          "1380",
+          "Electric & Plug-In Vehicles"
+        ],
+        [
+          "1381",
+          "Microblogging"
+        ],
+        [
+          "1382",
+          "Mobile OS"
+        ],
+        [
+          "1383",
+          "Camera Lenses"
+        ],
+        [
+          "1384",
+          "Binoculars, Telescopes & Optical Devices"
+        ],
+        [
+          "1385",
+          "Government Contracting & Procurement"
+        ],
+        [
+          "1386",
+          "Lobbying"
+        ],
+        [
+          "1387",
+          "Government Agencies"
+        ],
+        [
+          "1388",
+          "Training & Certification"
+        ],
+        [
+          "1389",
+          "Agritourism"
+        ],
+        [
+          "1390",
+          "Sightseeing Tours"
+        ],
+        [
+          "1391",
+          "Vineyards & Wine Tourism"
+        ],
+        [
+          "1392",
+          "Tourist Boards & Visitor Centers"
+        ],
+        [
+          "1393",
+          "DVRs & Set-Top Boxes"
+        ],
+        [
+          "1394",
+          "Blu-Ray Players & Recorders"
+        ],
+        [
+          "1395",
+          "DVD Players & Recorders"
+        ],
+        [
+          "1396",
+          "Headphones"
+        ],
+        [
+          "1397",
+          "Drawing & Coloring"
+        ]
+      ],
+      "description": "Parameter is used to define a search category. The default value is 0 (All categories). You can find or download all supported values in the Google Trends Categories list. Note that these are different from the categories supported for Google Trends Trending Now",
+      "group": "advanced_google_trends_parameters"
+    },
+    "gprop": {
+      "type": "select",
+      "options": [
+        "",
+        "images",
+        "news",
+        "froogle",
+        "youtube"
+      ],
+      "description": "Parameter is used for sorting results by property. The default property is set to `Web Search` (activated when the value of gprop parameter is not set or empty). Other available options: `images` - Image Search `news` - News Search `froogle` - Google Shopping `youtube` - YouTube Search",
+      "group": "advanced_google_trends_parameters"
+    },
+    "date": {
+      "description": "Parameter is used to define a date. Available options: `now 1-H` - Past hour `now 4-H` - Past 4 hours `now 1-d` - Past day `now 7-d` - Past 7 days `today 1-m` - Past 30 days `today 3-m` - Past 90 days `today 12-m` - Past 12 months `today 5-y` - Past 5 years `all` - 2004 - present You can also pass custom values: Dates from 2004 to present: `yyyy-mm-dd yyyy-mm-dd` (e.g. `2021-10-15 2022-05-25`) Dates with hours within a week range: `yyyy-mm-ddThh yyyy-mm-ddThh` (e.g. `2022-05-19T10 2022-05-24T22`). Hours will be calculated depending on the tz (time zone) parameter.",
+      "group": "advanced_google_trends_parameters"
+    },
+    "csv": {
+      "type": "checkbox",
+      "description": "Parameter is used for retrieving the CSV results. Set the parameter to `true` to retrieve CSV results as an array.",
+      "group": "advanced_google_trends_parameters"
+    },
+    "include_low_search_volume": {
+      "type": "checkbox",
+      "description": "Parameter is used for including low search volume regions in the results. Set the parameter to `true` to include low search volume regions in the results. This parameter is ignored if data_type is not set to `GEO_MAP` or `GEO_MAP_0`.",
+      "group": "advanced_google_trends_parameters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `google_trends` to use the Google Trends API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Google Trends results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

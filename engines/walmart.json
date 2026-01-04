@@ -1,0 +1,112 @@
+{
+  "engine": "walmart",
+  "params": {
+    "query": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Walmart search. Either a `query` or a `cat_id` parameter is required.",
+      "group": "search_query"
+    },
+    "sort": {
+      "type": "select",
+      "options": [
+        "price_low",
+        "price_high",
+        "best_seller",
+        "best_match",
+        "rating_high"
+      ],
+      "description": "Parameter defines sorting. (e.g. `price_low`, `price_high`, `best_seller`, `best_match`, `rating_high`, `new`)",
+      "group": "advanced_walmart_parameters"
+    },
+    "soft_sort": {
+      "type": "checkbox",
+      "description": "Parameter enables sort by relevance. Walmart is by default showing results sorted by relevance and using the `sort` option. Set to `false` to disable sort by Relevance.",
+      "group": "advanced_walmart_parameters"
+    },
+    "cat_id": {
+      "description": "Category on Walmart Search. (e.g. `0` (default) is all departments, `976759_976787` is 'Cookies', etc.). Either a `query` or a `cat_id` parameter is required.",
+      "group": "advanced_filters"
+    },
+    "facet": {
+      "description": "Parameter defines items filtering based on their attributes. The structure is a list of `key:value` pairs separated by `||`. The key and value are separated by `:`",
+      "group": "advanced_filters"
+    },
+    "store_id": {
+      "description": "Store ID to filter the products by the specific store only. Head to the Walmart Stores Locations for a full list of supported stores. It's possible for the product pricing to differ between stores.",
+      "group": "advanced_filters"
+    },
+    "min_price": {
+      "type": "number",
+      "description": "Lower bound of price range query.",
+      "group": "advanced_filters"
+    },
+    "max_price": {
+      "type": "number",
+      "description": "Upper bound of price range query.",
+      "group": "advanced_filters"
+    },
+    "spelling": {
+      "type": "checkbox",
+      "description": "Activate spelling fix. `true` (default) includes spelling fix, `false` searches without spelling fix.",
+      "group": "advanced_filters"
+    },
+    "nd_en": {
+      "type": "checkbox",
+      "description": "Show results with NextDay delivery only. Set to `true` to enable or `false` (default) to disable",
+      "group": "advanced_filters"
+    },
+    "page": {
+      "type": "number",
+      "description": "Value is used to get the items on a specific page. (e.g., `1` (default) is the first page of results, `2` is the 2nd page of results, `3` is the 3rd page of results, etc.). Maximum page value is `100`.",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `walmart` to use the Walmart API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Walmart results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    },
+    "include_filters": {
+      "type": "checkbox",
+      "description": "Include `filters` to the JSON response. Set to `true` to enable or `false` to disable (default).",
+      "group": "serpapi_parameters"
+    }
+  }
+}

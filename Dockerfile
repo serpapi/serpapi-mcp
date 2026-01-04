@@ -7,6 +7,7 @@ WORKDIR /app
 COPY pyproject.toml /app/
 COPY README.md /app/
 COPY src /app/src
+COPY engines /app/engines
 
 RUN uv sync
 

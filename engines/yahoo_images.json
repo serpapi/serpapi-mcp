@@ -1,0 +1,193 @@
+{
+  "engine": "yahoo_images",
+  "params": {
+    "p": {
+      "required": true,
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Yahoo! Images search.",
+      "group": "search_query"
+    },
+    "yahoo_domain": {
+      "type": "select",
+      "options": [
+        "espanol",
+        "be",
+        "fr",
+        "br",
+        "ca",
+        "espanol",
+        "espanol",
+        "de",
+        "es",
+        "espanol",
+        "fr",
+        "in",
+        "id",
+        "ie",
+        "it",
+        "malaysia",
+        "espanol",
+        "nl",
+        "no",
+        "at",
+        "espanol",
+        "ph",
+        "pl",
+        "qc",
+        "ro",
+        "ch",
+        "sg",
+        "za",
+        "fi",
+        "se",
+        "tr",
+        "uk",
+        "espanol",
+        "vn",
+        "gr",
+        "ru",
+        "ua",
+        "il",
+        "hk",
+        "tw"
+      ],
+      "description": "Parameter defines the Yahoo! domain to use. It defaults to `search.yahoo.com`. If specified domain is allowed, it will be prepended to the domain (e.g., `fr.search.yahoo.com`). You can check a full list of supported Yahoo! domains.",
+      "group": "localization"
+    },
+    "imgsz": {
+      "type": "select",
+      "options": [
+        "small",
+        "medium",
+        "large",
+        "wallpaper"
+      ],
+      "description": "Parameter is used for filtering images by size. It can be set to: `small` - Small `medium` - Medium `large` - Large `wallpaper` - Extra Large",
+      "group": "advanced_yahoo_images_parameters"
+    },
+    "imgc": {
+      "type": "select",
+      "options": [
+        "color",
+        "bw",
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "teal",
+        "blue",
+        "purple",
+        "pink",
+        "brown",
+        "black",
+        "gray",
+        "white"
+      ],
+      "description": "Parameter is used for filtering images by color. It can be set to: `color` - Color Only `bw` - Black & white `red` - Red color `orange` - Orange color `yellow` - Yellow color `green` - Green color `teal` - Teal color `blue` - Blue color `purple` - Purple color `pink` - Pink color `brown` - Brown color `black` - Black color `gray` - Gray color `white` - White color",
+      "group": "advanced_yahoo_images_parameters"
+    },
+    "imgty": {
+      "type": "select",
+      "options": [
+        "photo",
+        "clipart",
+        "linedrawing",
+        "gif",
+        "transparent"
+      ],
+      "description": "Parameter is used for filtering images by image type. It can be set to: `photo` - Photo `clipart` - Clipart `linedrawing` - Line Drawing `gif` - Animated GIF `transparent` - Transparent",
+      "group": "advanced_yahoo_images_parameters"
+    },
+    "imga": {
+      "type": "select",
+      "options": [
+        "square",
+        "wide",
+        "tall"
+      ],
+      "description": "Parameter is used for filtering images by layout. It can be set to: `square` - Square `wide` - Wide `tall` - Tall",
+      "group": "advanced_yahoo_images_parameters"
+    },
+    "imgf": {
+      "type": "select",
+      "options": [
+        "face",
+        "portrait",
+        "nonportrait"
+      ],
+      "description": "Parameter is used for filtering images by people. It can be set to: `face` - Faces Only `portrait` - Head & Shoulders `nonportrait` - No People",
+      "group": "advanced_yahoo_images_parameters"
+    },
+    "imgt": {
+      "type": "select",
+      "options": [
+        "day",
+        "week",
+        "month",
+        "year"
+      ],
+      "description": "Parameter is used for filtering images by time. It can be set to: `day` - Past 24 hours `week` - Past week `month` - Past month `year` - Past year",
+      "group": "advanced_yahoo_images_parameters"
+    },
+    "imgl": {
+      "type": "select",
+      "options": [
+        "cc",
+        "pd",
+        "fsu",
+        "fsuc",
+        "fmsu",
+        "fmsuc"
+      ],
+      "description": "Parameter is used for filtering images by usage rights. It can be set to: `cc` - All Creative Commons `pd` - Public Domain `fsu` - Free to share and use `fsuc` - Free to share and use commercially `fmsu` - Free to modify, share and use `fmsuc` - Free to modify, share, and use commercially",
+      "group": "advanced_yahoo_images_parameters"
+    },
+    "b": {
+      "type": "number",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `1` (default) starts from the first result, `61` starts from the 61st result, `121` starts from the 121st result, etc.).",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `yahoo_images` to use the Yahoo Images API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Yahoo Images results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

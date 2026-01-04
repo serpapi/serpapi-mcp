@@ -1,0 +1,2411 @@
+{
+  "engine": "google_trends_trending_now",
+  "params": {
+    "geo": {
+      "type": "select",
+      "options": [
+        "AL",
+        "DZ",
+        "AO",
+        "AR",
+        "AR-C",
+        "AR-B",
+        "AR-K",
+        "AR-H",
+        "AR-U",
+        "AR-X",
+        "AR-W",
+        "AR-E",
+        "AR-P",
+        "AR-Y",
+        "AR-L",
+        "AR-F",
+        "AR-M",
+        "AR-N",
+        "AR-Q",
+        "AR-R",
+        "AR-A",
+        "AR-J",
+        "AR-D",
+        "AR-Z",
+        "AR-S",
+        "AR-G",
+        "AR-V",
+        "AR-T",
+        "AM",
+        "AU",
+        "AU-ACT",
+        "AU-NSW",
+        "AU-NT",
+        "AU-QLD",
+        "AU-SA",
+        "AU-TAS",
+        "AU-VIC",
+        "AU-WA",
+        "AT",
+        "AT-1",
+        "AT-2",
+        "AT-3",
+        "AT-5",
+        "AT-6",
+        "AT-7",
+        "AT-4",
+        "AT-9",
+        "AT-8",
+        "AZ",
+        "BH",
+        "BD",
+        "BY",
+        "BE",
+        "BE-BRU",
+        "BE-VLG",
+        "BE-WAL",
+        "BJ",
+        "BO",
+        "BA",
+        "BR",
+        "BR-DF",
+        "BR-AC",
+        "BR-AL",
+        "BR-AP",
+        "BR-AM",
+        "BR-BA",
+        "BR-CE",
+        "BR-ES",
+        "BR-GO",
+        "BR-MA",
+        "BR-MT",
+        "BR-MS",
+        "BR-MG",
+        "BR-PA",
+        "BR-PB",
+        "BR-PR",
+        "BR-PE",
+        "BR-PI",
+        "BR-RJ",
+        "BR-RN",
+        "BR-RS",
+        "BR-RO",
+        "BR-RR",
+        "BR-SC",
+        "BR-SP",
+        "BR-SE",
+        "BR-TO",
+        "BG",
+        "BF",
+        "KH",
+        "CM",
+        "CA",
+        "CA-AB",
+        "CA-BC",
+        "CA-MB",
+        "CA-NB",
+        "CA-NL",
+        "CA-NT",
+        "CA-NS",
+        "CA-NU",
+        "CA-ON",
+        "CA-PE",
+        "CA-QC",
+        "CA-SK",
+        "CA-YT",
+        "CL",
+        "CL-AN",
+        "CL-AR",
+        "CL-AP",
+        "CL-AT",
+        "CL-BI",
+        "CL-CO",
+        "CL-LL",
+        "CL-LR",
+        "CL-MA",
+        "CL-ML",
+        "CL-LI",
+        "CL-RM",
+        "CL-TA",
+        "CL-VS",
+        "CL-AI",
+        "CO",
+        "CO-AMA",
+        "CO-ANT",
+        "CO-ARA",
+        "CO-ATL",
+        "CO-DC",
+        "CO-BOL",
+        "CO-BOY",
+        "CO-CAL",
+        "CO-CAQ",
+        "CO-CAS",
+        "CO-CAU",
+        "CO-CES",
+        "CO-CHO",
+        "CO-COR",
+        "CO-CUN",
+        "CO-GUA",
+        "CO-GUV",
+        "CO-HUI",
+        "CO-LAG",
+        "CO-MAG",
+        "CO-MET",
+        "CO-NAR",
+        "CO-NSA",
+        "CO-PUT",
+        "CO-QUI",
+        "CO-RIS",
+        "CO-SAP",
+        "CO-SAN",
+        "CO-SUC",
+        "CO-TOL",
+        "CO-VAC",
+        "CO-VAU",
+        "CO-VID",
+        "CD",
+        "CR",
+        "CI",
+        "HR",
+        "CU",
+        "CY",
+        "CZ",
+        "DK",
+        "DK-84",
+        "DK-82",
+        "DK-81",
+        "DK-83",
+        "DK-85",
+        "DO",
+        "EC",
+        "EC-A",
+        "EC-B",
+        "EC-F",
+        "EC-C",
+        "EC-H",
+        "EC-X",
+        "EC-O",
+        "EC-E",
+        "EC-W",
+        "EC-G",
+        "EC-I",
+        "EC-L",
+        "EC-R",
+        "EC-M",
+        "EC-S",
+        "EC-D",
+        "EC-Y",
+        "EC-P",
+        "EC-N",
+        "EC-SE",
+        "EC-SD",
+        "EC-U",
+        "EC-T",
+        "EC-Z",
+        "EG",
+        "EG-KB",
+        "EG-ALX",
+        "EG-SHR",
+        "EG-AST",
+        "EG-ASN",
+        "EG-BNS",
+        "EG-C",
+        "EG-DK",
+        "EG-DT",
+        "EG-BH",
+        "EG-FYM",
+        "EG-GH",
+        "EG-GZ",
+        "EG-IS",
+        "EG-KFS",
+        "EG-LX",
+        "EG-MT",
+        "EG-MN",
+        "EG-MNF",
+        "EG-WAD",
+        "EG-SIN",
+        "EG-PTS",
+        "EG-KN",
+        "EG-BA",
+        "EG-SHG",
+        "EG-JS",
+        "EG-SUZ",
+        "SV",
+        "EE",
+        "ET",
+        "FI",
+        "FR",
+        "FR-A",
+        "FR-B",
+        "FR-C",
+        "FR-E",
+        "FR-D",
+        "FR-F",
+        "FR-G",
+        "FR-H",
+        "FR-I",
+        "FR-J",
+        "FR-K",
+        "FR-L",
+        "FR-M",
+        "FR-P",
+        "FR-N",
+        "FR-O",
+        "FR-R",
+        "FR-S",
+        "FR-T",
+        "FR-U",
+        "FR-V",
+        "FR-Q",
+        "FR-01",
+        "FR-02",
+        "FR-03",
+        "FR-06",
+        "FR-04",
+        "FR-07",
+        "FR-08",
+        "FR-09",
+        "FR-10",
+        "FR-11",
+        "FR-12",
+        "FR-67",
+        "FR-13",
+        "FR-14",
+        "FR-15",
+        "FR-16",
+        "FR-17",
+        "FR-18",
+        "FR-19",
+        "FR-2A",
+        "FR-22",
+        "FR-23",
+        "FR-21",
+        "FR-79",
+        "FR-24",
+        "FR-25",
+        "FR-26",
+        "FR-91",
+        "FR-27",
+        "FR-28",
+        "FR-29",
+        "FR-30",
+        "FR-32",
+        "FR-33",
+        "FR-68",
+        "FR-2B",
+        "FR-31",
+        "FR-43",
+        "FR-52",
+        "FR-74",
+        "FR-70",
+        "FR-87",
+        "FR-05",
+        "FR-65",
+        "FR-92",
+        "FR-34",
+        "FR-35",
+        "FR-36",
+        "FR-37",
+        "FR-38",
+        "FR-39",
+        "FR-40",
+        "FR-41",
+        "FR-42",
+        "FR-44",
+        "FR-45",
+        "FR-46",
+        "FR-47",
+        "FR-48",
+        "FR-49",
+        "FR-50",
+        "FR-51",
+        "FR-53",
+        "FR-54",
+        "FR-55",
+        "FR-56",
+        "FR-57",
+        "FR-58",
+        "FR-59",
+        "FR-60",
+        "FR-61",
+        "FR-75",
+        "FR-62",
+        "FR-63",
+        "FR-64",
+        "FR-66",
+        "FR-69",
+        "FR-72",
+        "FR-73",
+        "FR-71",
+        "FR-76",
+        "FR-93",
+        "FR-77",
+        "FR-80",
+        "FR-81",
+        "FR-82",
+        "FR-90",
+        "FR-95",
+        "FR-94",
+        "FR-83",
+        "FR-84",
+        "FR-85",
+        "FR-86",
+        "FR-88",
+        "FR-89",
+        "FR-78",
+        "GE",
+        "DE",
+        "DE-BW",
+        "DE-BY",
+        "DE-BE",
+        "DE-BB",
+        "DE-HB",
+        "DE-HH",
+        "DE-HE",
+        "DE-NI",
+        "DE-MV",
+        "DE-NW",
+        "DE-RP",
+        "DE-SL",
+        "DE-SN",
+        "DE-ST",
+        "DE-SH",
+        "DE-TH",
+        "GH",
+        "GR",
+        "GT",
+        "HT",
+        "HN",
+        "HK",
+        "HU",
+        "IN",
+        "IN-AN",
+        "IN-AP",
+        "IN-AR",
+        "IN-AS",
+        "IN-BR",
+        "IN-CH",
+        "IN-CT",
+        "IN-DN",
+        "IN-DD",
+        "IN-DL",
+        "IN-GA",
+        "IN-GJ",
+        "IN-HR",
+        "IN-HP",
+        "IN-JK",
+        "IN-JH",
+        "IN-KA",
+        "IN-KL",
+        "IN-LD",
+        "IN-MP",
+        "IN-MH",
+        "IN-MN",
+        "IN-ML",
+        "IN-MZ",
+        "IN-NL",
+        "IN-OR",
+        "IN-PY",
+        "IN-PB",
+        "IN-RJ",
+        "IN-SK",
+        "IN-TN",
+        "IN-TG",
+        "IN-TR",
+        "IN-UP",
+        "IN-UT",
+        "IN-WB",
+        "ID",
+        "ID-AC",
+        "ID-BA",
+        "ID-BB",
+        "ID-BT",
+        "ID-BE",
+        "ID-JT",
+        "ID-KT",
+        "ID-ST",
+        "ID-JI",
+        "ID-KI",
+        "ID-NT",
+        "ID-GO",
+        "ID-JA",
+        "ID-LA",
+        "ID-MA",
+        "ID-KU",
+        "ID-MU",
+        "ID-SA",
+        "ID-SU",
+        "ID-PA",
+        "ID-RI",
+        "ID-KR",
+        "ID-SG",
+        "ID-KS",
+        "ID-SN",
+        "ID-SS",
+        "ID-JK",
+        "ID-YO",
+        "ID-JB",
+        "ID-KB",
+        "ID-NB",
+        "ID-PB",
+        "ID-SR",
+        "ID-SB",
+        "IR",
+        "IQ",
+        "IE",
+        "IL",
+        "IL-M",
+        "IL-HA",
+        "IL-JM",
+        "IL-Z",
+        "IL-D",
+        "IL-TA",
+        "IT",
+        "IT-65",
+        "IT-23",
+        "IT-75",
+        "IT-77",
+        "IT-78",
+        "IT-72",
+        "IT-45",
+        "IT-36",
+        "IT-62",
+        "IT-42",
+        "IT-25",
+        "IT-57",
+        "IT-67",
+        "IT-21",
+        "IT-88",
+        "IT-82",
+        "IT-32",
+        "IT-52",
+        "IT-55",
+        "IT-34",
+        "JM",
+        "JP",
+        "JP-23",
+        "JP-05",
+        "JP-02",
+        "JP-12",
+        "JP-38",
+        "JP-18",
+        "JP-40",
+        "JP-07",
+        "JP-21",
+        "JP-10",
+        "JP-34",
+        "JP-01",
+        "JP-28",
+        "JP-08",
+        "JP-17",
+        "JP-03",
+        "JP-37",
+        "JP-46",
+        "JP-14",
+        "JP-39",
+        "JP-43",
+        "JP-26",
+        "JP-24",
+        "JP-04",
+        "JP-45",
+        "JP-20",
+        "JP-42",
+        "JP-29",
+        "JP-15",
+        "JP-44",
+        "JP-33",
+        "JP-47",
+        "JP-27",
+        "JP-41",
+        "JP-11",
+        "JP-25",
+        "JP-32",
+        "JP-22",
+        "JP-09",
+        "JP-36",
+        "JP-13",
+        "JP-31",
+        "JP-16",
+        "JP-30",
+        "JP-06",
+        "JP-35",
+        "JP-19",
+        "JO",
+        "KZ",
+        "KE",
+        "KW",
+        "KG",
+        "LV",
+        "LB",
+        "LY",
+        "LT",
+        "MY",
+        "MY-14",
+        "MY-01",
+        "MY-02",
+        "MY-03",
+        "MY-15",
+        "MY-04",
+        "MY-05",
+        "MY-06",
+        "MY-07",
+        "MY-08",
+        "MY-09",
+        "MY-16",
+        "MY-12",
+        "MY-13",
+        "MY-10",
+        "MY-11",
+        "ML",
+        "MX",
+        "MX-AGU",
+        "MX-BCN",
+        "MX-BCS",
+        "MX-CAM",
+        "MX-CHP",
+        "MX-CHH",
+        "MX-COA",
+        "MX-COL",
+        "MX-DUR",
+        "MX-GUA",
+        "MX-GRO",
+        "MX-HID",
+        "MX-JAL",
+        "MX-DIF",
+        "MX-MIC",
+        "MX-MOR",
+        "MX-NAY",
+        "MX-NLE",
+        "MX-OAX",
+        "MX-PUE",
+        "MX-QUE",
+        "MX-ROO",
+        "MX-SLP",
+        "MX-SIN",
+        "MX-SON",
+        "MX-MEX",
+        "MX-TAB",
+        "MX-TAM",
+        "MX-TLA",
+        "MX-VER",
+        "MX-YUC",
+        "MX-ZAC",
+        "MD",
+        "MA",
+        "MZ",
+        "MM",
+        "NP",
+        "NL",
+        "NL-DR",
+        "NL-FL",
+        "NL-FR",
+        "NL-GE",
+        "NL-GR",
+        "NL-LI",
+        "NL-NB",
+        "NL-NH",
+        "NL-OV",
+        "NL-ZH",
+        "NL-UT",
+        "NL-ZE",
+        "NZ",
+        "NZ-AUK",
+        "NZ-BOP",
+        "NZ-CAN",
+        "NZ-GIS",
+        "NZ-HKB",
+        "NZ-MWT",
+        "NZ-MBH",
+        "NZ-NSN",
+        "NZ-NTL",
+        "NZ-OTA",
+        "NZ-STL",
+        "NZ-TKI",
+        "NZ-TAS",
+        "NZ-WKO",
+        "NZ-WGN",
+        "NZ-WTC",
+        "NI",
+        "NG",
+        "NG-AB",
+        "NG-AD",
+        "NG-AK",
+        "NG-AN",
+        "NG-BA",
+        "NG-BY",
+        "NG-BE",
+        "NG-BO",
+        "NG-CR",
+        "NG-DE",
+        "NG-EB",
+        "NG-ED",
+        "NG-EK",
+        "NG-EN",
+        "NG-FC",
+        "NG-GO",
+        "NG-IM",
+        "NG-JI",
+        "NG-KD",
+        "NG-KN",
+        "NG-KT",
+        "NG-KE",
+        "NG-KO",
+        "NG-KW",
+        "NG-LA",
+        "NG-NA",
+        "NG-NI",
+        "NG-OG",
+        "NG-ON",
+        "NG-OS",
+        "NG-OY",
+        "NG-PL",
+        "NG-RI",
+        "NG-SO",
+        "NG-TA",
+        "NG-YO",
+        "NG-ZA",
+        "MK",
+        "NO",
+        "OM",
+        "PK",
+        "PK-JK",
+        "PK-BA",
+        "PK-TA",
+        "PK-GB",
+        "PK-IS",
+        "PK-KP",
+        "PK-PB",
+        "PK-SD",
+        "PS",
+        "PA",
+        "PY",
+        "PE",
+        "PE-AMA",
+        "PE-ANC",
+        "PE-APU",
+        "PE-ARE",
+        "PE-AYA",
+        "PE-CAJ",
+        "PE-CAL",
+        "PE-CUS",
+        "PE-HUV",
+        "PE-HUC",
+        "PE-ICA",
+        "PE-JUN",
+        "PE-LAL",
+        "PE-LAM",
+        "PE-LIM",
+        "PE-LOR",
+        "PE-MDD",
+        "PE-MOQ",
+        "PE-PAS",
+        "PE-PIU",
+        "PE-PUN",
+        "PE-SAM",
+        "PE-TAC",
+        "PE-TUM",
+        "PE-UCA",
+        "PH",
+        "PH-14",
+        "PH-05",
+        "PH-02",
+        "PH-40",
+        "PH-13",
+        "PH-03",
+        "PH-07",
+        "PH-15",
+        "PH-11",
+        "PH-08",
+        "PH-01",
+        "PH-00",
+        "PH-41",
+        "PH-10",
+        "PH-12",
+        "PH-06",
+        "PH-09",
+        "PL",
+        "PL-WP",
+        "PL-KP",
+        "PL-MA",
+        "PL-LD",
+        "PL-DS",
+        "PL-LU",
+        "PL-LB",
+        "PL-MZ",
+        "PL-OP",
+        "PL-PK",
+        "PL-PD",
+        "PL-PM",
+        "PL-SL",
+        "PL-SK",
+        "PL-WN",
+        "PL-ZP",
+        "PT",
+        "PT-01",
+        "PT-20",
+        "PT-02",
+        "PT-03",
+        "PT-04",
+        "PT-05",
+        "PT-06",
+        "PT-07",
+        "PT-08",
+        "PT-09",
+        "PT-10",
+        "PT-11",
+        "PT-30",
+        "PT-12",
+        "PT-13",
+        "PT-14",
+        "PT-15",
+        "PT-16",
+        "PT-17",
+        "PT-18",
+        "PR",
+        "QA",
+        "RO",
+        "RU",
+        "RU-AD",
+        "RU-ALT",
+        "RU-AL",
+        "RU-AMU",
+        "RU-ARK",
+        "RU-AST",
+        "RU-BEL",
+        "RU-BRY",
+        "RU-BU",
+        "RU-CE",
+        "RU-CHE",
+        "RU-CHU",
+        "RU-CU",
+        "RU-DA",
+        "RU-IN",
+        "RU-IRK",
+        "RU-IVA",
+        "RU-YEV",
+        "RU-KB",
+        "RU-KGD",
+        "RU-KL",
+        "RU-KLU",
+        "RU-KAM",
+        "RU-KC",
+        "RU-KEM",
+        "RU-KHA",
+        "RU-KHM",
+        "RU-KIR",
+        "RU-KO",
+        "RU-KOS",
+        "RU-KDA",
+        "RU-KYA",
+        "RU-KGN",
+        "RU-KRS",
+        "RU-LEN",
+        "RU-LIP",
+        "RU-MAG",
+        "RU-ME",
+        "RU-MO",
+        "RU-MOW",
+        "RU-MOS",
+        "RU-MUR",
+        "RU-NEN",
+        "RU-NIZ",
+        "RU-SE",
+        "RU-NGR",
+        "RU-NVS",
+        "RU-OMS",
+        "RU-ORE",
+        "RU-ORL",
+        "RU-PNZ",
+        "RU-PER",
+        "RU-PRI",
+        "RU-PSK",
+        "RU-BA",
+        "RU-KR",
+        "RU-KK",
+        "RU-ROS",
+        "RU-RYA",
+        "RU-SPE",
+        "RU-SA",
+        "RU-SAK",
+        "RU-SAM",
+        "RU-SAR",
+        "RU-SMO",
+        "RU-STA",
+        "RU-SVE",
+        "RU-TAM",
+        "RU-TA",
+        "RU-TOM",
+        "RU-TUL",
+        "RU-TY",
+        "RU-TVE",
+        "RU-TYU",
+        "RU-UD",
+        "RU-ULY",
+        "RU-VLA",
+        "RU-VGG",
+        "RU-VLG",
+        "RU-VOR",
+        "RU-YAN",
+        "RU-YAR",
+        "RU-ZAB",
+        "SA",
+        "SA-11",
+        "SA-12",
+        "SA-03",
+        "SA-05",
+        "SA-14",
+        "SA-04",
+        "SA-06",
+        "SA-09",
+        "SA-02",
+        "SA-10",
+        "SA-08",
+        "SA-01",
+        "SA-07",
+        "SN",
+        "RS",
+        "SG",
+        "SK",
+        "SI",
+        "ZA",
+        "ZA-EC",
+        "ZA-FS",
+        "ZA-GT",
+        "ZA-NL",
+        "ZA-LP",
+        "ZA-MP",
+        "ZA-NW",
+        "ZA-NC",
+        "ZA-WC",
+        "KR",
+        "KR-26",
+        "KR-43",
+        "KR-44",
+        "KR-27",
+        "KR-30",
+        "KR-42",
+        "KR-29",
+        "KR-41",
+        "KR-47",
+        "KR-48",
+        "KR-28",
+        "KR-49",
+        "KR-45",
+        "KR-46",
+        "KR-11",
+        "KR-31",
+        "ES",
+        "ES-AN",
+        "ES-AR",
+        "ES-AS",
+        "ES-IB",
+        "ES-PV",
+        "ES-CN",
+        "ES-CB",
+        "ES-CL",
+        "ES-CM",
+        "ES-CT",
+        "ES-CE",
+        "ES-MD",
+        "ES-EX",
+        "ES-GA",
+        "ES-RI",
+        "ES-ML",
+        "ES-NC",
+        "ES-MC",
+        "ES-VC",
+        "LK",
+        "SE",
+        "SE-K",
+        "SE-W",
+        "SE-X",
+        "SE-I",
+        "SE-N",
+        "SE-Z",
+        "SE-F",
+        "SE-H",
+        "SE-G",
+        "SE-BD",
+        "SE-T",
+        "SE-E",
+        "SE-M",
+        "SE-D",
+        "SE-AB",
+        "SE-C",
+        "SE-S",
+        "SE-AC",
+        "SE-Y",
+        "SE-U",
+        "SE-O",
+        "CH",
+        "CH-AG",
+        "CH-AI",
+        "CH-AR",
+        "CH-BL",
+        "CH-BS",
+        "CH-BE",
+        "CH-FR",
+        "CH-GL",
+        "CH-JU",
+        "CH-NE",
+        "CH-OW",
+        "CH-SH",
+        "CH-SZ",
+        "CH-SO",
+        "CH-UR",
+        "CH-ZG",
+        "CH-GE",
+        "CH-GR",
+        "CH-LU",
+        "CH-NW",
+        "CH-SG",
+        "CH-TG",
+        "CH-TI",
+        "CH-VS",
+        "CH-VD",
+        "CH-ZH",
+        "SY",
+        "TW",
+        "TW-KHH",
+        "TW-TPQ",
+        "TW-TXG",
+        "TW-TNN",
+        "TW-TPE",
+        "TW-TAO",
+        "TZ",
+        "TH",
+        "TT",
+        "TN",
+        "TR",
+        "TR-01",
+        "TR-02",
+        "TR-03",
+        "TR-04",
+        "TR-68",
+        "TR-05",
+        "TR-06",
+        "TR-07",
+        "TR-75",
+        "TR-08",
+        "TR-09",
+        "TR-10",
+        "TR-74",
+        "TR-72",
+        "TR-69",
+        "TR-11",
+        "TR-12",
+        "TR-13",
+        "TR-14",
+        "TR-15",
+        "TR-16",
+        "TR-17",
+        "TR-18",
+        "TR-19",
+        "TR-20",
+        "TR-21",
+        "TR-81",
+        "TR-22",
+        "TR-23",
+        "TR-24",
+        "TR-25",
+        "TR-26",
+        "TR-27",
+        "TR-28",
+        "TR-29",
+        "TR-30",
+        "TR-31",
+        "TR-76",
+        "TR-32",
+        "TR-34",
+        "TR-35",
+        "TR-46",
+        "TR-78",
+        "TR-70",
+        "TR-36",
+        "TR-37",
+        "TR-38",
+        "TR-79",
+        "TR-71",
+        "TR-39",
+        "TR-40",
+        "TR-41",
+        "TR-42",
+        "TR-43",
+        "TR-44",
+        "TR-45",
+        "TR-47",
+        "TR-33",
+        "TR-48",
+        "TR-49",
+        "TR-50",
+        "TR-51",
+        "TR-52",
+        "TR-80",
+        "TR-53",
+        "TR-54",
+        "TR-55",
+        "TR-63",
+        "TR-56",
+        "TR-57",
+        "TR-58",
+        "TR-73",
+        "TR-59",
+        "TR-60",
+        "TR-61",
+        "TR-62",
+        "TR-64",
+        "TR-65",
+        "TR-77",
+        "TR-66",
+        "TR-67",
+        "TM",
+        "UG",
+        "UA",
+        "UA-71",
+        "UA-74",
+        "UA-77",
+        "UA-43",
+        "UA-12",
+        "UA-14",
+        "UA-26",
+        "UA-63",
+        "UA-65",
+        "UA-68",
+        "UA-35",
+        "UA-30",
+        "UA-32",
+        "UA-09",
+        "UA-46",
+        "UA-48",
+        "UA-51",
+        "UA-53",
+        "UA-56",
+        "UA-40",
+        "UA-59",
+        "UA-61",
+        "UA-05",
+        "UA-07",
+        "UA-21",
+        "UA-23",
+        "UA-18",
+        "AE",
+        "AE-AZ",
+        "AE-AJ",
+        "AE-DU",
+        "AE-FU",
+        "AE-RK",
+        "AE-SH",
+        "AE-UQ",
+        "GB",
+        "GB-ENG",
+        "GB-NIR",
+        "GB-SCT",
+        "GB-WLS",
+        "US",
+        "US-AL",
+        "US-AK",
+        "US-AZ",
+        "US-AR",
+        "US-CA",
+        "US-CO",
+        "US-CT",
+        "US-DE",
+        "US-DC",
+        "US-FL",
+        "US-GA",
+        "US-HI",
+        "US-ID",
+        "US-IL",
+        "US-IN",
+        "US-IA",
+        "US-KS",
+        "US-KY",
+        "US-LA",
+        "US-ME",
+        "US-MD",
+        "US-MA",
+        "US-MI",
+        "US-MN",
+        "US-MS",
+        "US-MO",
+        "US-MT",
+        "US-NE",
+        "US-NV",
+        "US-NH",
+        "US-NJ",
+        "US-NM",
+        "US-NY",
+        "US-NC",
+        "US-ND",
+        "US-OH",
+        "US-OK",
+        "US-OR",
+        "US-PA",
+        "US-RI",
+        "US-SC",
+        "US-SD",
+        "US-TN",
+        "US-TX",
+        "US-UT",
+        "US-VT",
+        "US-VA",
+        "US-WA",
+        "US-WV",
+        "US-WI",
+        "US-WY",
+        [
+          "662",
+          "Abilene-Sweetwater TX"
+        ],
+        [
+          "525",
+          "Albany GA"
+        ],
+        [
+          "532",
+          "Albany-Schenectady-Troy NY"
+        ],
+        [
+          "790",
+          "Albuquerque-Santa Fe NM"
+        ],
+        [
+          "644",
+          "Alexandria LA"
+        ],
+        [
+          "583",
+          "Alpena MI"
+        ],
+        [
+          "634",
+          "Amarillo TX"
+        ],
+        [
+          "743",
+          "Anchorage AK"
+        ],
+        [
+          "524",
+          "Atlanta GA"
+        ],
+        [
+          "520",
+          "Augusta GA"
+        ],
+        [
+          "635",
+          "Austin TX"
+        ],
+        [
+          "800",
+          "Bakersfield CA"
+        ],
+        [
+          "512",
+          "Baltimore MD"
+        ],
+        [
+          "537",
+          "Bangor ME"
+        ],
+        [
+          "716",
+          "Baton Rouge LA"
+        ],
+        [
+          "692",
+          "Beaumont-Port Arthur TX"
+        ],
+        [
+          "821",
+          "Bend OR"
+        ],
+        [
+          "756",
+          "Billings, MT"
+        ],
+        [
+          "746",
+          "Biloxi-Gulfport MS"
+        ],
+        [
+          "502",
+          "Binghamton NY"
+        ],
+        [
+          "630",
+          "Birmingham AL"
+        ],
+        [
+          "559",
+          "Bluefield-Beckley-Oak Hill WV"
+        ],
+        [
+          "757",
+          "Boise ID"
+        ],
+        [
+          "506",
+          "Boston MA-Manchester NH"
+        ],
+        [
+          "736",
+          "Bowling Green KY"
+        ],
+        [
+          "514",
+          "Buffalo NY"
+        ],
+        [
+          "523",
+          "Burlington VT-Plattsburgh NY"
+        ],
+        [
+          "754",
+          "Butte-Bozeman MT"
+        ],
+        [
+          "767",
+          "Casper-Riverton WY"
+        ],
+        [
+          "637",
+          "Cedar Rapids-Waterloo-Iowa City & Dubuque IA"
+        ],
+        [
+          "648",
+          "Champaign & Springfield-Decatur IL"
+        ],
+        [
+          "519",
+          "Charleston SC"
+        ],
+        [
+          "564",
+          "Charleston-Huntington WV"
+        ],
+        [
+          "517",
+          "Charlotte NC"
+        ],
+        [
+          "584",
+          "Charlottesville VA"
+        ],
+        [
+          "575",
+          "Chattanooga TN"
+        ],
+        [
+          "759",
+          "Cheyenne WY-Scottsbluff NE"
+        ],
+        [
+          "602",
+          "Chicago IL"
+        ],
+        [
+          "868",
+          "Chico-Redding CA"
+        ],
+        [
+          "515",
+          "Cincinnati OH"
+        ],
+        [
+          "598",
+          "Clarksburg-Weston WV"
+        ],
+        [
+          "510",
+          "Cleveland-Akron (Canton) OH"
+        ],
+        [
+          "752",
+          "Colorado Springs-Pueblo CO"
+        ],
+        [
+          "546",
+          "Columbia SC"
+        ],
+        [
+          "604",
+          "Columbia-Jefferson City MO"
+        ],
+        [
+          "522",
+          "Columbus GA"
+        ],
+        [
+          "535",
+          "Columbus OH"
+        ],
+        [
+          "673",
+          "Columbus-Tupelo-West Point MS"
+        ],
+        [
+          "600",
+          "Corpus Christi TX"
+        ],
+        [
+          "623",
+          "Dallas-Ft. Worth TX"
+        ],
+        [
+          "682",
+          "Davenport IA-Rock Island-Moline IL"
+        ],
+        [
+          "542",
+          "Dayton OH"
+        ],
+        [
+          "751",
+          "Denver CO"
+        ],
+        [
+          "679",
+          "Des Moines-Ames IA"
+        ],
+        [
+          "505",
+          "Detroit MI"
+        ],
+        [
+          "606",
+          "Dothan AL"
+        ],
+        [
+          "676",
+          "Duluth MN-Superior WI"
+        ],
+        [
+          "765",
+          "El Paso TX"
+        ],
+        [
+          "565",
+          "Elmira NY"
+        ],
+        [
+          "516",
+          "Erie PA"
+        ],
+        [
+          "801",
+          "Eugene OR"
+        ],
+        [
+          "802",
+          "Eureka CA"
+        ],
+        [
+          "649",
+          "Evansville IN"
+        ],
+        [
+          "745",
+          "Fairbanks AK"
+        ],
+        [
+          "724",
+          "Fargo-Valley City ND"
+        ],
+        [
+          "513",
+          "Flint-Saginaw-Bay City MI"
+        ],
+        [
+          "570",
+          "Florence-Myrtle Beach SC"
+        ],
+        [
+          "866",
+          "Fresno-Visalia CA"
+        ],
+        [
+          "571",
+          "Ft. Myers-Naples FL"
+        ],
+        [
+          "670",
+          "Ft. Smith-Fayetteville-Springdale-Rogers AR"
+        ],
+        [
+          "509",
+          "Ft. Wayne IN"
+        ],
+        [
+          "592",
+          "Gainesville FL"
+        ],
+        [
+          "798",
+          "Glendive MT"
+        ],
+        [
+          "773",
+          "Grand Junction-Montrose CO"
+        ],
+        [
+          "563",
+          "Grand Rapids-Kalamazoo-Battle Creek MI"
+        ],
+        [
+          "755",
+          "Great Falls MT"
+        ],
+        [
+          "658",
+          "Green Bay-Appleton WI"
+        ],
+        [
+          "518",
+          "Greensboro-High Point-Winston Salem NC"
+        ],
+        [
+          "545",
+          "Greenville-New Bern-Washington NC"
+        ],
+        [
+          "567",
+          "Greenville-Spartanburg SC-Asheville NC-Anderson SC"
+        ],
+        [
+          "647",
+          "Greenwood-Greenville MS"
+        ],
+        [
+          "636",
+          "Harlingen-Weslaco-Brownsville-McAllen TX"
+        ],
+        [
+          "566",
+          "Harrisburg-Lancaster-Lebanon-York PA"
+        ],
+        [
+          "569",
+          "Harrisonburg VA"
+        ],
+        [
+          "533",
+          "Hartford & New Haven CT"
+        ],
+        [
+          "710",
+          "Hattiesburg-Laurel MS"
+        ],
+        [
+          "766",
+          "Helena MT"
+        ],
+        [
+          "744",
+          "Honolulu HI"
+        ],
+        [
+          "618",
+          "Houston TX"
+        ],
+        [
+          "691",
+          "Huntsville-Decatur (Florence) AL"
+        ],
+        [
+          "758",
+          "Idaho Falls-Pocatello ID"
+        ],
+        [
+          "527",
+          "Indianapolis IN"
+        ],
+        [
+          "718",
+          "Jackson MS"
+        ],
+        [
+          "639",
+          "Jackson TN"
+        ],
+        [
+          "561",
+          "Jacksonville FL"
+        ],
+        [
+          "574",
+          "Johnstown-Altoona PA"
+        ],
+        [
+          "734",
+          "Jonesboro AR"
+        ],
+        [
+          "603",
+          "Joplin MO-Pittsburg KS"
+        ],
+        [
+          "747",
+          "Juneau AK"
+        ],
+        [
+          "616",
+          "Kansas City MO"
+        ],
+        [
+          "557",
+          "Knoxville TN"
+        ],
+        [
+          "702",
+          "La Crosse-Eau Claire WI"
+        ],
+        [
+          "582",
+          "Lafayette IN"
+        ],
+        [
+          "642",
+          "Lafayette LA"
+        ],
+        [
+          "643",
+          "Lake Charles LA"
+        ],
+        [
+          "551",
+          "Lansing MI"
+        ],
+        [
+          "749",
+          "Laredo TX"
+        ],
+        [
+          "839",
+          "Las Vegas NV"
+        ],
+        [
+          "541",
+          "Lexington KY"
+        ],
+        [
+          "558",
+          "Lima OH"
+        ],
+        [
+          "722",
+          "Lincoln & Hastings-Kearney NE"
+        ],
+        [
+          "693",
+          "Little Rock-Pine Bluff AR"
+        ],
+        [
+          "803",
+          "Los Angeles CA"
+        ],
+        [
+          "529",
+          "Louisville KY"
+        ],
+        [
+          "651",
+          "Lubbock TX"
+        ],
+        [
+          "503",
+          "Macon GA"
+        ],
+        [
+          "669",
+          "Madison WI"
+        ],
+        [
+          "737",
+          "Mankato MN"
+        ],
+        [
+          "553",
+          "Marquette MI"
+        ],
+        [
+          "813",
+          "Medford-Klamath Falls OR"
+        ],
+        [
+          "640",
+          "Memphis TN"
+        ],
+        [
+          "711",
+          "Meridian MS"
+        ],
+        [
+          "528",
+          "Miami-Ft. Lauderdale FL"
+        ],
+        [
+          "617",
+          "Milwaukee WI"
+        ],
+        [
+          "613",
+          "Minneapolis-St. Paul MN"
+        ],
+        [
+          "687",
+          "Minot-Bismarck-Dickinson(Williston) ND"
+        ],
+        [
+          "762",
+          "Missoula MT"
+        ],
+        [
+          "686",
+          "Mobile AL-Pensacola (Ft. Walton Beach) FL"
+        ],
+        [
+          "628",
+          "Monroe LA-El Dorado AR"
+        ],
+        [
+          "828",
+          "Monterey-Salinas CA"
+        ],
+        [
+          "698",
+          "Montgomery (Selma) AL"
+        ],
+        [
+          "659",
+          "Nashville TN"
+        ],
+        [
+          "622",
+          "New Orleans LA"
+        ],
+        [
+          "501",
+          "New York NY"
+        ],
+        [
+          "544",
+          "Norfolk-Portsmouth-Newport News VA"
+        ],
+        [
+          "740",
+          "North Platte NE"
+        ],
+        [
+          "633",
+          "Odessa-Midland TX"
+        ],
+        [
+          "650",
+          "Oklahoma City OK"
+        ],
+        [
+          "652",
+          "Omaha NE"
+        ],
+        [
+          "534",
+          "Orlando-Daytona Beach-Melbourne FL"
+        ],
+        [
+          "631",
+          "Ottumwa IA-Kirksville MO"
+        ],
+        [
+          "632",
+          "Paducah KY-Cape Girardeau MO-Harrisburg-Mount Vernon IL"
+        ],
+        [
+          "804",
+          "Palm Springs CA"
+        ],
+        [
+          "656",
+          "Panama City FL"
+        ],
+        [
+          "597",
+          "Parkersburg WV"
+        ],
+        [
+          "675",
+          "Peoria-Bloomington IL"
+        ],
+        [
+          "504",
+          "Philadelphia PA"
+        ],
+        [
+          "753",
+          "Phoenix AZ"
+        ],
+        [
+          "508",
+          "Pittsburgh PA"
+        ],
+        [
+          "820",
+          "Portland OR"
+        ],
+        [
+          "500",
+          "Portland-Auburn ME"
+        ],
+        [
+          "552",
+          "Presque Isle ME"
+        ],
+        [
+          "521",
+          "Providence RI-New Bedford MA"
+        ],
+        [
+          "717",
+          "Quincy IL-Hannibal MO-Keokuk IA"
+        ],
+        [
+          "560",
+          "Raleigh-Durham (Fayetteville) NC"
+        ],
+        [
+          "764",
+          "Rapid City SD"
+        ],
+        [
+          "811",
+          "Reno NV"
+        ],
+        [
+          "556",
+          "Richmond-Petersburg VA"
+        ],
+        [
+          "573",
+          "Roanoke-Lynchburg VA"
+        ],
+        [
+          "611",
+          "Rochester MN-Mason City IA-Austin MN"
+        ],
+        [
+          "538",
+          "Rochester NY"
+        ],
+        [
+          "610",
+          "Rockford IL"
+        ],
+        [
+          "862",
+          "Sacramento-Stockton-Modesto CA"
+        ],
+        [
+          "576",
+          "Salisbury MD"
+        ],
+        [
+          "770",
+          "Salt Lake City UT"
+        ],
+        [
+          "661",
+          "San Angelo TX"
+        ],
+        [
+          "641",
+          "San Antonio TX"
+        ],
+        [
+          "825",
+          "San Diego CA"
+        ],
+        [
+          "807",
+          "San Francisco-Oakland-San Jose CA"
+        ],
+        [
+          "855",
+          "Santa Barbara-Santa Maria-San Luis Obispo CA"
+        ],
+        [
+          "507",
+          "Savannah GA"
+        ],
+        [
+          "819",
+          "Seattle-Tacoma WA"
+        ],
+        [
+          "657",
+          "Sherman TX-Ada OK"
+        ],
+        [
+          "612",
+          "Shreveport LA"
+        ],
+        [
+          "624",
+          "Sioux City IA"
+        ],
+        [
+          "725",
+          "Sioux Falls(Mitchell) SD"
+        ],
+        [
+          "588",
+          "South Bend-Elkhart IN"
+        ],
+        [
+          "881",
+          "Spokane WA"
+        ],
+        [
+          "619",
+          "Springfield MO"
+        ],
+        [
+          "543",
+          "Springfield-Holyoke MA"
+        ],
+        [
+          "638",
+          "St. Joseph MO"
+        ],
+        [
+          "609",
+          "St. Louis MO"
+        ],
+        [
+          "555",
+          "Syracuse NY"
+        ],
+        [
+          "530",
+          "Tallahassee FL-Thomasville GA"
+        ],
+        [
+          "539",
+          "Tampa-St. Petersburg (Sarasota) FL"
+        ],
+        [
+          "581",
+          "Terre Haute IN"
+        ],
+        [
+          "547",
+          "Toledo OH"
+        ],
+        [
+          "605",
+          "Topeka KS"
+        ],
+        [
+          "540",
+          "Traverse City-Cadillac MI"
+        ],
+        [
+          "531",
+          "Tri-Cities TN-VA"
+        ],
+        [
+          "789",
+          "Tucson (Sierra Vista) AZ"
+        ],
+        [
+          "671",
+          "Tulsa OK"
+        ],
+        [
+          "760",
+          "Twin Falls ID"
+        ],
+        [
+          "709",
+          "Tyler-Longview(Lufkin & Nacogdoches) TX"
+        ],
+        [
+          "526",
+          "Utica NY"
+        ],
+        [
+          "626",
+          "Victoria TX"
+        ],
+        [
+          "625",
+          "Waco-Temple-Bryan TX"
+        ],
+        [
+          "511",
+          "Washington DC (Hagerstown MD)"
+        ],
+        [
+          "549",
+          "Watertown NY"
+        ],
+        [
+          "705",
+          "Wausau-Rhinelander WI"
+        ],
+        [
+          "548",
+          "West Palm Beach-Ft. Pierce FL"
+        ],
+        [
+          "554",
+          "Wheeling WV-Steubenville OH"
+        ],
+        [
+          "627",
+          "Wichita Falls TX & Lawton OK"
+        ],
+        [
+          "678",
+          "Wichita-Hutchinson KS"
+        ],
+        [
+          "577",
+          "Wilkes Barre-Scranton PA"
+        ],
+        [
+          "550",
+          "Wilmington NC"
+        ],
+        [
+          "810",
+          "Yakima-Pasco-Richland-Kennewick WA"
+        ],
+        [
+          "536",
+          "Youngstown OH"
+        ],
+        [
+          "771",
+          "Yuma AZ-El Centro CA"
+        ],
+        [
+          "596",
+          "Zanesville OH"
+        ],
+        "UY",
+        "UY-AR",
+        "UY-CA",
+        "UY-CL",
+        "UY-CO",
+        "UY-DU",
+        "UY-FS",
+        "UY-FD",
+        "UY-LA",
+        "UY-MA",
+        "UY-MO",
+        "UY-PA",
+        "UY-RN",
+        "UY-RV",
+        "UY-RO",
+        "UY-SA",
+        "UY-SJ",
+        "UY-SO",
+        "UY-TA",
+        "UY-TT",
+        "UZ",
+        "VE",
+        "VN",
+        "VN-44",
+        "VN-43",
+        "VN-54",
+        "VN-53",
+        "VN-55",
+        "VN-56",
+        "VN-50",
+        "VN-31",
+        "VN-57",
+        "VN-58",
+        "VN-40",
+        "VN-59",
+        "VN-CT",
+        "VN-04",
+        "VN-DN",
+        "VN-33",
+        "VN-72",
+        "VN-71",
+        "VN-39",
+        "VN-45",
+        "VN-30",
+        "VN-03",
+        "VN-63",
+        "VN-23",
+        "VN-61",
+        "VN-HP",
+        "VN-HN",
+        "VN-73",
+        "VN-SG",
+        "VN-14",
+        "VN-66",
+        "VN-34",
+        "VN-47",
+        "VN-28",
+        "VN-01",
+        "VN-35",
+        "VN-09",
+        "VN-02",
+        "VN-41",
+        "VN-67",
+        "VN-22",
+        "VN-18",
+        "VN-36",
+        "VN-68",
+        "VN-32",
+        "VN-24",
+        "VN-27",
+        "VN-29",
+        "VN-13",
+        "VN-25",
+        "VN-52",
+        "VN-05",
+        "VN-37",
+        "VN-20",
+        "VN-69",
+        "VN-21",
+        "VN-26",
+        "VN-46",
+        "VN-51",
+        "VN-07",
+        "VN-49",
+        "VN-70",
+        "VN-06",
+        "YE",
+        "ZM",
+        "ZW"
+      ],
+      "required": true,
+      "description": "Parameter defines the location from where you want the search to originate. It defaults to `US` (activated when the value of geo parameter is not set or empty). Head to the Google Trends Trending Now Locations for a full list of supported locations.",
+      "group": "search_query"
+    },
+    "hours": {
+      "type": "number",
+      "description": "Parameter defines the number of past hours to retrieve the results for. It defaults to `24` (Past 24 hours). The predefined value from Google are the following: -`4` (Past 4 hours) -`24` (Past 24 hours) -`48` (Past 48 hours) -`168` (Past 7 days).",
+      "group": "advanced_parameters"
+    },
+    "category_id": {
+      "required": false,
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "Autos and Vehicles - 1"
+        ],
+        [
+          "2",
+          "Beauty and Fashion - 2"
+        ],
+        [
+          "3",
+          "Business and Finance - 3"
+        ],
+        [
+          "20",
+          "Climate - 20"
+        ],
+        [
+          "4",
+          "Entertainment - 4"
+        ],
+        [
+          "5",
+          "Food and Drink - 5"
+        ],
+        [
+          "6",
+          "Games - 6"
+        ],
+        [
+          "7",
+          "Health - 7"
+        ],
+        [
+          "8",
+          "Hobbies and Leisure - 8"
+        ],
+        [
+          "9",
+          "Jobs and Education - 9"
+        ],
+        [
+          "10",
+          "Law and Government - 10"
+        ],
+        [
+          "11",
+          "Other - 11"
+        ],
+        [
+          "13",
+          "Pets and Animals - 13"
+        ],
+        [
+          "14",
+          "Politics - 14"
+        ],
+        [
+          "15",
+          "Science - 15"
+        ],
+        [
+          "16",
+          "Shopping - 16"
+        ],
+        [
+          "17",
+          "Sports - 17"
+        ],
+        [
+          "18",
+          "Technology - 18"
+        ],
+        [
+          "19",
+          "Travel and Transportation - 19"
+        ]
+      ],
+      "description": "Parameter allows results to be filtered by a specific category. E.g. category_id:`18` will return only results from the \"Technology\" category. Head to the Google Trends Trending Now Categories for the full list of supported categories.",
+      "group": "advanced_parameters"
+    },
+    "only_active": {
+      "required": false,
+      "type": "checkbox",
+      "description": "Parameter filters results to only include those that are currently active.",
+      "group": "advanced_parameters"
+    },
+    "hl": {
+      "type": "select",
+      "options": [
+        "af",
+        "ak",
+        "sq",
+        "ws",
+        "am",
+        "ar",
+        "hy",
+        "az",
+        "eu",
+        "be",
+        "bem",
+        "bn",
+        "bh",
+        "xx-bork",
+        "bs",
+        "br",
+        "bg",
+        "bt",
+        "km",
+        "ca",
+        "chr",
+        "ny",
+        "zh-cn",
+        "zh-tw",
+        "co",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "xx-elmer",
+        "en",
+        "eo",
+        "et",
+        "ee",
+        "fo",
+        "tl",
+        "fi",
+        "fr",
+        "fy",
+        "gaa",
+        "gl",
+        "ka",
+        "de",
+        "el",
+        "kl",
+        "gn",
+        "gu",
+        "xx-hacker",
+        "ht",
+        "ha",
+        "haw",
+        "iw",
+        "he",
+        "hi",
+        "hu",
+        "is",
+        "ig",
+        "id",
+        "ia",
+        "ga",
+        "it",
+        "ja",
+        "jw",
+        "kn",
+        "kk",
+        "rw",
+        "rn",
+        "xx-klingon",
+        "kg",
+        "ko",
+        "kri",
+        "ku",
+        "ckb",
+        "ky",
+        "lo",
+        "la",
+        "lv",
+        "ln",
+        "lt",
+        "loz",
+        "lg",
+        "ach",
+        "mk",
+        "mg",
+        "ms",
+        "ml",
+        "mt",
+        "mv",
+        "mi",
+        "mr",
+        "mfe",
+        "mo",
+        "mn",
+        "sr-me",
+        "my",
+        "ne",
+        "pcm",
+        "nso",
+        "no",
+        "nn",
+        "oc",
+        "or",
+        "om",
+        "ps",
+        "fa",
+        "xx-pirate",
+        "pl",
+        "pt",
+        "pt-br",
+        "pt-pt",
+        "pa",
+        "qu",
+        "ro",
+        "rm",
+        "nyn",
+        "ru",
+        "gd",
+        "sr",
+        "sh",
+        "st",
+        "tn",
+        "crs",
+        "sn",
+        "sd",
+        "si",
+        "sk",
+        "sl",
+        "so",
+        "es",
+        "es-419",
+        "su",
+        "sw",
+        "sv",
+        "tg",
+        "ta",
+        "tt",
+        "te",
+        "th",
+        "ti",
+        "to",
+        "lua",
+        "tum",
+        "tr",
+        "tk",
+        "tw",
+        "ug",
+        "uk",
+        "ur",
+        "uz",
+        "vu",
+        "vi",
+        "cy",
+        "wo",
+        "xh",
+        "yi",
+        "yo",
+        "zu"
+      ],
+      "description": "Parameter defines the language to use for the Google Trends Trending Now search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
+      "group": "localization"
+    },
+    "frequency": {
+      "type": "select",
+      "options": [
+        "daily",
+        "realtime"
+      ],
+      "required": true,
+      "description": "Parameter is used for retrieving different trends frequency. It defaults to `daily`. Available options: `daily` - Daily `realtime` - Realtime",
+      "group": "old_version_parameters"
+    },
+    "date": {
+      "description": "Parameter defines the date of the results you want to retrieve. It defaults to the current day. The date format is `yyyymmdd` (e.g., `20231015`).",
+      "group": "old_version_parameters"
+    },
+    "cat": {
+      "type": "select",
+      "options": [
+        "all",
+        "b",
+        "e",
+        "m",
+        "t",
+        "s",
+        "h"
+      ],
+      "description": "Parameter defines the category of the results you want to retrieve. Available options: `all` - All categories (default). `b` - Business. `e` - Entertainment. `m` - Health. `t` - Sci/Tech. `s` - Sports. `h` - Top stories. Parameter can only be used when frequency is set to `realtime`.",
+      "group": "old_version_parameters"
+    },
+    "next_page_token": {
+      "description": "Parameter defines the next page token, which is used for retrieving the next page of results. When querying the API, the first response will provide access to all available pages. However, it's important to note that Google realtime search trends do not follow conventional pagination practices. Not to worry, though, as we have abstracted this complexity for you. Here's the caveat: only the first page will contain pagination information. Subsequent requests for the next page will not display pagination details. To ensure you retrieve all pages of data, your code should be designed to handle the following process: start by fetching the first response, and then use the provided pagination token to navigate through the subsequent pages. Parameter can only be used when frequency is set to `realtime`.",
+      "group": "old_version_parameters"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `google_trends_trending_now` to use the Google Trends Trending Now API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Google Trends Trending Now results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}
