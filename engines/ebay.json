@@ -3,7 +3,7 @@
   "params": {
     "_nkw": {
       "required": true,
-      "description": "Parameter defines the search query. You can use anything that you would use in a regular eBay search. _nkw parameter is optional when category_id parameter is specified.",
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular eBay search. \\_nkw parameter is optional when category\\_id parameter is specified.",
       "group": "search_query"
     },
     "ebay_domain": {
@@ -959,7 +959,7 @@
       "group": "advanced_filters"
     },
     "show_only": {
-      "description": "Parameter defines the list of filters you can apply to the results. Available options (case-sensitive): `Complete` - Completed items `Sold` - Sold items `FR` - Free returns `RPA` - Returns accepted `AS` - Authorized seller `Savings` - Deals and savings `SaleItems` - Sale items `Lots` - Listed as lots `Charity` - Benefits charity `AV` - Authenticity Guarantee `FS` - Free shipping `LPickup` - Local pickup You can also combine multiple filter values by joining them with a comma (`value` + `,` + `value`; eg: `Sold,FS`).",
+      "description": "Parameter defines the list of filters you can apply to the results. Available options **(case-sensitive)**: `Complete` - Completed items `Sold` - Sold items `FR` - Free returns `RPA` - Returns accepted `AS` - Authorized seller `Savings` - Deals and savings `SaleItems` - Sale items `Lots` - Listed as lots `Charity` - Benefits charity `AV` - Authenticity Guarantee `FS` - Free shipping `LPickup` - Local pickup You can also combine multiple filter values by joining them with a comma (`value` + `,` + `value`; eg: `Sold,FS`).",
       "group": "advanced_filters"
     },
     "buying_format": {
@@ -969,7 +969,7 @@
         "BIN",
         "BO"
       ],
-      "description": "Parameter defines the buying format you can apply to the results. Available options (case-sensitive): `Auction` - Auction `BIN` - Buy It Now `BO` - Accepts Offers",
+      "description": "Parameter defines the buying format you can apply to the results. Available options **(case-sensitive)**: `Auction` - Auction `BIN` - Buy It Now `BO` - Accepts Offers",
       "group": "advanced_filters"
     },
     "_udlo": {
@@ -1045,7 +1045,7 @@
       "group": "advanced_ebay_parameters"
     },
     "category_id": {
-      "description": "Parameter defines the ID of a category where you want your search to be concentrated. ID values are accessible inside `categories` array, located in our JSON output (e.g. `categories[1].id`). You can search using category_id parameter without specifying _nkw parameter.",
+      "description": "Parameter defines the ID of a category where you want your search to be concentrated. ID values are accessible inside `categories` array, located in our JSON output (e.g. `categories[1].id`). You can search using category\\_id parameter without specifying \\_nkw parameter.",
       "group": "advanced_ebay_parameters"
     },
     "_stpos": {
@@ -1084,11 +1084,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Ebay results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Ebay results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

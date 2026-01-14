@@ -472,7 +472,7 @@
         "watch",
         "car"
       ],
-      "description": "Parameter defines the device for sorting results. This parameter cannot be used with apps_category or q parameters. Available options: `phone` - Phone device (default) `tablet` - Tablet device `tv` - TV device `chromebook` - Chromebook device `watch` - Watch device `car` - Car device",
+      "description": "Parameter defines the device for sorting results. This parameter cannot be used with apps\\_category or q parameters. Available options: `phone` - Phone device (default) `tablet` - Tablet device `tv` - TV device `chromebook` - Chromebook device `watch` - Watch device `car` - Car device",
       "group": "advanced_google_play_parameters"
     },
     "age": {
@@ -486,19 +486,19 @@
       "group": "advanced_google_play_parameters"
     },
     "next_page_token": {
-      "description": "Parameter defines the next page token. It is used for retrieving the next page results. It shouldn't be used with the section_page_token, see_more_token, and chart parameters.",
+      "description": "Parameter defines the next page token. It is used for retrieving the next page results. It shouldn't be used with the section\\_page\\_token, see\\_more\\_token, and chart parameters.",
       "group": "pagination"
     },
     "section_page_token": {
-      "description": "Parameter defines the section page token used for retrieving the pagination results from individual sections. This parameter is a safer version of see_more_token, and is found in every row you can paginate into. It shouldn't be used with the next_page_token, see_more_token, and chart parameters",
+      "description": "Parameter defines the section page token used for retrieving the pagination results from individual sections. This parameter is a safer version of see\\_more\\_token, and is found in every row you can paginate into. It shouldn't be used with the next\\_page\\_token, see\\_more\\_token, and chart parameters",
       "group": "pagination"
     },
     "chart": {
-      "description": "Parameter is used for showing top charts. It can return up to `50` results. Each store contains different charts which require different values for retrieving results. To get the value of a specific chart you can use our Google Play Apps Store API JSON output: `chart_options[index].value` (e.g. `chart=topselling_free`). It shouldn't be used with the section_page_token, see_more_token, and next_page_token parameters",
+      "description": "Parameter is used for showing top charts. It can return up to `50` results. Each store contains different charts which require different values for retrieving results. To get the value of a specific chart you can use our Google Play Apps Store API JSON output: `chart_options[index].value` (e.g. `chart=topselling_free`). It shouldn't be used with the section\\_page\\_token, see\\_more\\_token, and next\\_page\\_token parameters",
       "group": "pagination"
     },
     "see_more_token": {
-      "description": "Parameter defines the see more token used for retrieving the pagination results from individual sections It is usually found in next page results. It shouldn't be used with the section_page_token, next_page_token, and chart, parameters",
+      "description": "Parameter defines the see more token used for retrieving the pagination results from individual sections It is usually found in next page results. It shouldn't be used with the section\\_page\\_token, next\\_page\\_token, and chart, parameters",
       "group": "pagination"
     }
   },
@@ -510,11 +510,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Play results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Play results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

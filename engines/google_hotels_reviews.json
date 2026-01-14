@@ -1,9 +1,9 @@
 {
-  "engine": "google_trends_autocomplete",
+  "engine": "google_hotels_reviews",
   "params": {
-    "q": {
+    "property_token": {
       "required": true,
-      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Trends search. The query is used to retrieve suggested searches.",
+      "description": "Parameter defines the sepcific property. You can find property\\_token from Google Hotels Properties API.",
       "group": "search_query"
     },
     "hl": {
@@ -167,19 +167,55 @@
         "yo",
         "zu"
       ],
-      "description": "Parameter defines the language to use for the Google Trends Autocomplete search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
+      "description": "Parameter defines the language to use for the Google Hotels search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
       "group": "localization"
+    },
+    "category_token": {
+      "description": "Parameter is used to get reviews filtered by a specific category. You can find category\\_token from Google Hotels API under reviews\\_breakdown.",
+      "group": "advanced_google_hotels_reviews_parameters"
+    },
+    "sort_by": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "Most helpful (Default)"
+        ],
+        [
+          "2",
+          "Most recent"
+        ],
+        [
+          "3",
+          "Highest score"
+        ],
+        [
+          "4",
+          "Lowest score"
+        ]
+      ],
+      "description": "Parameter defines the sorting order of the reviews. Available options: `1` - Most helpful (Default) `2` - Most recent `3` - Highest score `4` - Lowest score",
+      "group": "advanced_google_hotels_reviews_parameters"
+    },
+    "source_number": {
+      "type": "number",
+      "description": "Parameter filter the reviews based on their originating source. Standard options (always availbable): `0` - All reviews (Default) `-1` - Google For property-specific source numbers, refer to the other\\_reviews field in Google Hotels Property Details API. Available sources vary by property.",
+      "group": "advanced_google_hotels_reviews_parameters"
+    },
+    "next_page_token": {
+      "description": "Parameter defines the next page token. It is used for retrieving the next page results.",
+      "group": "pagination"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `google_trends_autocomplete` to use the Google Trends Autocomplete API engine.",
+      "description": "Set parameter to `google_hotels` to use the Google Hotels API engine.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Trends Autocomplete results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Hotels results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

@@ -1,20 +1,16 @@
 {
-  "engine": "walmart_product",
+  "engine": "naver_ai_overview",
   "params": {
-    "product_id": {
+    "query": {
       "required": true,
-      "description": "Parameter defines the product to get results for. Normally found from shopping results for supported products (e.g., `https://www.walmart.com/ip/{product_id}`). You can pass `product_id` and `us_item_id`. Responses from Walmart.com are faster when `product_id` is used.",
+      "description": "Parameter defines the query you want to search.",
       "group": "search_query"
-    },
-    "store_id": {
-      "description": "Store ID to filter the products by the specific store only. Head to the Walmart Stores Locations for a full list of supported stores. It's possible for the product pricing to differ between stores.",
-      "group": "advanced_filters"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `walmart_product` to use the Walmart Product API engine.",
+      "description": "Set parameter to `naver_ai_overview` to use the Naver Ai Overview API engine.",
       "group": "serpapi_parameters"
     },
     "device": {
@@ -29,7 +25,7 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Walmart Product results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Naver Ai Overview results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

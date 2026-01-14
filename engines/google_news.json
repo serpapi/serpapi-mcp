@@ -421,7 +421,7 @@
       "group": "localization"
     },
     "topic_token": {
-      "description": "Parameter defines the Google News topic token. It is used for accessing the news results for a specific topic (e.g., \"World\", \"Business\", \"Technology\"). The token can be found in our JSON response or the URL of the Google News page (in the URL, it is a string of characters preceded by `/topics/`). Parameter can be used together with section_token.",
+      "description": "Parameter defines the Google News topic token. It is used for accessing the news results for a specific topic (e.g., \"World\", \"Business\", \"Technology\"). The token can be found in our JSON response or the URL of the Google News page (in the URL, it is a string of characters preceded by `/topics/`). Parameter can be used together with section\\_token.",
       "group": "advanced_google_news_parameters"
     },
     "kgmid": {
@@ -429,11 +429,11 @@
       "group": "advanced_google_news_parameters"
     },
     "publication_token": {
-      "description": "Parameter defines the Google News publication token. It is used for accessing the news results from a specific publisher (e.g., \"CNN\", \"BBC\", \"The Guardian\"). The token can be found in our JSON response or the URL of the Google News page (in the URL, it is a string of characters preceded by `/publications/`). Parameter can be used together with section_token.",
+      "description": "Parameter defines the Google News publication token. It is used for accessing the news results from a specific publisher (e.g., \"CNN\", \"BBC\", \"The Guardian\"). The token can be found in our JSON response or the URL of the Google News page (in the URL, it is a string of characters preceded by `/publications/`). Parameter can be used together with section\\_token.",
       "group": "advanced_google_news_parameters"
     },
     "section_token": {
-      "description": "Parameter defines the Google News section token. It is used for accessing the sub-section of a specific topic. (e.g., \"Business -> Economy\"). The token can be found in our JSON response or the URL of the Google News page (in the URL, it is a string of characters preceded by `/sections/`) Parameter can be used together with topic_token, publication_token, and so.",
+      "description": "Parameter defines the Google News section token. It is used for accessing the sub-section of a specific topic. (e.g., \"Business -> Economy\"). The token can be found in our JSON response or the URL of the Google News page (in the URL, it is a string of characters preceded by `/sections/`) Parameter can be used together with topic\\_token, publication\\_token, and so.",
       "group": "advanced_google_news_parameters"
     },
     "story_token": {
@@ -452,7 +452,7 @@
           "Date"
         ]
       ],
-      "description": "Parameter defines the sorting method. Results can be sorted by relevance or by date. By default, the results are sorted by relevance. List of supported values are: `0` - Relevance `1` - Date Parameter can be used together with story_token and section_token.",
+      "description": "Parameter defines the sorting method. Results can be sorted by relevance or by date. By default, the results are sorted by relevance. List of supported values are: `0` - Relevance `1` - Date Parameter can be used together with story\\_token and section\\_token.",
       "group": "advanced_google_news_parameters"
     }
   },
@@ -464,11 +464,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google News results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google News results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

@@ -2,7 +2,7 @@
   "engine": "google_maps_reviews",
   "params": {
     "data_id": {
-      "description": "Parameter defines the Google Maps data ID. Find the data ID by using our Google Maps API. Either data_id or place_id should be set.",
+      "description": "Parameter defines the Google Maps data ID. Find the data ID by using our Google Maps API. Either data\\_id or place\\_id should be set.",
       "group": "search_query"
     },
     "hl": {
@@ -170,7 +170,7 @@
       "group": "localization"
     },
     "place_id": {
-      "description": "Parameter defines the unique reference to a place on a Google Map. Place IDs are available for most locations, including businesses, landmarks, parks, and intersections. You can find the place_id using our Google Maps API. You can read more about Place IDs here. Either data_id or place_id should be set.",
+      "description": "Parameter defines the unique reference to a place on a Google Map. Place IDs are available for most locations, including businesses, landmarks, parks, and intersections. You can find the place\\_id using our Google Maps API. You can read more about Place IDs here. Either data\\_id or place\\_id should be set.",
       "group": "advanced_google_maps_reviews_parameters"
     },
     "sort_by": {
@@ -185,15 +185,15 @@
       "group": "advanced_google_maps_reviews_parameters"
     },
     "topic_id": {
-      "description": "Parameter defines the ID of the topic you want to use for filtering reviews. You can access IDs inside our structured JSON response. topic_id and query parameters can't be used together.",
+      "description": "Parameter defines the ID of the topic you want to use for filtering reviews. You can access IDs inside our structured JSON response. topic\\_id and query parameters can't be used together.",
       "group": "advanced_google_maps_reviews_parameters"
     },
     "query": {
-      "description": "Parameter defines a text query you want to use for filtering reviews. query and topic_id parameters can't be used together.",
+      "description": "Parameter defines a text query you want to use for filtering reviews. query and topic\\_id parameters can't be used together.",
       "group": "advanced_google_maps_reviews_parameters"
     },
     "num": {
-      "description": "Parameter defines the maximum number of results to return. It ranges from `1` to `20`. It defaults to `10`. Parameter cannot be used on the initial page when neither next_page_token, topic_id, nor query is set. It always returns `8` results.",
+      "description": "Parameter defines the maximum number of results to return. It ranges from `1` to `20`. It defaults to `10`. Parameter cannot be used on the initial page when neither next\\_page\\_token, topic\\_id, nor query is set. It always returns `8` results.",
       "group": "pagination"
     },
     "next_page_token": {
@@ -209,11 +209,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Maps Reviews results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Maps Reviews results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

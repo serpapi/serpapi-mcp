@@ -12,12 +12,12 @@
     },
     "as_ylo": {
       "type": "number",
-      "description": "Parameter defines the year from which you want the results to be included. (e.g. if you set as_ylo parameter to the year `2018`, the results before that year will be omitted.). This parameter can be combined with the as_yhi parameter.",
+      "description": "Parameter defines the year from which you want the results to be included. (e.g. if you set as\\_ylo parameter to the year `2018`, the results before that year will be omitted.). This parameter can be combined with the as\\_yhi parameter.",
       "group": "advanced_google_scholar_parameters"
     },
     "as_yhi": {
       "type": "number",
-      "description": "Parameter defines the year until which you want the results to be included. (e.g. if you set as_yhi parameter to the year `2018`, the results after that year will be omitted.). This parameter can be combined with the as_ylo parameter.",
+      "description": "Parameter defines the year until which you want the results to be included. (e.g. if you set as\\_yhi parameter to the year `2018`, the results after that year will be omitted.). This parameter can be combined with the as\\_ylo parameter.",
       "group": "advanced_google_scholar_parameters"
     },
     "scisbd": {
@@ -218,7 +218,7 @@
       "group": "pagination"
     },
     "as_sdt": {
-      "description": "Parameter can be used either as a search type or a filter. As a Filter (only works when searching articles): `0` - exclude patents (default). `7` - include patents. As a Search Type: `4` - Select case law (US courts only). This will select all the State and Federal courts. e.g. `as_sdt=4` - Selects case law (all courts) To select specific courts, see the full list of supported Google Scholar courts. e.g. `as_sdt=4,33,192` - `4` is the required value and should always be in the first position, `33` selects all New York courts and `192` selects Tax Court. Values have to be separated by comma (`,`)",
+      "description": "Parameter can be used either as a search type or a filter. **As a Filter** (only works when searching articles): `0` - exclude patents (default). `7` - include patents. **As a Search Type**: `4` - Select case law (US courts only). This will select all the State and Federal courts. e.g. `as_sdt=4` - Selects case law (all courts) To select specific courts, see the full list of supported Google Scholar courts. e.g. `as_sdt=4,33,192` - `4` is the required value and should always be in the first position, `33` selects all New York courts and `192` selects Tax Court. Values have to be separated by comma (`,`)",
       "group": "search_type"
     },
     "safe": {
@@ -254,11 +254,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Scholar results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Scholar results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

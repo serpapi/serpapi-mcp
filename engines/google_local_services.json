@@ -121,7 +121,7 @@
     "data_cid": {
       "required": true,
       "type": "number",
-      "description": "Parameter defines the Google CID (customer identifier) of a place. This parameter can be found in Google Maps API local results, as well as in Google Search API and Google Local API local results under the name of place_id. You can also acquire it using Google's CID converter. Example CID for \"New York, NY, USA\": `14414772292044717666` Using data_cid for specific business locations or streets may produce inconsistent results due to limitations on Google's side; we recommend using the city or district level instead. Google Local Services API returns empty results for places outside of the USA. Parameter should not be confused with cid as they are different parameters.",
+      "description": "Parameter defines the Google CID (customer identifier) of a place. This parameter can be found in Google Maps API local results, as well as in Google Search API and Google Local API local results under the name of place\\_id. You can also acquire it using Google's CID converter. Example CID for \"New York, NY, USA\": `14414772292044717666` Using data\\_cid for specific business locations or streets may produce inconsistent results due to limitations on Google's side; we recommend using the city or district level instead. Google Local Services API returns empty results for places outside of the USA. Parameter should not be confused with cid as they are different parameters.",
       "group": "geographic_location"
     },
     "hl": {
@@ -1516,12 +1516,12 @@
         "vinyasa",
         "yin"
       ],
-      "description": "Parameter defines the type of a job, or a subcategory of a service you have searched for. For example, if you search for \"electrician\", you can be more specific by adding a job_type (e.g. `job_type=restore_power`). Head to the Google local services job types page for a full list of supported Google local services job types.",
+      "description": "Parameter defines the type of a job, or a subcategory of a service you have searched for. For example, if you search for \"electrician\", you can be more specific by adding a job\\_type (e.g. `job_type=restore_power`). Head to the Google local services job types page for a full list of supported Google local services job types.",
       "group": "advanced_google_local_services_parameters"
     },
     "cid": {
       "type": "number",
-      "description": "Parameter defines a unique ID of a place. The ID is available in our Google Local Services API JSON response. Parameter is required when accessing a specific business and should be used with bid and pid parameters. Parameter should not be confused with data_cid which corresponds to Google CID (customer identifier) of a place.",
+      "description": "Parameter defines a unique ID of a place. The ID is available in our Google Local Services API JSON response. Parameter is required when accessing a specific business and should be used with bid and pid parameters. Parameter should not be confused with data\\_cid which corresponds to Google CID (customer identifier) of a place.",
       "group": "google_local_services_place_parameters"
     },
     "bid": {
@@ -1543,11 +1543,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Local Services results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Local Services results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

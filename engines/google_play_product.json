@@ -453,7 +453,7 @@
         "tv",
         "car"
       ],
-      "description": "Parameter is used for filtering reviews by platform. It can be set to: `phone`: Phone (default), `tablet`: Tablet, `watch`: Watch, `chromebook`: Chromebook, `tv`: TV. It should be used only when all_reviews parameter is set to `true`.",
+      "description": "Parameter is used for filtering reviews by platform. It can be set to: `phone`: Phone (default), `tablet`: Tablet, `watch`: Watch, `chromebook`: Chromebook, `tv`: TV. It should be used only when all\\_reviews parameter is set to `true`.",
       "group": "reviews_parameters"
     },
     "rating": {
@@ -480,7 +480,7 @@
           "5-star"
         ]
       ],
-      "description": "Parameter is used for filtering reviews by rating. It can be set to: `1`: 1-star, `2`: 2-star, `3`: 3-star, `4`: 4-star, `5`: 5-star. It should be used only when all_reviews parameter is set to `true`.",
+      "description": "Parameter is used for filtering reviews by rating. It can be set to: `1`: 1-star, `2`: 2-star, `3`: 3-star, `4`: 4-star, `5`: 5-star. It should be used only when all\\_reviews parameter is set to `true`.",
       "group": "reviews_parameters"
     },
     "sort_by": {
@@ -499,16 +499,16 @@
           "Rating"
         ]
       ],
-      "description": "Parameter is used for sorting reviews by relevance. It can be set to: `1`: Most relevant (default), `2`: Newest, `3`: Rating. It should be used only when all_reviews parameter is set to `true`.",
+      "description": "Parameter is used for sorting reviews by relevance. It can be set to: `1`: Most relevant (default), `2`: Newest, `3`: Rating. It should be used only when all\\_reviews parameter is set to `true`.",
       "group": "reviews_parameters"
     },
     "num": {
       "type": "number",
-      "description": "Parameter defines the maximum number of reviews to return. (e.g., `40` (default) returns 40 reviews, `80` returns 80 reviews, and `100` returns 100 reviews). Maximum number of reviews you can return per search is `199`. It should be used only when all_reviews parameter is set to `true`.",
+      "description": "Parameter defines the maximum number of reviews to return. (e.g., `40` (default) returns 40 reviews, `80` returns 80 reviews, and `100` returns 100 reviews). Maximum number of reviews you can return per search is `199`. It should be used only when all\\_reviews parameter is set to `true`.",
       "group": "reviews_parameters"
     },
     "next_page_token": {
-      "description": "Parameter defines the next page token. It is used for retrieving the next page results. It should be used only when all_reviews parameter is set to `true`.",
+      "description": "Parameter defines the next page token. It is used for retrieving the next page results. It should be used only when all\\_reviews parameter is set to `true`.",
       "group": "reviews_parameters"
     }
   },
@@ -520,11 +520,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Play Product results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Play Product results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

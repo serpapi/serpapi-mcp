@@ -2,11 +2,11 @@
   "engine": "google_maps_directions",
   "params": {
     "start_addr": {
-      "description": "Parameter defines the address of the starting point for the direction you want to search. You can use anything that you would use in a regular Google Maps Directions search. Alternatively, you can use start_data_id or start_coords.",
+      "description": "Parameter defines the address of the starting point for the direction you want to search. You can use anything that you would use in a regular Google Maps Directions search. Alternatively, you can use start\\_data\\_id or start\\_coords.",
       "group": "search_query"
     },
     "end_addr": {
-      "description": "Parameter defines the address of the ending point for the direction you want to search. You can use anything that you would use in a regular Google Maps Directions search. Alternatively, you can use end_data_id or end_coords.",
+      "description": "Parameter defines the address of the ending point for the direction you want to search. You can use anything that you would use in a regular Google Maps Directions search. Alternatively, you can use end\\_data\\_id or end\\_coords.",
       "group": "search_query"
     },
     "gl": {
@@ -460,19 +460,19 @@
       "group": "advanced_google_maps_directions_parameters"
     },
     "start_data_id": {
-      "description": "Parameter defines the data ID of the starting point for the direction you want to search. Find the data ID of a place using our Google Maps API. Alternatively, you can use start_addr or start_coords.",
+      "description": "Parameter defines the data ID of the starting point for the direction you want to search. Find the data ID of a place using our Google Maps API. Alternatively, you can use start\\_addr or start\\_coords.",
       "group": "advanced_google_maps_directions_parameters"
     },
     "end_data_id": {
-      "description": "Parameter defines the data ID of the ending point for the direction you want to search. Find the data ID of a place using our Google Maps API. Alternatively, you can use end_addr or end_coords.",
+      "description": "Parameter defines the data ID of the ending point for the direction you want to search. Find the data ID of a place using our Google Maps API. Alternatively, you can use end\\_addr or end\\_coords.",
       "group": "advanced_google_maps_directions_parameters"
     },
     "start_coords": {
-      "description": "Parameter defines the GPS coordinates of the starting point for the direction you want to search. The format is `latitude,longitude`. E.g. `30.197471099,-97.66635289`. Alternatively, you can use start_addr or start_data_id.",
+      "description": "Parameter defines the GPS coordinates of the starting point for the direction you want to search. The format is `latitude,longitude`. E.g. `30.197471099,-97.66635289`. Alternatively, you can use start\\_addr or start\\_data\\_id.",
       "group": "advanced_google_maps_directions_parameters"
     },
     "end_coords": {
-      "description": "Parameter defines the GPS coordinates of the ending point for the direction you want to search. The format is `latitude,longitude`. E.g. `30.197471099,-97.66635289`. Alternatively, you can use end_addr or end_data_id.",
+      "description": "Parameter defines the GPS coordinates of the ending point for the direction you want to search. The format is `latitude,longitude`. E.g. `30.197471099,-97.66635289`. Alternatively, you can use end\\_addr or end\\_data\\_id.",
       "group": "advanced_google_maps_directions_parameters"
     },
     "distance_unit": {
@@ -495,7 +495,7 @@
       "group": "advanced_options"
     },
     "prefer": {
-      "description": "Parameter defines preferred transit options. Available options: `bus` - Bus `subway` - Subway `train` - Train `tram_light_rail` - Tram and light rail You can also combine multiple options by joining them with a comma (e.g.: `subway,train`). Parameter works only if travel_mode parameter is set to: `3` (Transit)",
+      "description": "Parameter defines preferred transit options. Available options: `bus` - Bus `subway` - Subway `train` - Train `tram_light_rail` - Tram and light rail You can also combine multiple options by joining them with a comma (e.g.: `subway,train`). Parameter works only if travel\\_mode parameter is set to: `3` (Transit)",
       "group": "advanced_options"
     },
     "route": {
@@ -514,11 +514,11 @@
           "Wheelchair accessible - 4"
         ]
       ],
-      "description": "Parameter defines route options. Available options: `2` - Fewer transfers `3` - Less walking `4` - Wheelchair accessible Parameter works only if travel_mode parameter is set to: `3` (Transit)",
+      "description": "Parameter defines route options. Available options: `2` - Fewer transfers `3` - Less walking `4` - Wheelchair accessible Parameter works only if travel\\_mode parameter is set to: `3` (Transit)",
       "group": "advanced_options"
     },
     "time": {
-      "description": "Parameter defines the time to travel. Available options: `depart_at:xxxxxx` - Specifies the departure time, where `xxxxxx` is the timestamp. E.g. `depart_at:1698229538` specifies the departure time to 2023-10-25 10:25:38 GMT+0000 `arrive_by:xxxxxx` - Specifies the arrival time, where `xxxxxx` is the timestamp. E.g. `arrive_by:1698229538` specifies the arrival time to 2023-10-25 10:25:38 GMT+0000 `last_available` - Takes the last available transit. This option works only if travel_mode parameter is set to: `3` (Transit)",
+      "description": "Parameter defines the time to travel. Available options: `depart_at:xxxxxx` - Specifies the departure time, where `xxxxxx` is the timestamp. E.g. `depart_at:1698229538` specifies the departure time to 2023-10-25 10:25:38 GMT+0000 `arrive_by:xxxxxx` - Specifies the arrival time, where `xxxxxx` is the timestamp. E.g. `arrive_by:1698229538` specifies the arrival time to 2023-10-25 10:25:38 GMT+0000 `last_available` - Takes the last available transit. This option works only if travel\\_mode parameter is set to: `3` (Transit)",
       "group": "advanced_options"
     }
   },
@@ -530,11 +530,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Maps Directions results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Maps Directions results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

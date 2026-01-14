@@ -102,7 +102,7 @@
     },
     "not_recommended": {
       "type": "checkbox",
-      "description": "Parameter fetches reviews that are not recommended by Yelp. It can be set to `true` to only show not recommended reviews, or `false` to show recommended reviews. By default, only recommended reviews are shown.",
+      "description": "Parameter fetches reviews that are not recommended by Yelp. It can be set to `true` to only show not recommended reviews, or `false` to show recommended reviews. By default, only **recommended** reviews are shown.",
       "group": "advanced_yelp_parameters"
     },
     "start": {
@@ -117,7 +117,7 @@
     },
     "not_recommended_start": {
       "type": "number",
-      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.). The not_recommended_start parameter can only be used with the not_recommended parameter set to `true`.",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.). The not\\_recommended\\_start parameter can only be used with the not\\_recommended parameter set to `true`.",
       "group": "pagination"
     }
   },
@@ -129,11 +129,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Yelp Reviews results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Yelp Reviews results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

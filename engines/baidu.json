@@ -32,11 +32,11 @@
     },
     "rn": {
       "type": "number",
-      "description": "Parameter defines the maximum number of results to return, limited to 50. (e.g., `10` (default) returns 10 results, `30` returns 30 results, and `50` returns 50 results). This parameter is only available for desktop and tablet searches.",
+      "description": "Parameter defines the maximum number of results to return, limited to 50. (e.g., `10` (default) returns 10 results, `30` returns 30 results, and `50` returns 50 results). This parameter is only available for **desktop and tablet** searches.",
       "group": "pagination"
     },
     "gpc": {
-      "description": "Parameter defines the time period for results. (e.g., `stf=1766826674,1767431474|stftype=1` only returns results from the past 7 days. First integer within the parameter,`1766826674` is Unix Timestamp for 7 days ago. Second integer,`1767431474` is Unix Timestamp for now.).",
+      "description": "Parameter defines the time period for results. (e.g., `stf=1767797961,1768402761|stftype=1` only returns results from the past 7 days. First integer within the parameter,`1767797961` is Unix Timestamp for 7 days ago. Second integer,`1768402761` is Unix Timestamp for now.).",
       "group": "advanced_filters"
     },
     "q5": {
@@ -78,11 +78,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Baidu results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Baidu results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

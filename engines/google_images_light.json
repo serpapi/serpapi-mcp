@@ -8,7 +8,7 @@
     },
     "location": {
       "type": "location",
-      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. The location and uule parameters can't be used together. It is recommended to specify location at the city level in order to simulate a real user\u2019s search. If location is omitted, the search may take on the location of the proxy.",
+      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. The location and uule parameters can't be used together. It is recommended to specify location at the city level in order to simulate a real user’s search. If location is omitted, the search may take on the location of the proxy.",
       "group": "geographic_location"
     },
     "uule": {
@@ -627,7 +627,7 @@
       "group": "localization"
     },
     "as_dt": {
-      "description": "Parameter controls whether to include or exclude results from the site named in the as_sitesearch parameter.",
+      "description": "Parameter controls whether to include or exclude results from the site named in the as\\_sitesearch parameter.",
       "group": "advanced_search_query_parameters"
     },
     "as_epq": {
@@ -643,11 +643,11 @@
       "group": "advanced_search_query_parameters"
     },
     "as_nlo": {
-      "description": "Parameter specifies the starting value for a search range. Use as_nlo and as_nhi to append an inclusive search range.",
+      "description": "Parameter specifies the starting value for a search range. Use as\\_nlo and as\\_nhi to append an inclusive search range.",
       "group": "advanced_search_query_parameters"
     },
     "as_nhi": {
-      "description": "Parameter specifies the ending value for a search range. Use as_nlo and as_nhi to append an inclusive search range.",
+      "description": "Parameter specifies the ending value for a search range. Use as\\_nlo and as\\_nhi to append an inclusive search range.",
       "group": "advanced_search_query_parameters"
     },
     "as_oq": {
@@ -667,7 +667,7 @@
       "group": "advanced_search_query_parameters"
     },
     "as_sitesearch": {
-      "description": "Parameter allows you to specify that all search results should be pages from a given site. By setting the as_dt parameter, you can also use it to exclude pages from a given site from your search results.",
+      "description": "Parameter allows you to specify that all search results should be pages from a given site. By setting the as\\_dt parameter, you can also use it to exclude pages from a given site from your search results.",
       "group": "advanced_search_query_parameters"
     },
     "period_unit": {
@@ -733,7 +733,7 @@
         "40mp",
         "70mp"
       ],
-      "description": "Parameter defines the size of images. Options: `l` - Large `m` - Medium `i` - Icon `qsvga` - Larger than 400\u00d7300 `vga` - Larger than 640\u00d7480 `svga` - Larger than 800\u00d7600 `xga` - Larger than 1024\u00d7768 `2mp` - Larger than 2 MP `4mp` - Larger than 4 MP `6mp` - Larger than 6 MP `8mp` - Larger than 8 MP `10mp` - Larger than 10 MP `12mp` - Larger than 12 MP `15mp` - Larger than 15 MP `20mp` - Larger than 20 MP `40mp` - Larger than 40 MP `70mp` - Larger than 70 MP",
+      "description": "Parameter defines the size of images. Options: `l` - Large `m` - Medium `i` - Icon `qsvga` - Larger than 400×300 `vga` - Larger than 640×480 `svga` - Larger than 800×600 `xga` - Larger than 1024×768 `2mp` - Larger than 2 MP `4mp` - Larger than 4 MP `6mp` - Larger than 6 MP `8mp` - Larger than 8 MP `10mp` - Larger than 10 MP `12mp` - Larger than 12 MP `15mp` - Larger than 15 MP `20mp` - Larger than 20 MP `40mp` - Larger than 40 MP `70mp` - Larger than 70 MP",
       "group": "advanced_filters"
     },
     "image_color": {
@@ -825,11 +825,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Images Light results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Images Light results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

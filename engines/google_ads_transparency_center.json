@@ -6,7 +6,7 @@
       "group": "search_query"
     },
     "text": {
-      "description": "Parameter defines the text you want to search, typically related to a domain search within the context of Google Ads. You can use anything that you would normally use in a standard Google Ads Transparency Center search. It can be used as an alternative to advertiser_id. The advertiser_id can be optional when text is present.",
+      "description": "Parameter defines the text you want to search, typically related to a domain search within the context of Google Ads. You can use anything that you would normally use in a standard Google Ads Transparency Center search. It can be used as an alternative to advertiser\\_id. The advertiser\\_id can be optional when text is present.",
       "group": "advanced_ads_transparency_parameters"
     },
     "platform": {
@@ -994,7 +994,7 @@
       "group": "date_range"
     },
     "end_date": {
-      "description": "Parameter defines the end date for which you want the search results to conclude. The format for this field is `YYYYMMDD`. Example: `20221231` To set the date for Today / Single Day, you should set end_date as start_date + `1 day`.",
+      "description": "Parameter defines the end date for which you want the search results to conclude. The format for this field is `YYYYMMDD`. Example: `20221231` To set the date for **Today / Single Day**, you should set end\\_date as start\\_date + `1 day`.",
       "group": "date_range"
     },
     "creative_format": {
@@ -1025,11 +1025,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Ads Transparency Center results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Ads Transparency Center results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

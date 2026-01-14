@@ -571,15 +571,15 @@
       "group": "localization"
     },
     "data": {
-      "description": "This parameter is deprecated, please use place_id or data_cid instead. Parameter can be used to filter the search results. You can visit Google Maps website, set filters you want and simply copy the data value from their URL to SerpApi URL. One of the uses of the parameter is to search for a specific place; therefore, it is required if the type is set to `place`. To use the data parameter to search for a specific place, it needs to be constructed in the following sequence: `!4m5!3m4!1s` + `data_id` + `!8m2!3d` + `latitude` + `!4d` + `longitude` This will form a string that looks like this: `!4m5!3m4!1s0x89c259b7abdd4769:0xc385876db174521a!8m2!3d40.750231!4d-74.004019`. You can find the `data_id` using our Google Maps API.",
+      "description": "This parameter is deprecated, please use place\\_id or data\\_cid instead. Parameter can be used to filter the search results. You can visit Google Maps website, set filters you want and simply copy the data value from their URL to SerpApi URL. One of the uses of the parameter is to search for a specific place; therefore, it is required if the type is set to `place`. To use the data parameter to search for a specific place, it needs to be constructed in the following sequence: `!4m5!3m4!1s` + `data_id` + `!8m2!3d` + `latitude` + `!4d` + `longitude` This will form a string that looks like this: `!4m5!3m4!1s0x89c259b7abdd4769:0xc385876db174521a!8m2!3d40.750231!4d-74.004019`. You can find the `data_id` using our Google Maps API.",
       "group": "advanced_google_maps_parameters"
     },
     "place_id": {
-      "description": "Parameter defines the unique reference to a place in Google Maps. Place IDs are available for most locations, including businesses, landmarks, parks, and intersections. You can find the place_id using our Google Maps API. You can read more about Place IDs here. place_id can be used without any other optional parameter. place_id and data_cid can't be used together. Parameter should not be confused with place_id in Google Search API and Google Local API which are the same as data_cid in Google Maps API.",
+      "description": "Parameter defines the unique reference to a place in Google Maps. Place IDs are available for most locations, including businesses, landmarks, parks, and intersections. You can find the place\\_id using our Google Maps API. You can read more about Place IDs here. place\\_id can be used without any other optional parameter. place\\_id and data\\_cid can't be used together. Parameter should not be confused with place\\_id in Google Search API and Google Local API which are the same as data\\_cid in Google Maps API.",
       "group": "advanced_google_maps_parameters"
     },
     "data_cid": {
-      "description": "Parameter defines the Google CID (customer identifier) of a place. This parameter can be found in Google Maps API local results, as well as in Google Search API and Google Local API local results under the name of place_id. You can also acquire it using Google's CID converter. data_cid can be used without any other optional parameter. data_cid and place_id can't be used together.",
+      "description": "Parameter defines the Google CID (customer identifier) of a place. This parameter can be found in Google Maps API local results, as well as in Google Search API and Google Local API local results under the name of place\\_id. You can also acquire it using Google's CID converter. data\\_cid can be used without any other optional parameter. data\\_cid and place\\_id can't be used together.",
       "group": "advanced_google_maps_parameters"
     },
     "type": {
@@ -589,7 +589,7 @@
         "search",
         "place"
       ],
-      "description": "Parameter defines the type of search you want to make. It can be set to: `search` - returns a list of results for the set q parameter, `place` - returns results for a specific place when data parameter is set Parameter is not required when using place_id or data_cid.",
+      "description": "Parameter defines the type of search you want to make. It can be set to: `search` - returns a list of results for the set q parameter, `place` - returns results for a specific place when data parameter is set Parameter is not required when using place\\_id or data\\_cid.",
       "group": "search_type"
     },
     "start": {
@@ -606,11 +606,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Maps results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Maps results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

@@ -88,7 +88,7 @@
         "amazon.com|es_US",
         "amazon.com.mx|pt_MX"
       ],
-      "description": "Parameter defines the language to use for the Amazon search. It's a locale name represented as _. (e.g., on amazon.com `en_US` for English, `es_US` for Spanish, or on amazon.co.jp `ja_JP` for Japanese). Head to Amazon languages for a full list of supported Amazon languages.",
+      "description": "Parameter defines the language to use for the Amazon search. It's a locale name represented as \\_. (e.g., on amazon.com `en_US` for English, `es_US` for Spanish, or on amazon.co.jp `ja_JP` for Japanese). Head to Amazon languages for a full list of supported Amazon languages.",
       "group": "localization"
     },
     "delivery_zip": {
@@ -354,11 +354,11 @@
       "group": "advanced_amazon_parameters"
     },
     "node": {
-      "description": "Parameter specifies the category for Amazon search results. You can find the appropriate node value by browsing Amazon\u2019s website and accessing a specific category. The node ID is typically included in the URL after the format `node=[NODE ID]`. For example, on Amazon.com, the node for Smart Home is `6563140011`, and on Amazon.co.uk, the node for Fashion is `11961407031`. Use this node value to filter search results by category.",
+      "description": "Parameter specifies the category for Amazon search results. You can find the appropriate node value by browsing Amazon’s website and accessing a specific category. The node ID is typically included in the URL after the format `node=[NODE ID]`. For example, on Amazon.com, the node for Smart Home is `6563140011`, and on Amazon.co.uk, the node for Fashion is `11961407031`. Use this node value to filter search results by category.",
       "group": "advanced_filters"
     },
     "rh": {
-      "description": "Parameter defines items filtering based on their attributes. The structure is a list of `key:value` pairs separated by `,`. For example `n:16318031,p_n_cpf_eligible:21512497011,p_72:1248897011` to filter for products in Coffee department (`n:16318031`) that are Climate Pledge Friendly (`p_n_cpf_eligible:21512497011`) and rated 4 Stars & Up (`p_72:1248897011`).",
+      "description": "Parameter defines items filtering based on their attributes. The structure is a list of `key:value` pairs separated by `,`. For example `n:16318031,p_n_cpf_eligible:21512497011,p_72:1248897011` to filter for products in **Coffee** department (`n:16318031`) that are **Climate Pledge Friendly** (`p_n_cpf_eligible:21512497011`) and rated **4 Stars & Up** (`p_72:1248897011`).",
       "group": "advanced_filters"
     },
     "dc": {
@@ -390,11 +390,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Amazon results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Amazon results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

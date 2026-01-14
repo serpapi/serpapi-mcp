@@ -3,7 +3,7 @@
   "params": {
     "q": {
       "required": true,
-      "description": "Parameter defines the query or queries you want to search. You can use anything that you would use in a regular Google Trends search. The maximum number of queries per search is `5` (this only applies to \"Interest over time\" and \"Compared breakdown by region\" data_type, other types of data will only accept `1` query per search). When passing multiple queries you need to use a comma (`,`) to separate them (e.g. `coffee,pizza,dark chocolate,/m/027lnzs,bread`). Query can be a \"Search term\" (e.g. `World Cup`, `Eminem`, `iPhone`, etc.) or a \"Topic\" (e.g. `/m/0663v`, `/m/027lnzs`, `/g/11mw8j71m4`, etc.). Queries that are \"Topics\" are encoded. To retrieve these values you can use our Google Trends Autocomplete API. Maximum length for each query is 100 characters.",
+      "description": "Parameter defines the query or queries you want to search. You can use anything that you would use in a regular Google Trends search. The maximum number of queries per search is `5` (this only applies to \"Interest over time\" and \"Compared breakdown by region\" data\\_type, other types of data will only accept `1` query per search). When passing multiple queries you need to use a comma (`,`) to separate them (e.g. `coffee,pizza,dark chocolate,/m/027lnzs,bread`). Query can be a \"Search term\" (e.g. `World Cup`, `Eminem`, `iPhone`, etc.) or a \"Topic\" (e.g. `/m/0663v`, `/m/027lnzs`, `/g/11mw8j71m4`, etc.). Queries that are \"Topics\" are encoded. To retrieve these values you can use our Google Trends Autocomplete API. Maximum length for each query is 100 characters.",
       "group": "search_query"
     },
     "hl": {
@@ -4406,7 +4406,7 @@
         "DMA",
         "CITY"
       ],
-      "description": "Parameter is used for getting more specific results when using \"Compared breakdown by region\" and \"Interest by region\" data_type charts. Other data_type charts do not accept region parameter. The default value depends on the geo location that is set. Available options: `COUNTRY` - Country `REGION` - Subregion `DMA` - Metro `CITY` - City Not all region options will return results for every geo location.",
+      "description": "Parameter is used for getting more specific results when using \"Compared breakdown by region\" and \"Interest by region\" data\\_type charts. Other data\\_type charts do not accept region parameter. The default value depends on the geo location that is set. Available options: `COUNTRY` - Country `REGION` - Subregion `DMA` - Metro `CITY` - City Not all region options will return results for every geo location.",
       "group": "geographic_location"
     },
     "data_type": {
@@ -6847,7 +6847,7 @@
         ],
         [
           "834",
-          "Citro\u00ebn"
+          "Citroën"
         ],
         [
           "835",
@@ -8988,7 +8988,7 @@
     },
     "include_low_search_volume": {
       "type": "checkbox",
-      "description": "Parameter is used for including low search volume regions in the results. Set the parameter to `true` to include low search volume regions in the results. This parameter is ignored if data_type is not set to `GEO_MAP` or `GEO_MAP_0`.",
+      "description": "Parameter is used for including low search volume regions in the results. Set the parameter to `true` to include low search volume regions in the results. This parameter is ignored if data\\_type is not set to `GEO_MAP` or `GEO_MAP_0`.",
       "group": "advanced_google_trends_parameters"
     }
   },
@@ -9000,11 +9000,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Trends results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Trends results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

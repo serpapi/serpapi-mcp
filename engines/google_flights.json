@@ -518,15 +518,15 @@
           "Multi-city - 3"
         ]
       ],
-      "description": "Parameter defines the type of the flights. Available options: `1` - Round trip (default) `2` - One way `3` - Multi-city When this parameter is set to `3`, use multi_city_json to set the flight information. To obtain the returning flight information for Round Trip `(1)`, you need to make another request using a departure_token.",
+      "description": "Parameter defines the type of the flights. Available options: `1` - Round trip (default) `2` - One way `3` - Multi-city When this parameter is set to `3`, use multi\\_city\\_json to set the flight information. To obtain the returning flight information for Round Trip `(1)`, you need to make another request using a departure\\_token.",
       "group": "advanced_google_flights_parameters"
     },
     "outbound_date": {
-      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-01-04`",
+      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-01-15`",
       "group": "advanced_google_flights_parameters"
     },
     "return_date": {
-      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-01-10` Parameter is required if type parameter is set to: `1` (Round trip)",
+      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-01-21` Parameter is required if type parameter is set to: `1` (Round trip)",
       "group": "advanced_google_flights_parameters"
     },
     "travel_class": {
@@ -553,7 +553,7 @@
       "group": "advanced_google_flights_parameters"
     },
     "multi_city_json": {
-      "description": "Parameter defines the flight information for multi-city flights. It's a JSON string containing multiple flight information objects. Each object should contain the following fields: `departure_id` - The departure airport code or location kgmid. The format is the same as the main departure_id parameter. `arrival_id` - The arrival airport code or location kgmid. The format is the same as the main arrival_id parameter. `date` - Flight date. The format is the same as the outbound_date parameter. `times` - Time range for the flight. The format is the same as the outbound_times parameter. This parameter is optional. Example: `[{\"departure_id\":\"CDG\",\"arrival_id\":\"NRT\",\"date\":\"2026-01-10\"},{\"departure_id\":\"NRT\",\"arrival_id\":\"LAX,SEA\",\"date\":\"2026-01-17\"},{\"departure_id\":\"LAX,SEA\",\"arrival_id\":\"AUS\",\"date\":\"2026-01-24\",\"times\":\"8,18,9,23\"}]` The example is a multi-city flight from `CDG` to `NRT` on `2026-01-10`, then from `NRT` to `LAX` or `SEA` on `2026-01-17`, and finally from `LAX` or `SEA` to `AUS` on `2026-01-24`. The last flight has a departure time range from 8:00 AM to 7:00 PM and an arrival time range from 9:00 AM to 12:00 AM (Midnight).",
+      "description": "Parameter defines the flight information for multi-city flights. It's a JSON string containing multiple flight information objects. Each object should contain the following fields: `departure_id` - The departure airport code or location kgmid. The format is the same as the main departure\\_id parameter. `arrival_id` - The arrival airport code or location kgmid. The format is the same as the main arrival\\_id parameter. `date` - Flight date. The format is the same as the outbound\\_date parameter. `times` - Time range for the flight. The format is the same as the outbound\\_times parameter. This parameter is optional. Example: `[{\"departure_id\":\"CDG\",\"arrival_id\":\"NRT\",\"date\":\"2026-01-21\"},{\"departure_id\":\"NRT\",\"arrival_id\":\"LAX,SEA\",\"date\":\"2026-01-28\"},{\"departure_id\":\"LAX,SEA\",\"arrival_id\":\"AUS\",\"date\":\"2026-02-04\",\"times\":\"8,18,9,23\"}]` The example is a multi-city flight from `CDG` to `NRT` on `2026-01-21`, then from `NRT` to `LAX` or `SEA` on `2026-01-28`, and finally from `LAX` or `SEA` to `AUS` on `2026-02-04`. The last flight has a departure time range from 8:00 AM to 7:00 PM and an arrival time range from 9:00 AM to 12:00 AM (Midnight).",
       "group": "advanced_google_flights_parameters"
     },
     "show_hidden": {
@@ -563,7 +563,7 @@
     },
     "exclude_basic": {
       "type": "checkbox",
-      "description": "Set to `true` to exclude basic results. Resulting fares will have free seat selection and carry on bags. Default to `false`. As of now, this filter only works for domestic flights in the US. Parameter can only be used when gl is`us` and travel_class is`1`",
+      "description": "Set to `true` to exclude basic results. Resulting fares will have free seat selection and carry on bags. Default to `false`. As of now, this filter only works for domestic flights in the US. Parameter can only be used when gl is`us` and travel\\_class is`1`",
       "group": "advanced_google_flights_parameters"
     },
     "deep_search": {
@@ -646,16 +646,16 @@
       "group": "advanced_filters"
     },
     "exclude_airlines": {
-      "description": "Parameter defines the airline codes to be excluded. Split multiple airlines with comma. It can't be used together with `include_airlines`. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude_airlines and include_airlines parameters can't be used together.",
+      "description": "Parameter defines the airline codes to be excluded. Split multiple airlines with comma. It can't be used together with `include_airlines`. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude\\_airlines and include\\_airlines parameters can't be used together.",
       "group": "advanced_filters"
     },
     "include_airlines": {
-      "description": "Parameter defines the airline codes to be included. Split multiple airlines with comma. It can't be used together with `exclude_airlines`. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude_airlines and include_airlines parameters can't be used together.",
+      "description": "Parameter defines the airline codes to be included. Split multiple airlines with comma. It can't be used together with `exclude_airlines`. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude\\_airlines and include\\_airlines parameters can't be used together.",
       "group": "advanced_filters"
     },
     "bags": {
       "type": "number",
-      "description": "Parameter defines the number of carry-on bags. Default to `0`. Parameter should not exceed the total number of passengers with carry-on bag allowance (adults, children and infants_in_seat).",
+      "description": "Parameter defines the number of carry-on bags. Default to `0`. Parameter should not exceed the total number of passengers with carry-on bag allowance (adults, children and infants\\_in\\_seat).",
       "group": "advanced_filters"
     },
     "max_price": {
@@ -696,11 +696,11 @@
       "group": "advanced_filters"
     },
     "departure_token": {
-      "description": "Parameter is used to select the flight and get returning flights (for Round trip) or flights for the next leg of itinerary (for Multi-city). Find this token in the departure flight results. It cannot be used together with booking_token.",
+      "description": "Parameter is used to select the flight and get returning flights (for Round trip) or flights for the next leg of itinerary (for Multi-city). Find this token in the departure flight results. It cannot be used together with booking\\_token.",
       "group": "next_flights"
     },
     "booking_token": {
-      "description": "Parameter is used to get booking options for the selected flights. Find this token in the flight results. It cannot be used together with departure_token. When using this token, parameters related to date and parameters inside \"Advanced Filters\" section won't affect the result.",
+      "description": "Parameter is used to get booking options for the selected flights. Find this token in the flight results. It cannot be used together with departure\\_token. When using this token, parameters related to date and parameters inside \"Advanced Filters\" section won't affect the result.",
       "group": "booking_flights"
     }
   },
@@ -712,11 +712,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Flights results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Flights results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

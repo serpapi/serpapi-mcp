@@ -3,12 +3,12 @@
   "params": {
     "q": {
       "required": true,
-      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Short Videos search. e.g. `inurl:`, `site:`, `intitle:`. We also support advanced search query parameters such as as_dt and as_eq. See the full list of supported advanced search query parameters.",
+      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google Short Videos search. e.g. `inurl:`, `site:`, `intitle:`. We also support advanced search query parameters such as as\\_dt and as\\_eq. See the full list of supported advanced search query parameters.",
       "group": "search_query"
     },
     "location": {
       "type": "location",
-      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. The location and uule parameters can't be used together. It is recommended to specify location at the city level in order to simulate a real user\u2019s search. If location is omitted, the search may take on the location of the proxy.",
+      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. The location and uule parameters can't be used together. It is recommended to specify location at the city level in order to simulate a real user’s search. If location is omitted, the search may take on the location of the proxy.",
       "group": "geographic_location"
     },
     "uule": {
@@ -627,7 +627,7 @@
       "group": "localization"
     },
     "as_dt": {
-      "description": "Parameter controls whether to include or exclude results from the site named in the as_sitesearch parameter.",
+      "description": "Parameter controls whether to include or exclude results from the site named in the as\\_sitesearch parameter.",
       "group": "advanced_search_query_parameters"
     },
     "as_epq": {
@@ -643,11 +643,11 @@
       "group": "advanced_search_query_parameters"
     },
     "as_nlo": {
-      "description": "Parameter specifies the starting value for a search range. Use as_nlo and as_nhi to append an inclusive search range.",
+      "description": "Parameter specifies the starting value for a search range. Use as\\_nlo and as\\_nhi to append an inclusive search range.",
       "group": "advanced_search_query_parameters"
     },
     "as_nhi": {
-      "description": "Parameter specifies the ending value for a search range. Use as_nlo and as_nhi to append an inclusive search range.",
+      "description": "Parameter specifies the ending value for a search range. Use as\\_nlo and as\\_nhi to append an inclusive search range.",
       "group": "advanced_search_query_parameters"
     },
     "as_oq": {
@@ -667,7 +667,7 @@
       "group": "advanced_search_query_parameters"
     },
     "as_sitesearch": {
-      "description": "Parameter allows you to specify that all search results should be pages from a given site. By setting the as_dt parameter, you can also use it to exclude pages from a given site from your search results.",
+      "description": "Parameter allows you to specify that all search results should be pages from a given site. By setting the as\\_dt parameter, you can also use it to exclude pages from a given site from your search results.",
       "group": "advanced_search_query_parameters"
     },
     "tbs": {
@@ -717,11 +717,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Short Videos results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Short Videos results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

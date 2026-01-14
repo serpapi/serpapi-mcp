@@ -2169,7 +2169,7 @@
           "Travel and Transportation - 19"
         ]
       ],
-      "description": "Parameter allows results to be filtered by a specific category. E.g. category_id:`18` will return only results from the \"Technology\" category. Head to the Google Trends Trending Now Categories for the full list of supported categories.",
+      "description": "Parameter allows results to be filtered by a specific category. E.g. category\\_id:`18` will return only results from the \"Technology\" category. Head to the Google Trends Trending Now Categories for the full list of supported categories.",
       "group": "advanced_parameters"
     },
     "only_active": {
@@ -2371,7 +2371,7 @@
       "group": "old_version_parameters"
     },
     "next_page_token": {
-      "description": "Parameter defines the next page token, which is used for retrieving the next page of results. When querying the API, the first response will provide access to all available pages. However, it's important to note that Google realtime search trends do not follow conventional pagination practices. Not to worry, though, as we have abstracted this complexity for you. Here's the caveat: only the first page will contain pagination information. Subsequent requests for the next page will not display pagination details. To ensure you retrieve all pages of data, your code should be designed to handle the following process: start by fetching the first response, and then use the provided pagination token to navigate through the subsequent pages. Parameter can only be used when frequency is set to `realtime`.",
+      "description": "Parameter defines the next page token, which is used for retrieving the next page of results. When querying the API, the first response will provide access to all available pages. However, it's important to note that Google realtime search trends do not follow conventional pagination practices. Not to worry, though, as we have abstracted this complexity for you. Here's the caveat: only the first page will contain pagination information. Subsequent requests for the next page will not display pagination details.",
       "group": "old_version_parameters"
     }
   },
@@ -2383,11 +2383,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Trends Trending Now results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Trends Trending Now results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

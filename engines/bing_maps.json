@@ -64,11 +64,11 @@
         "uk",
         "vi"
       ],
-      "description": "Parameter defines the language to search with. It follows the 2-character ISO_3166-1 format. (e.g., `us` for United States, `de` for Germany, `gb` for United Kingdom, etc.). You can view all supported language codes on Bing Maps.",
+      "description": "Parameter defines the language to search with. It follows the 2-character ISO\\_3166-1 format. (e.g., `us` for United States, `de` for Germany, `gb` for United Kingdom, etc.). You can view all supported language codes on Bing Maps.",
       "group": "localization"
     },
     "place_id": {
-      "description": "Parameter defines the unique reference to a place on a Bing Map. Place IDs are available for most locations, including businesses, landmarks, parks, and intersections. You can find the place_id using our Bing Maps API and Bing Local Pack API. place_id can be used without any other optional parameter including q parameter.",
+      "description": "Parameter defines the unique reference to a place on a Bing Map. Place IDs are available for most locations, including businesses, landmarks, parks, and intersections. You can find the place\\_id using our Bing Maps API and Bing Local Pack API. place\\_id can be used without any other optional parameter including q parameter.",
       "group": "advanced_bing_maps_parameters"
     },
     "first": {
@@ -90,11 +90,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Bing Maps results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Bing Maps results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

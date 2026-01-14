@@ -102,6 +102,9 @@ uv sync && uv run src/server.py
 # Docker
 docker build -t serpapi-mcp . && docker run -p 8000:8000 serpapi-mcp
 
+# Regenerate engine resources (Playground scrape)
+python build-engines.py
+
 # Testing with MCP Inspector
 npx @modelcontextprotocol/inspector
 # Configure: URL mcp.serpapi.com/YOUR_KEY/mcp, Transport "Streamable HTTP transport"

@@ -422,7 +422,7 @@
       "group": "localization"
     },
     "sp": {
-      "description": "Parameter can be used for pagination. Youtube uses continuous pagination and the next page token can be found in the SerpApi JSON response serpapi_pagination -> next_page_token and pagination -> next_page_token fields. Parameter can also be used to filter the search results: by Upload date, you need to set the sp parameter to `CAI%3D` by 4K, you need to set the sp parameter to `EgJwAQ%3D%3D` ... It can also be used for forcing the exact search query spelling by setting the sp value to `QgIIAQ%3D%3D`. If you are interested in passing other filters, you can visit the YouTube website, set filters you want and simply copy sp value from their URL to SerpApi URL.",
+      "description": "Parameter can be used for pagination. Youtube uses continuous pagination and the next page token can be found in the SerpApi JSON response serpapi\\_pagination -> next\\_page\\_token and pagination -> next\\_page\\_token fields. Parameter can also be used to filter the search results: by Upload date, you need to set the sp parameter to `CAI%3D` by 4K, you need to set the sp parameter to `EgJwAQ%3D%3D` ... It can also be used for forcing the exact search query spelling by setting the sp value to `QgIIAQ%3D%3D`. If you are interested in passing other filters, you can visit the YouTube website, set filters you want and simply copy sp value from their URL to SerpApi URL.",
       "group": "advanced_youtube_parameters"
     }
   },
@@ -434,11 +434,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the YouTube results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the YouTube results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

@@ -518,19 +518,19 @@
           "One way - 2"
         ]
       ],
-      "description": "Parameter defines the type of the flights. Available options: `1` - Round trip (default) `2` - One way When this parameter is set to `3`, use multi_city_json to set the flight information.",
+      "description": "Parameter defines the type of the flights. Available options: `1` - Round trip (default) `2` - One way When this parameter is set to `3`, use multi\\_city\\_json to set the flight information.",
       "group": "advanced_google_travel_explore_parameters"
     },
     "outbound_date": {
-      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-01-04`",
+      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-01-15`",
       "group": "advanced_google_travel_explore_parameters"
     },
     "return_date": {
-      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-01-10` Parameter is required if type parameter is set to: `1` (Round trip)",
+      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-01-21` Parameter is required if type parameter is set to: `1` (Round trip)",
       "group": "advanced_google_travel_explore_parameters"
     },
     "month": {
-      "description": "Parameter defines the month of the trip with flexible travel dates. The value must be a number from `1` to `12`, where `1` = January, `2` = February, \u2026, `12` = December. `0` (default) means all months within the next 6 months are considered. Only the next 6 months from the current date are available for selection.",
+      "description": "Parameter defines the month of the trip with flexible travel dates. The value must be a number from `1` to `12`, where `1` = January, `2` = February, …, `12` = December. `0` (default) means all months within the next 6 months are considered. Only the next 6 months from the current date are available for selection.",
       "group": "advanced_google_travel_explore_parameters"
     },
     "travel_duration": {
@@ -630,7 +630,7 @@
           "Flight only - 1"
         ]
       ],
-      "description": "Parameter defines the travel mode. Available options: `0` - All (default) `1` - Flight only travel_mode and interest parameters can't be used together.",
+      "description": "Parameter defines the travel mode. Available options: `0` - All (default) `1` - Flight only travel\\_mode and interest parameters can't be used together.",
       "group": "advanced_filters"
     },
     "interest": {
@@ -646,7 +646,7 @@
         "/m/03g3w",
         "/m/071k0"
       ],
-      "description": "Parameter defines the interest of the destination. Available options: `0` - Popular (default) `/g/11bc58l13w` - Outdoors `/m/0b3yr` - Beaches `/m/09cmq` - Museum `/m/03g3w` - History `/m/071k0` - Skiing travel_mode and interest parameters can't be used together.",
+      "description": "Parameter defines the interest of the destination. Available options: `0` - Popular (default) `/g/11bc58l13w` - Outdoors `/m/0b3yr` - Beaches `/m/09cmq` - Museum `/m/03g3w` - History `/m/071k0` - Skiing travel\\_mode and interest parameters can't be used together.",
       "group": "advanced_filters"
     },
     "include_airlines": {
@@ -655,7 +655,7 @@
     },
     "bags": {
       "type": "number",
-      "description": "Parameter defines the number of carry-on bags. Default to `0`. Parameter should not exceed the total number of passengers with carry-on bag allowance (adults, children and infants_in_seat).",
+      "description": "Parameter defines the number of carry-on bags. Default to `0`. Parameter should not exceed the total number of passengers with carry-on bag allowance (adults, children and infants\\_in\\_seat).",
       "group": "advanced_filters"
     },
     "max_price": {
@@ -677,11 +677,11 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Travel Explore results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Travel Explore results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {
-      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
       "group": "serpapi_parameters"
     },
     "zero_trace": {

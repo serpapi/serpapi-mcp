@@ -29,6 +29,8 @@ dependencies = [
     "uvicorn>=0.38.0",
     "starlette>=0.50.0",
     "serpapi>=0.1.5",
+    "beautifulsoup4>=4.12.0",
+    "markdownify>=0.13.1",
 ]
 
 [project.optional-dependencies]
