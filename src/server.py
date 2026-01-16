@@ -16,6 +16,7 @@ import serpapi
 import logging
 from datetime import datetime
 from pathlib import Path
+import re
 
 load_dotenv()
 
@@ -69,6 +70,10 @@ def _engine_resource_factory(engine: str, engine_path: Path) -> Resource:
 
 for _engine_path in _get_engine_files():
     _engine_name = _engine_path.stem
+    # Only allow alphanumeric and underscores in engine names.
+    if not re.fullmatch(r"[a-z0-9_]+", _engine_name):
+        logger.warning("Skipping invalid engine filename: %s", _engine_name)
+        continue
     mcp.add_resource(_engine_resource_factory(_engine_name, _engine_path))
 
 

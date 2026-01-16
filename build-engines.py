@@ -29,7 +29,6 @@ def html_to_markdown(value: str) -> str:
     return " ".join(md.split())
 
 
-
 def normalize_options(options: list[object]) -> list[object]:
     """Normalize option values, simplifying [value, label] pairs where possible."""
     normalized = []
@@ -37,7 +36,14 @@ def normalize_options(options: list[object]) -> list[object]:
         if isinstance(option, list) and option:
             value = option[0]
             label = option[1] if len(option) > 1 else None
-            if label is not None and (isinstance(value, (int, float)) or (isinstance(value, str) and value.isdigit())) and value != label:
+            if (
+                label is not None
+                and (
+                    isinstance(value, (int, float))
+                    or (isinstance(value, str) and value.isdigit())
+                )
+                and value != label
+            ):
                 normalized.append(option)
             else:
                 normalized.append(value)
@@ -83,7 +89,11 @@ def normalize_engine(engine: str, payload: dict[str, object]) -> dict[str, objec
                     else:
                         normalized_params[param_name] = filtered
 
-    return {"engine": engine, "params": normalized_params, "common_params": common_params}
+    return {
+        "engine": engine,
+        "params": normalized_params,
+        "common_params": common_params,
+    }
 
 
 def main() -> int:
