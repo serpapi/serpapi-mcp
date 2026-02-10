@@ -9,12 +9,12 @@ image:
   build: Dockerfile
   port: 8000
 
-cpu: 512
-memory: 1024
+cpu: 2048
+memory: 4096
 platform: linux/x86_64
 count:
   range:
-    min: 1
+    min: 3
     max: 6
   cpu_percentage: 70
 exec: true
