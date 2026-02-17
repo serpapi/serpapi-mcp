@@ -21,8 +21,22 @@ exec: true
 network:
   connect: true # Enable Service Connect for intra-environment traffic between services.
 
-# storage:
-  # readonly_fs: true       # Limit to read-only access to mounted root filesystems.
+storage:
+  readonly_fs: true
+
+variables:
+  PYTHONDONTWRITEBYTECODE: "1"
+
+# Allow writes to /tmp
+taskdef_overrides:
+  - path: ContainerDefinitions[0].MountPoints[-]
+    value:
+      SourceVolume: "ephemeral-scratch"
+      ContainerPath: "/tmp"
+      ReadOnly: false
+  - path: Volumes[-]
+    value:
+      Name: "ephemeral-scratch"
 
 # Optional fields for more advanced use-cases.
 #
