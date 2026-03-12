@@ -5,7 +5,6 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Install in VS Code](https://img.shields.io/badge/Install%20in-VS%20Code-blue?logo=visualstudiocode)](https://insiders.vscode.dev/redirect/mcp/install?name=serpapi-mcp&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.serpapi.com%2FYOUR_SERPAPI_API_KEY%2Fmcp%22%7D)
-[![Install in Cursor](https://img.shields.io/badge/Install%20in-Cursor-purple?logo=cursor)](cursor://anysphere.cursor-deeplink/mcp/install?name=serpapi-mcp&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLnNlcnBhcGkuY29tL1lPVVJfU0VSUEFQSV9BUElfS0VZL21jcCJ9)
 
 ## Features
 
