@@ -16,6 +16,10 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 - **Flexible Response Modes**: Complete or compact JSON responses
 - **JSON Responses**: Structured JSON output with complete or compact modes
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/serpapi-serpapi-mcp).
+
 ## Quick Start
 
 SerpApi MCP Server is available as a hosted service at [mcp.serpapi.com](https://mcp.serpapi.com). In order to connect to it, you need to provide an API key. You can find your API key on your [SerpApi dashboard](https://serpapi.com/dashboard).
