@@ -5,12 +5,13 @@ RUN pip install uv
 WORKDIR /app
 
 COPY pyproject.toml /app/
+COPY uv.lock /app/uv.lock
 COPY README.md /app/
 COPY src /app/src
 COPY engines /app/engines
 COPY build-engines.py /app/build-engines.py
 
-RUN uv sync
+RUN uv sync --locked
 
 ENV PATH="/app/.venv/bin:$PATH"
 
