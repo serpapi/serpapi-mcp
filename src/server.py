@@ -1,5 +1,7 @@
 import uvicorn
 import time
+
+from fastmcp.resources import ResourceResult, ResourceContent
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -40,24 +42,40 @@ def _get_engine_files() -> list[Path]:
     description="Index of available SerpApi engines and their resource URIs.",
     mime_type="application/json",
 )
-def engines_index() -> dict[str, Any]:
+def engines_index() -> ResourceResult:
     engine_files = _get_engine_files()
     engines = [path.stem for path in engine_files]
-    return {
-        "count": len(engines),
-        "engines": engines,
-        "resources": [f"serpapi://engines/{engine}" for engine in engines],
-        "schema": {
-            "note": "Each engine resource uses a flat schema: params are engine-specific; common_params are shared SerpApi parameters.",
-            "params_key": "params",
-            "common_params_key": "common_params",
-        },
-    }
+    resource_content = json.dumps(
+        {
+            "count": len(engines),
+            "engines": engines,
+            "resources": [f"serpapi://engines/{engine}" for engine in engines],
+            "schema": {
+                "note": "Each engine resource uses a flat schema: params are engine-specific; common_params are shared SerpApi parameters.",
+                "params_key": "params",
+                "common_params_key": "common_params",
+            },
+        }
+    )
+    return ResourceResult(
+        contents=[
+            ResourceContent(content=resource_content, mime_type="application/json"),
+        ]
+    )
 
 
 def _engine_resource_factory(engine: str, engine_path: Path) -> Resource:
-    def _load_engine() -> dict[str, Any]:
-        return json.loads(engine_path.read_text())
+    def _load_engine() -> ResourceResult:
+        return ResourceResult(
+            contents=[
+                # The json dump and load chain looks redundant - but it will help remove newlines from the file at `engine_path`,
+                # making the response context efficient for LLMs
+                ResourceContent(
+                    content=json.dumps(json.loads(engine_path.read_text())),
+                    mime_type="application/json",
+                ),
+            ]
+        )
 
     return Resource.from_function(
         fn=_load_engine,
