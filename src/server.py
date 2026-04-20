@@ -1,5 +1,7 @@
 import uvicorn
 import time
+
+from fastmcp.resources import ResourceResult, ResourceContent
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -40,24 +42,40 @@ def _get_engine_files() -> list[Path]:
     description="Index of available SerpApi engines and their resource URIs.",
     mime_type="application/json",
 )
-def engines_index() -> dict[str, Any]:
+def engines_index() -> ResourceResult:
     engine_files = _get_engine_files()
     engines = [path.stem for path in engine_files]
-    return {
-        "count": len(engines),
-        "engines": engines,
-        "resources": [f"serpapi://engines/{engine}" for engine in engines],
-        "schema": {
-            "note": "Each engine resource uses a flat schema: params are engine-specific; common_params are shared SerpApi parameters.",
-            "params_key": "params",
-            "common_params_key": "common_params",
-        },
-    }
+    resource_content = json.dumps(
+        {
+            "count": len(engines),
+            "engines": engines,
+            "resources": [f"serpapi://engines/{engine}" for engine in engines],
+            "schema": {
+                "note": "Each engine resource uses a flat schema: params are engine-specific; common_params are shared SerpApi parameters.",
+                "params_key": "params",
+                "common_params_key": "common_params",
+            },
+        }
+    )
+    return ResourceResult(
+        contents=[
+            ResourceContent(content=resource_content, mime_type="application/json"),
+        ]
+    )
 
 
 def _engine_resource_factory(engine: str, engine_path: Path) -> Resource:
-    def _load_engine() -> dict[str, Any]:
-        return json.loads(engine_path.read_text())
+    def _load_engine() -> ResourceResult:
+        return ResourceResult(
+            contents=[
+                # The json dump and load chain looks redundant - but it will help remove newlines from the file at `engine_path`,
+                # making the response context efficient for LLMs
+                ResourceContent(
+                    content=json.dumps(json.loads(engine_path.read_text())),
+                    mime_type="application/json",
+                ),
+            ]
+        )
 
     return Resource.from_function(
         fn=_load_engine,
@@ -195,26 +213,34 @@ class RequestMetricsMiddleware(BaseHTTPMiddleware):
         return response
 
 
-@mcp.tool()
-async def search(params: dict[str, Any] = {}, mode: str = "complete") -> str:
-    """Universal search tool supporting all SerpApi engines and result types.
+search_tool_description = """Universal search tool supporting all SerpApi engines and result types.
 
-    This tool consolidates weather, stock, and general search functionality into a single interface.
-    It processes multiple result types and returns structured JSON output.
+    When to use:
+        - Any query needing live, structured SERP data: web results, news, product listings, job postings, local businesses, flight/hotel prices, video results, images, stock/weather cards, knowledge graph entities.
+    
+    Engine discovery via MCP resources:
+        - serpapi://engines lists all engines supported by this tool.
+        - serpapi://engines/<engine> provides engine-specific parameters and supported options.
+        - Example: serpapi://engines/google_news
 
-    Args:
-        params: Dictionary of engine-specific parameters. Common parameters include:
-            - q: Search query (required for most engines)
-            - engine: Search engine to use (default: "google_light")
-            - location: Geographic location filter
-            - num: Number of results to return
-
-        mode: Response mode (default: "complete")
-            - "complete": Returns full JSON response with all fields
-            - "compact": Returns JSON response with metadata fields removed
-
-    Returns:
-        A JSON string containing search results or an error message.
+    Input schema:
+        params: JSON object containing SerpApi engine parameters.
+            Common parameters:
+                - q: Search query. Required for most engines.
+                - engine: SerpApi engine name. Defaults to "google_light".
+                - location: Optional geographic location for localized results.
+                - num: Optional number of results to return.
+    
+            Engine-specific parameters are available via MCP resources:
+                - serpapi://engines lists all supported engines.
+                - serpapi://engines/<engine> provides parameters and options for one engine.
+    
+        mode: Response mode. Defaults to "complete".
+            - "complete": Return the full SerpApi JSON response.
+            - "compact": Return a reduced response with metadata removed.
+    
+    Output schema:
+        JSON string containing search results, structured engine output, or an error message.
 
     Examples:
         Weather: {"params": {"q": "weather in London", "engine": "google"}, "mode": "complete"}
@@ -238,13 +264,34 @@ async def search(params: dict[str, Any] = {}, mode: str = "complete") -> str:
         - youtube_search
         - baidu
         - ebay
+    """
 
-    Engine params are available via resources at serpapi://engines/<engine> (index: serpapi://engines).
+
+@mcp.tool(description=search_tool_description)
+async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
+    """Universal search tool supporting all SerpApi engines and result types.
+
+    Args:
+        params: Dictionary of SerpApi engine-specific parameters. Common parameters include:
+            - q: Search query (required for most engines)
+            - engine: Search engine to use (default: "google_light")
+            - location: Geographic location filter
+            - num: Number of results to return
+
+        mode: Response mode (default: "complete")
+            - "complete": Returns full JSON response with all fields
+            - "compact": Returns JSON response with metadata fields removed
+
+    Returns:
+        A JSON string containing search results or an error message.
     """
 
     # Validate mode parameter
     if mode not in ["complete", "compact"]:
         return "Error: Invalid mode. Must be 'complete' or 'compact'"
+
+    if params is None:
+        params = {}
 
     request = get_http_request()
     if hasattr(request, "state") and request.state.api_key:
