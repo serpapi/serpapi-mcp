@@ -1324,7 +1324,7 @@ wheels = [
 
 [[package]]
 name = "serpapi-mcp-server"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1351,7 +1351,7 @@ dev = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.12.0" },
     { name = "black", marker = "extra == 'dev'", specifier = ">=23.0" },
-    { name = "fastmcp", specifier = ">=2.13.0.2" },
+    { name = "fastmcp", specifier = ">=3.2.0" },
     { name = "flake8", marker = "extra == 'dev'", specifier = ">=6.0.0" },
     { name = "httpx", specifier = ">=0.25.0" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.12.0" },
