@@ -9,7 +9,7 @@
   },
   "remotes": [
     {
-      "type": "sse",
+      "type": "http",
       "url": "https://mcp.serpapi.com/mcp"
     }
   ]
