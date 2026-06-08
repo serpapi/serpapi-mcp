@@ -327,15 +327,26 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
     except serpapi.exceptions.HTTPError as e:
         if "429" in str(e):
             retry_after = _extract_retry_after(e)
-            hint = (
-                f" Retry-After: {retry_after}s."
-                if retry_after and retry_after != "unknown"
-                else " Retry-After header not present."
-            )
+            
+            # Parse Retry-After: can be seconds (int) or HTTP-date
+            has_retry = bool(retry_after and retry_after != "unknown")
+            is_seconds = has_retry and retry_after.strip().isdigit()
+            
+            if is_seconds:
+                hint = f" Retry-After: {retry_after}s."
+                action = f"wait {retry_after}s and retry"
+            elif has_retry:
+                # HTTP-date or unknown format
+                hint = f" Retry-After: {retry_after}."
+                action = "retry after the time indicated by Retry-After"
+            else:
+                hint = " Retry-After header not present."
+                action = "retry in a bit"
+            
             return (
                 f"Error: Rate limit exceeded (HTTP 429).{hint} "
                 f"Free tier: 50 searches/hour, 2540/month. "
-                f"Action: wait {retry_after}s and retry, or use the same query again "
+                f"Action: {action}, or use the same query again "
                 f"to receive a cached result (1h TTL) if SerpApi has one."
             )
         elif "401" in str(e):
