@@ -281,14 +281,18 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
         mode: Response mode (default: "complete")
             - "complete": Returns full JSON response with all fields
             - "compact": Returns JSON response with metadata fields removed
+            - "formatted": Returns a human-readable text rendering of the
+              highest-signal parts (answer box, knowledge graph, organic
+              results, related questions, related searches). Useful for
+              LLM agents that prefer prose over raw JSON. Experimental.
 
     Returns:
         A JSON string containing search results or an error message.
     """
 
     # Validate mode parameter
-    if mode not in ["complete", "compact"]:
-        return "Error: Invalid mode. Must be 'complete' or 'compact'"
+    if mode not in ["complete", "compact", "formatted"]:
+        return "Error: Invalid mode. Must be 'complete', 'compact', or 'formatted'"
 
     if params is None:
         params = {}
@@ -321,7 +325,10 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
             for field in fields_to_remove:
                 data.pop(field, None)
 
-        # Return JSON response for both modes
+        # Return JSON response for "complete" and "compact" modes.
+        # For "formatted", render the highest-signal parts as text.
+        if mode == "formatted":
+            return _format_response_text(data)
         return json.dumps(data, indent=2, ensure_ascii=False)
 
     except serpapi.exceptions.HTTPError as e:
@@ -371,6 +378,108 @@ def main():
     port = int(os.getenv("MCP_PORT", "8000"))
 
     uvicorn.run(starlette_app, host=host, port=port, ws="none")
+
+
+def _truncate(s: str, n: int) -> str:
+    """Truncate a string to n chars, appending a marker if cut."""
+    if len(s) <= n:
+        return s
+    return s[:n] + f"… [+{len(s) - n} chars truncated]"
+
+
+def _format_response_text(data: dict) -> str:
+    """Render the highest-signal parts of a SerpApi response as text.
+
+    Used by mode="formatted". Covers:
+      - search_information (query + total_results)
+      - answer_box (snippet/answer if present)
+      - knowledge_graph (title + description if present)
+      - organic_results (top 8: title, link, snippet)
+      - related_questions (PAA: top 6)
+      - related_searches (top 8)
+    Output is capped at 12,000 chars to keep MCP messages tractable.
+    """
+    out: list[str] = []
+
+    si = data.get("search_information")
+    if isinstance(si, dict):
+        si_parts = []
+        if "query_displayed" in si:
+            si_parts.append(f"query_displayed: {si['query_displayed']}")
+        if "total_results" in si:
+            si_parts.append(f"total_results: {si['total_results']:,}")
+        if si_parts:
+            out.append("=== search_information ===\n" + "\n".join(si_parts))
+
+    ab = data.get("answer_box")
+    if isinstance(ab, dict):
+        ab_parts = []
+        if ab.get("type"):
+            ab_parts.append(f"type: {ab['type']}")
+        if ab.get("title"):
+            ab_parts.append(f"title: {ab['title']}")
+        if ab.get("answer"):
+            ab_parts.append(f"answer: {ab['answer']}")
+        if ab.get("snippet"):
+            ab_parts.append(f"snippet: {ab['snippet']}")
+        if ab.get("link"):
+            ab_parts.append(f"link: {ab['link']}")
+        if ab_parts:
+            out.append("=== answer_box ===\n" + _truncate("\n  ".join(ab_parts), 800))
+
+    kg = data.get("knowledge_graph")
+    if isinstance(kg, dict):
+        kg_parts = [f"title: {kg.get('title', '?')}", f"type: {kg.get('type', '?')}"]
+        if kg.get("description"):
+            kg_parts.append(f"description: {_truncate(kg['description'], 500)}")
+        out.append("=== knowledge_graph ===\n" + _truncate("\n  ".join(kg_parts), 1500))
+
+    organic = data.get("organic_results", [])
+    if isinstance(organic, list) and organic:
+        lines = [f"organic_results (top {min(len(organic), 8)} of {len(organic)}):"]
+        for i, r in enumerate(organic[:8], 1):
+            title = r.get("title", "(no title)")
+            link = r.get("link", "")
+            displayed = r.get("displayed_link", "")
+            snippet = r.get("snippet", "")
+            lines.append(f"\n  [{i}] {title}")
+            if displayed:
+                lines.append(f"      {displayed}")
+            elif link:
+                lines.append(f"      {link}")
+            if snippet:
+                lines.append(f"      snippet: {_truncate(snippet, 300)}")
+        out.append("\n".join(lines))
+
+    paa = data.get("related_questions", [])
+    if isinstance(paa, list) and paa:
+        lines = ["related_questions (PAA):"]
+        for i, q in enumerate(paa[:6], 1):
+            if not isinstance(q, dict):
+                continue
+            question = q.get("question", "?")
+            snippet = q.get("snippet", "")
+            title = q.get("title", "")
+            link = q.get("link", "")
+            lines.append(f"  [{i}] {question}")
+            if title:
+                lines.append(f"      {title}")
+            if snippet:
+                lines.append(f"      {_truncate(snippet, 250)}")
+            if link:
+                lines.append(f"      {link}")
+        out.append("\n".join(lines))
+
+    rs = data.get("related_searches", [])
+    if isinstance(rs, list) and rs:
+        qs = [r.get("query", r) if isinstance(r, dict) else r for r in rs[:8]]
+        out.append("related_searches: " + ", ".join(qs))
+
+    if not out:
+        # Fall back to JSON if nothing matched (defensive — shouldn't happen
+        # for any real SerpApi response)
+        return json.dumps(data, indent=2, ensure_ascii=False)
+    return _truncate("\n\n".join(out), 12_000)
 
 
 if __name__ == "__main__":
