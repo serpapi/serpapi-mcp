@@ -268,7 +268,11 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
 
 
 @mcp.tool(description=search_tool_description)
-async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
+async def search(
+    params: dict[str, Any] = None,
+    mode: str = "complete",
+    json_restrictor: str = "",
+) -> str:
     """Universal search tool supporting all SerpApi engines and result types.
 
     Args:
@@ -282,6 +286,14 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
             - "complete": Returns full JSON response with all fields
             - "compact": Returns JSON response with metadata fields removed
 
+        json_restrictor: SerpApi server-side field selector (default: "").
+            Comma-separated dotted paths to keep, e.g. "organic_results.title,
+            organic_results.link,answer_box.title,answer_box.answer".
+            When set, the SerpApi backend trims the response to ONLY the
+            listed fields before returning — saves bandwidth and tokens.
+            See https://serpapi.com/json-restrictor for full syntax.
+            Empty string (default) disables restriction (backward compatible).
+
     Returns:
         A JSON string containing search results or an error message.
     """
@@ -289,6 +301,14 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
     # Validate mode parameter
     if mode not in ["complete", "compact"]:
         return "Error: Invalid mode. Must be 'complete' or 'compact'"
+
+    # Validate json_restrictor: must be a non-empty string with reasonable shape.
+    # We don't try to validate the paths themselves — SerpApi's API is the
+    # source of truth and accepts arbitrary dotted paths.
+    if json_restrictor and not isinstance(json_restrictor, str):
+        return "Error: json_restrictor must be a string of comma-separated dotted paths"
+    if json_restrictor and len(json_restrictor) > 4000:
+        return "Error: json_restrictor too long (max 4000 chars)"
 
     if params is None:
         params = {}
@@ -304,6 +324,10 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
         "engine": "google_light",  # Fastest engine by default
         **params,  # Include any additional parameters
     }
+    if json_restrictor:
+        # SerpApi server-side trimming: only the listed dotted paths survive.
+        # Empty string (default) means no restriction.
+        search_params["json_restrictor"] = json_restrictor
 
     try:
         data = serpapi.search(search_params).as_dict()
