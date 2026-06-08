@@ -326,7 +326,18 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
 
     except serpapi.exceptions.HTTPError as e:
         if "429" in str(e):
-            return f"Error: Rate limit exceeded. Please try again later."
+            retry_after = _extract_retry_after(e)
+            hint = (
+                f" Retry-After: {retry_after}s."
+                if retry_after and retry_after != "unknown"
+                else " Retry-After header not present."
+            )
+            return (
+                f"Error: Rate limit exceeded (HTTP 429).{hint} "
+                f"Free tier: 50 searches/hour, 2540/month. "
+                f"Action: wait {retry_after}s and retry, or use the same query again "
+                f"to receive a cached result (1h TTL) if SerpApi has one."
+            )
         elif "401" in str(e):
             return f"Error: Invalid SerpApi API key. Check your API key in the path or Authorization header."
         elif "403" in str(e):
@@ -337,6 +348,35 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
     except Exception as e:
         error_msg = extract_error_response(e)
         return f"Error: {error_msg}"
+
+
+def _extract_retry_after(exception) -> str:
+    """Try to extract the Retry-After header from a 429 SerpApi exception.
+
+    Returns the value as a string, or "unknown" if not present.
+    Walks the exception chain (mirrors extract_error_response) to find
+    the underlying httpx Response object.
+    """
+    current = exception
+    max_depth = 10
+    depth = 0
+    while depth < max_depth:
+        response = getattr(current, "response", None)
+        if response is not None:
+            try:
+                # httpx.Response exposes headers via .headers (case-insensitive)
+                retry_after = response.headers.get("Retry-After")
+                if retry_after is not None:
+                    return retry_after
+            except AttributeError:
+                pass
+        args = getattr(current, "args", None)
+        if args and len(args) > 0:
+            current = args[0]
+            depth += 1
+        else:
+            break
+    return "unknown"
 
 
 async def healthcheck_handler(request):
