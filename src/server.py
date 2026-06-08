@@ -19,6 +19,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import re
+from mcp.types import ToolAnnotations
 
 load_dotenv()
 
@@ -267,7 +268,16 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
     """
 
 
-@mcp.tool(description=search_tool_description)
+@mcp.tool(
+    description=search_tool_description,
+    annotations=ToolAnnotations(
+        title="SerpApi search",
+        readOnlyHint=True,  # search is read-only; no state mutation
+        destructiveHint=False,  # nothing deleted or modified
+        idempotentHint=False,  # SERP can change between calls; cache is 1h
+        openWorldHint=True,  # talks to external search engines
+    ),
+)
 async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
     """Universal search tool supporting all SerpApi engines and result types.
 
