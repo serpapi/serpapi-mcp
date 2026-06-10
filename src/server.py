@@ -19,7 +19,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import re
-from mcp.types import ToolAnnotations
+from mcp.types import Annotations, ToolAnnotations
 
 load_dotenv()
 
@@ -42,6 +42,10 @@ def _get_engine_files() -> list[Path]:
     name="serpapi-engines-index",
     description="Index of available SerpApi engines and their resource URIs.",
     mime_type="application/json",
+    annotations=Annotations(
+        audience=["assistant"],
+        priority=0.3,
+    ),
 )
 def engines_index() -> ResourceResult:
     engine_files = _get_engine_files()
