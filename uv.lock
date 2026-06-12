@@ -1345,6 +1345,7 @@ dev = [
     { name = "mypy" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+    { name = "requests" },
 ]
 
 [package.metadata]
@@ -1360,6 +1361,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
+    { name = "requests", marker = "extra == 'dev'", specifier = ">=2" },
     { name = "serpapi", specifier = ">=0.1.5" },
     { name = "starlette", specifier = ">=0.50.0" },
     { name = "uvicorn", specifier = ">=0.38.0" },
