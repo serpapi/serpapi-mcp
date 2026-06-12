@@ -8,7 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 from starlette.requests import Request
 from fastmcp import FastMCP
-from fastmcp.resources.resource import Resource
+from fastmcp.exceptions import NotFoundError
 from fastmcp.server.dependencies import get_http_request
 from dotenv import load_dotenv
 import os
@@ -69,35 +69,40 @@ def engines_index() -> ResourceResult:
     )
 
 
-def _engine_resource_factory(engine: str, engine_path: Path) -> Resource:
-    def _load_engine() -> ResourceResult:
-        return ResourceResult(
-            contents=[
-                # The json dump and load chain looks redundant - but it will help remove newlines from the file at `engine_path`,
-                # making the response context efficient for LLMs
-                ResourceContent(
-                    content=json.dumps(json.loads(engine_path.read_text())),
-                    mime_type="application/json",
-                ),
-            ]
+@mcp.resource(
+    "serpapi://engines/{engine_name}",
+    name="serpapi-engine",
+    description=(
+        "SerpApi engine specification. The URI parameter {engine_name} "
+        "is the engine identifier (e.g. 'google', 'bing', 'walmart'). "
+        "Use serpapi://engines to list valid values."
+    ),
+    mime_type="application/json",
+    annotations=Annotations(
+        audience=["assistant"],
+        priority=0.3,
+    ),
+)
+def get_engine_schema(engine_name: str) -> ResourceResult:
+    if not re.fullmatch(r"[a-z0-9_]+", engine_name):
+        raise NotFoundError(
+            f"Invalid engine name: {engine_name!r}. Expected [a-z0-9_]+."
         )
-
-    return Resource.from_function(
-        fn=_load_engine,
-        uri=f"serpapi://engines/{engine}",
-        name=f"serpapi-engine-{engine}",
-        description=f"SerpApi engine specification for {engine}.",
-        mime_type="application/json",
+    engine_path = ENGINES_DIR / f"{engine_name}.json"
+    if not engine_path.exists():
+        raise NotFoundError(
+            f"Unknown engine: {engine_name!r}. See serpapi://engines for the full list."
+        )
+    return ResourceResult(
+        contents=[
+            # The json dump and load chain looks redundant - but it will help remove newlines from the file at `engine_path`,
+            # making the response context efficient for LLMs
+            ResourceContent(
+                content=json.dumps(json.loads(engine_path.read_text())),
+                mime_type="application/json",
+            ),
+        ]
     )
-
-
-for _engine_path in _get_engine_files():
-    _engine_name = _engine_path.stem
-    # Only allow alphanumeric and underscores in engine names.
-    if not re.fullmatch(r"[a-z0-9_]+", _engine_name):
-        logger.warning("Skipping invalid engine filename: %s", _engine_name)
-        continue
-    mcp.add_resource(_engine_resource_factory(_engine_name, _engine_path))
 
 
 def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
