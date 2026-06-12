@@ -8,6 +8,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 from starlette.requests import Request
 from fastmcp import FastMCP
+from fastmcp.exceptions import NotFoundError
 from fastmcp.server.dependencies import get_http_request
 from dotenv import load_dotenv
 import os
@@ -80,40 +81,18 @@ def engines_index() -> ResourceResult:
 )
 def get_engine_schema(engine_name: str) -> ResourceResult:
     if not re.fullmatch(r"[a-z0-9_]+", engine_name):
-        return ResourceResult(
-            contents=[
-                ResourceContent(
-                    content=json.dumps(
-                        {
-                            "error": (
-                                f"Invalid engine name: {engine_name!r}. "
-                                "Expected [a-z0-9_]+."
-                            )
-                        }
-                    ),
-                    mime_type="application/json",
-                ),
-            ]
+        raise NotFoundError(
+            f"Invalid engine name: {engine_name!r}. Expected [a-z0-9_]+."
         )
     engine_path = ENGINES_DIR / f"{engine_name}.json"
     if not engine_path.exists():
-        return ResourceResult(
-            contents=[
-                ResourceContent(
-                    content=json.dumps(
-                        {
-                            "error": (
-                                f"Unknown engine: {engine_name!r}. "
-                                "See serpapi://engines for the full list."
-                            )
-                        }
-                    ),
-                    mime_type="application/json",
-                ),
-            ]
+        raise NotFoundError(
+            f"Unknown engine: {engine_name!r}. See serpapi://engines for the full list."
         )
     return ResourceResult(
         contents=[
+            # The json dump and load chain looks redundant - but it will help remove newlines from the file at `engine_path`,
+            # making the response context efficient for LLMs
             ResourceContent(
                 content=json.dumps(json.loads(engine_path.read_text())),
                 mime_type="application/json",
