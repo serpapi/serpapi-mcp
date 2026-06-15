@@ -487,6 +487,70 @@ _ORGANIC_COLUMNS = [
 ]
 
 
+def build_table_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the results-table UI from a SerpApi response."""
+    with PrefabApp(title="Search results") as app:
+        with Column(gap=4, css_class="p-4"):
+            DataTable(
+                columns=_ORGANIC_COLUMNS,
+                rows=organic_rows(data),
+                search=True,
+                paginated=True,
+                page_size=10,
+            )
+    return app
+
+
+def build_dashboard_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the dashboard UI (metrics + chart + table + detail) from a response."""
+    summary = dashboard_summary(data)
+    total = summary["total_results"]
+
+    with PrefabApp(title="Search dashboard", state={"selected": None}) as app:
+        with Column(gap=4, css_class="p-4"):
+            with Grid(columns=[1, 1, 1], gap=4):
+                Metric(label="Query", value=summary["query"] or "—")
+                Metric(label="Engine", value=summary["engine"] or "—")
+                Metric(
+                    label="Results shown",
+                    value=str(summary["result_count"]),
+                    description=(
+                        f"of ~{total:,} total" if isinstance(total, int) else None
+                    ),
+                )
+
+            with Grid(columns=[1, 2], gap=4):
+                if summary["sources"]:
+                    PieChart(
+                        data=summary["sources"],
+                        data_key="count",
+                        name_key="source",
+                        show_legend=True,
+                        height=260,
+                    )
+                DataTable(
+                    columns=_ORGANIC_COLUMNS,
+                    rows=summary["rows"],
+                    search=True,
+                    on_row_click=SetState("selected", Rx("$event")),
+                )
+
+            with If(STATE.selected):
+                with Card():
+                    with CardHeader():
+                        H3(Rx("selected.title"))
+                        Small(content=Rx("selected.source"))
+                    with CardContent():
+                        with Column(gap=2):
+                            Text(content=Rx("selected.snippet"))
+                            Link(
+                                content=Rx("selected.link"),
+                                href=Rx("selected.link"),
+                                target="_blank",
+                            )
+    return app
+
+
 @mcp.tool(
     app=True,
     description=(
@@ -510,18 +574,7 @@ async def search_table(params: dict[str, Any] = None) -> PrefabApp:
         return _error_app(
             str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)
         )
-
-    rows = organic_rows(data)
-    with PrefabApp(title="Search results") as app:
-        with Column(gap=4, css_class="p-4"):
-            DataTable(
-                columns=_ORGANIC_COLUMNS,
-                rows=rows,
-                search=True,
-                paginated=True,
-                page_size=10,
-            )
-    return app
+    return build_table_app(data)
 
 
 @mcp.tool(
@@ -547,52 +600,7 @@ async def search_dashboard(params: dict[str, Any] = None) -> PrefabApp:
         return _error_app(
             str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)
         )
-
-    summary = dashboard_summary(data)
-    total = summary["total_results"]
-
-    with PrefabApp(title="Search dashboard", state={"selected": None}) as app:
-        with Column(gap=4, css_class="p-4"):
-            with Grid(columns=[1, 1, 1], gap=4):
-                Metric(label="Query", value=summary["query"] or "—")
-                Metric(label="Engine", value=summary["engine"] or "—")
-                Metric(
-                    label="Results shown",
-                    value=str(summary["result_count"]),
-                    description=(
-                        f"of ~{total:,} total" if isinstance(total, int) else None
-                    ),
-                )
-
-            with Grid(columns=[1, 2], gap=4):
-                if summary["sources"]:
-                    PieChart(
-                        data=summary["sources"],
-                        data_key="count",
-                        name_key="source",
-                        show_legend=True,
-                    )
-                DataTable(
-                    columns=_ORGANIC_COLUMNS,
-                    rows=summary["rows"],
-                    search=True,
-                    on_row_click=SetState("selected", Rx("$event")),
-                )
-
-            with If(STATE.selected):
-                with Card():
-                    with CardHeader():
-                        H3(Rx("selected.title"))
-                        Small(content=Rx("selected.source"))
-                    with CardContent():
-                        with Column(gap=2):
-                            Text(content=Rx("selected.snippet"))
-                            Link(
-                                content=Rx("selected.link"),
-                                href=Rx("selected.link"),
-                                target="_blank",
-                            )
-    return app
+    return build_dashboard_app(data)
 
 
 async def healthcheck_handler(request):
