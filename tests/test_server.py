@@ -302,3 +302,148 @@ async def test_healthcheck_returns_healthy_with_utc_timestamp():
     assert body["service"] == "SerpApi MCP Server"
     # timezone-aware UTC, Z-suffixed (utcnow() was deprecated on 3.12+).
     assert body["timestamp"].endswith("Z")
+
+
+# --- MCP Apps: shared error mapping ----------------------------------------
+
+
+@pytest.mark.parametrize(
+    "status, fragment",
+    [
+        (429, "Rate limit exceeded"),
+        (401, "Invalid SerpApi API key"),
+        (403, "forbidden"),
+    ],
+)
+def test_map_search_error_maps_known_statuses(status, fragment):
+    out = server.map_search_error(make_serpapi_http_error(status, {"error": "x"}))
+    assert out.startswith("Error:")
+    assert fragment in out
+
+
+def test_map_search_error_falls_back_to_json_body():
+    out = server.map_search_error(
+        make_serpapi_http_error(500, {"error": "server boom"})
+    )
+    assert "server boom" in out
+
+
+def test_map_search_error_handles_generic_exception():
+    assert server.map_search_error(ValueError("weird")) == "Error: weird"
+
+
+# --- MCP Apps: pure view-model helpers -------------------------------------
+
+
+def test_organic_rows_flattens_results():
+    data = {
+        "organic_results": [
+            {
+                "position": 1,
+                "title": "A",
+                "link": "https://a.com/x",
+                "source": "A Co",
+                "snippet": "s1",
+            },
+            {"position": 2, "title": "B", "link": "https://b.com/y", "snippet": "s2"},
+        ]
+    }
+    rows = server.organic_rows(data)
+    assert rows[0] == {
+        "position": 1,
+        "title": "A",
+        "link": "https://a.com/x",
+        "source": "A Co",
+        "snippet": "s1",
+    }
+    # source falls back to the link host (www stripped) when not provided.
+    assert rows[1]["source"] == "b.com"
+
+
+def test_organic_rows_strips_www_from_derived_source():
+    data = {"organic_results": [{"title": "x", "link": "https://www.example.com/p"}]}
+    assert server.organic_rows(data)[0]["source"] == "example.com"
+
+
+def test_organic_rows_empty_without_results():
+    assert server.organic_rows({}) == []
+    assert server.organic_rows({"organic_results": None}) == []
+
+
+def test_source_breakdown_counts_and_limits():
+    rows = [{"source": "a"}, {"source": "a"}, {"source": "b"}, {"source": ""}]
+    breakdown = server.source_breakdown(rows, limit=1)
+    assert breakdown == [{"source": "a", "count": 2}]
+
+
+def test_dashboard_summary_shape():
+    data = {
+        "search_parameters": {"q": "coffee", "engine": "google_light"},
+        "search_information": {"total_results": 999},
+        "organic_results": [{"title": "A", "link": "https://a.com", "source": "A"}],
+    }
+    summary = server.dashboard_summary(data)
+    assert summary["query"] == "coffee"
+    assert summary["engine"] == "google_light"
+    assert summary["total_results"] == 999
+    assert summary["result_count"] == 1
+    assert summary["sources"] == [{"source": "A", "count": 1}]
+
+
+# --- MCP Apps: tool behavior -----------------------------------------------
+
+
+def ui_json(app):
+    """Serialize a Prefab app via its canonical serializer for assertions."""
+    return json.dumps(app.to_json())
+
+
+_SAMPLE_PAYLOAD = {
+    "search_parameters": {"q": "coffee", "engine": "google_light"},
+    "search_information": {"total_results": 12345},
+    "organic_results": [
+        {
+            "position": 1,
+            "title": "Best Coffee",
+            "link": "https://example.com/a",
+            "snippet": "beans",
+        },
+    ],
+}
+
+
+async def test_search_table_returns_results_app(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
+    app = await server.search_table(params={"q": "coffee"})
+    assert app.title == "Search results"
+    body = ui_json(app)
+    assert "DataTable" in body
+    assert "Best Coffee" in body
+
+
+async def test_search_dashboard_returns_dashboard_app(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
+    app = await server.search_dashboard(params={"q": "coffee"})
+    assert app.title == "Search dashboard"
+    # click-to-expand detail panel starts collapsed.
+    assert app.state == {"selected": None}
+    body = ui_json(app)
+    assert "Best Coffee" in body
+    assert "coffee" in body  # query surfaced in a metric
+
+
+async def test_search_table_without_api_key_renders_error_app(monkeypatch):
+    use_request(monkeypatch, real_request(state={}))
+    app = await server.search_table(params={"q": "x"})
+    assert app.title == "Search error"
+    assert "Unable to access API key" in ui_json(app)
+
+
+async def test_search_dashboard_maps_http_error_to_error_app(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, raiser(make_serpapi_http_error(429, {"error": "x"})))
+    app = await server.search_dashboard(params={"q": "x"})
+    assert app.title == "Search error"
+    assert "Rate limit exceeded" in ui_json(app)
