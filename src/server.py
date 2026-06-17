@@ -1,25 +1,49 @@
-import uvicorn
-import time
-
-from fastmcp.resources import ResourceResult, ResourceContent
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import JSONResponse
-from starlette.requests import Request
-from fastmcp import FastMCP
-from fastmcp.exceptions import NotFoundError
-from fastmcp.server.dependencies import get_http_request
-from dotenv import load_dotenv
-import os
 import json
-from typing import Any
-import serpapi
 import logging
+import os
+import re
+import time
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
-import re
+from typing import Any
+from urllib.parse import urlparse
+
+import serpapi
+import uvicorn
+from dotenv import load_dotenv
+from fastmcp import FastMCP
+from fastmcp.exceptions import NotFoundError
+from fastmcp.resources import ResourceContent, ResourceResult
+from fastmcp.server.dependencies import get_http_request
 from mcp.types import Annotations, ToolAnnotations
+from prefab_ui.actions import SetState
+from prefab_ui.app import PrefabApp
+from prefab_ui.components import (
+    H3,
+    Alert,
+    AlertDescription,
+    AlertTitle,
+    Card,
+    CardContent,
+    CardHeader,
+    Column,
+    DataTable,
+    DataTableColumn,
+    Grid,
+    If,
+    Link,
+    Metric,
+    Small,
+    Text,
+)
+from prefab_ui.components.charts import PieChart
+from prefab_ui.rx import STATE, Rx
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 load_dotenv()
 
@@ -163,6 +187,29 @@ def extract_error_response(exception) -> str:
 
     # Fallback
     return str(exception)
+
+
+def map_search_error(exception) -> str:
+    """Map a SerpApi/transport exception to a user-facing 'Error: ...' string.
+
+    Shared by the text `search` tool and the App tools so all entry points
+    surface identical messages for the same upstream failure.
+    """
+    if isinstance(exception, serpapi.exceptions.HTTPError):
+        text = str(exception)
+        if "429" in text:
+            return "Error: Rate limit exceeded. Please try again later."
+        if "401" in text:
+            return (
+                "Error: Invalid SerpApi API key. "
+                "Check your API key in the path or Authorization header."
+            )
+        if "403" in text:
+            return (
+                "Error: SerpApi API key forbidden. "
+                "Verify your subscription and key validity."
+            )
+    return f"Error: {extract_error_response(exception)}"
 
 
 class ApiKeyMiddleware(BaseHTTPMiddleware):
@@ -342,19 +389,218 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
         # Return JSON response for both modes
         return json.dumps(data, indent=2, ensure_ascii=False)
 
-    except serpapi.exceptions.HTTPError as e:
-        if "429" in str(e):
-            return f"Error: Rate limit exceeded. Please try again later."
-        elif "401" in str(e):
-            return f"Error: Invalid SerpApi API key. Check your API key in the path or Authorization header."
-        elif "403" in str(e):
-            return f"Error: SerpApi API key forbidden. Verify your subscription and key validity."
-        else:
-            error_msg = extract_error_response(e)
-            return f"Error: {error_msg}"
     except Exception as e:
-        error_msg = extract_error_response(e)
-        return f"Error: {error_msg}"
+        return map_search_error(e)
+
+
+# ---------------------------------------------------------------------------
+# MCP Apps (SEP-1865): interactive UI variants of `search`.
+#
+# These are opt-in: the plain-text `search` tool above is unchanged and stays
+# the default. App-aware hosts can call `search_table` / `search_dashboard`
+# to get an interactive UI rendered in the conversation; the bulk SERP JSON
+# never enters the model context window. Hosts that don't support the Apps
+# extension simply ignore these tools.
+# ---------------------------------------------------------------------------
+
+
+def _result_source(result: dict[str, Any]) -> str:
+    """Best-effort source label for an organic result (explicit source or host)."""
+    source = result.get("source")
+    if source:
+        return str(source)
+    host = urlparse(result.get("link", "") or "").netloc
+    return host[4:] if host.startswith("www.") else host
+
+
+def organic_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Flatten SerpApi organic_results into compact, table-ready rows."""
+    rows: list[dict[str, Any]] = []
+    for index, result in enumerate(data.get("organic_results") or [], start=1):
+        rows.append(
+            {
+                "position": result.get("position", index),
+                "title": result.get("title", ""),
+                "link": result.get("link", ""),
+                "source": _result_source(result),
+                "snippet": result.get("snippet", ""),
+            }
+        )
+    return rows
+
+
+def source_breakdown(
+    rows: list[dict[str, Any]], limit: int = 8
+) -> list[dict[str, Any]]:
+    """Count results per source for the dashboard pie chart (top `limit`)."""
+    counts = Counter(row["source"] for row in rows if row["source"])
+    return [
+        {"source": source, "count": count}
+        for source, count in counts.most_common(limit)
+    ]
+
+
+def dashboard_summary(data: dict[str, Any]) -> dict[str, Any]:
+    """Derive the dashboard view-model from a SerpApi response."""
+    params = data.get("search_parameters") or {}
+    info = data.get("search_information") or {}
+    rows = organic_rows(data)
+    return {
+        "query": params.get("q", ""),
+        "engine": params.get("engine", ""),
+        "total_results": info.get("total_results"),
+        "result_count": len(rows),
+        "rows": rows,
+        "sources": source_breakdown(rows),
+    }
+
+
+def fetch_search_data(params: dict[str, Any] | None) -> dict[str, Any]:
+    """Run a SerpApi search using the request's API key. Raises on failure."""
+    request = get_http_request()
+    api_key = getattr(getattr(request, "state", None), "api_key", None)
+    if not api_key:
+        raise RuntimeError("Error: Unable to access API key from request context")
+
+    search_params = {
+        "api_key": api_key,
+        "engine": "google_light",
+        **(params or {}),
+    }
+    return serpapi.search(search_params).as_dict()
+
+
+def _error_app(message: str) -> PrefabApp:
+    """Render an upstream/search error as an Apps alert instead of raw text."""
+    with PrefabApp(title="Search error") as app:
+        with Alert(variant="destructive"):
+            AlertTitle(content="Search failed")
+            AlertDescription(content=message)
+    return app
+
+
+_ORGANIC_COLUMNS = [
+    DataTableColumn(key="position", header="#", sortable=True, width="64px"),
+    DataTableColumn(key="title", header="Title", sortable=True),
+    DataTableColumn(key="source", header="Source", sortable=True),
+    DataTableColumn(key="snippet", header="Snippet"),
+]
+
+
+def build_table_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the results-table UI from a SerpApi response."""
+    with PrefabApp(title="Search results") as app:
+        with Column(gap=4, css_class="p-4"):
+            DataTable(
+                columns=_ORGANIC_COLUMNS,
+                rows=organic_rows(data),
+                search=True,
+                paginated=True,
+                page_size=10,
+            )
+    return app
+
+
+def build_dashboard_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the dashboard UI (metrics + chart + table + detail) from a response."""
+    summary = dashboard_summary(data)
+    total = summary["total_results"]
+
+    with PrefabApp(title="Search dashboard", state={"selected": None}) as app:
+        with Column(gap=4, css_class="p-4"):
+            with Grid(columns=[1, 1, 1], gap=4):
+                Metric(label="Query", value=summary["query"] or "—")
+                Metric(label="Engine", value=summary["engine"] or "—")
+                Metric(
+                    label="Results shown",
+                    value=str(summary["result_count"]),
+                    description=(
+                        f"of ~{total:,} total" if isinstance(total, int) else None
+                    ),
+                )
+
+            with Grid(columns=[1, 2], gap=4):
+                if summary["sources"]:
+                    PieChart(
+                        data=summary["sources"],
+                        data_key="count",
+                        name_key="source",
+                        show_legend=True,
+                        height=260,
+                    )
+                DataTable(
+                    columns=_ORGANIC_COLUMNS,
+                    rows=summary["rows"],
+                    search=True,
+                    on_row_click=SetState("selected", Rx("$event")),
+                )
+
+            with If(STATE.selected):
+                with Card():
+                    with CardHeader():
+                        H3(Rx("selected.title"))
+                        Small(content=Rx("selected.source"))
+                    with CardContent():
+                        with Column(gap=2):
+                            Text(content=Rx("selected.snippet"))
+                            Link(
+                                content=Rx("selected.link"),
+                                href=Rx("selected.link"),
+                                target="_blank",
+                            )
+    return app
+
+
+@mcp.tool(
+    app=True,
+    description=(
+        "Interactive UI variant of `search`: returns organic results as a "
+        "sortable, searchable table rendered in the conversation. Same params "
+        "as `search`. Use when the host supports MCP Apps and the user wants "
+        "to browse results visually rather than read JSON."
+    ),
+    annotations=ToolAnnotations(
+        title="SerpApi search (table)",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=False,
+        openWorldHint=True,
+    ),
+)
+async def search_table(params: dict[str, Any] = None) -> PrefabApp:
+    try:
+        data = fetch_search_data(params)
+    except Exception as exc:
+        return _error_app(
+            str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)
+        )
+    return build_table_app(data)
+
+
+@mcp.tool(
+    app=True,
+    description=(
+        "Interactive dashboard variant of `search`: returns summary metrics, a "
+        "source breakdown chart, and a results table with a click-to-expand "
+        "detail panel, all rendered in the conversation. Same params as "
+        "`search`. Use for a richer visual overview of a query's results."
+    ),
+    annotations=ToolAnnotations(
+        title="SerpApi search (dashboard)",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=False,
+        openWorldHint=True,
+    ),
+)
+async def search_dashboard(params: dict[str, Any] = None) -> PrefabApp:
+    try:
+        data = fetch_search_data(params)
+    except Exception as exc:
+        return _error_app(
+            str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)
+        )
+    return build_dashboard_app(data)
 
 
 async def healthcheck_handler(request):

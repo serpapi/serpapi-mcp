@@ -16,6 +16,7 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 - **Dynamic Result Processing**: Automatically detects and formats different result types
 - **Flexible Response Modes**: Complete or compact JSON responses
 - **JSON Responses**: Structured JSON output with complete or compact modes
+- **Interactive UI (MCP Apps)**: Opt-in `search_table` and `search_dashboard` tools that render results as an interactive UI in supporting hosts
 
 ## Quick Start
 
@@ -96,6 +97,21 @@ The parameters you can provide are specific for each API engine. Some sample par
 **Supported Engines:** Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and more (see `serpapi://engines`).
 
 **Result Types:** Answer boxes, organic results, news, images, shopping - automatically detected and formatted.
+
+## Interactive UI (MCP Apps)
+
+The default `search` tool returns JSON and is unchanged. For hosts that support the [MCP Apps extension](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) (SEP-1865), two opt-in tools render results as an interactive UI directly in the conversation, so the bulk SERP JSON never enters the model's context window:
+
+- `search_table`: organic results as a sortable, searchable table.
+- `search_dashboard`: summary metrics, a source-breakdown chart, and a results table with a click-to-expand detail panel.
+
+Both accept the same `params` as `search`. Hosts that don't support MCP Apps simply ignore these tools.
+
+Preview them locally without an MCP host:
+
+```bash
+uv run fastmcp dev apps src/server.py
+```
 
 ## Development
 

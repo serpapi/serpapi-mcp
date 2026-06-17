@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "serpapi-mcp-server"
-version = "0.3.0"
+version = "0.4.0"
 description = "A Model Context Protocol (MCP) server implementation that integrates with SerpApi for comprehensive search engine results and data extraction"
 readme = "README.md"
 license = "MIT"
@@ -23,11 +23,15 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "fastmcp>=3.2.0",
+    "fastmcp[apps]>=3.4.2",
+    # Prefab (the MCP Apps UI library) ships frequent breaking changes and
+    # fastmcp does not pin an upper bound, so pin it explicitly here.
+    "prefab-ui>=0.20.2,<0.21",
     "python-dotenv>=1.0.0",
     "httpx>=0.25.0",
     "uvicorn>=0.38.0",
-    "starlette>=0.50.0",
+    # >=1.0.1 avoids CVE-2026-48710 (fastmcp 3.4.1 floors this transitively).
+    "starlette>=1.0.1",
     "serpapi>=0.1.5",
     "beautifulsoup4>=4.12.0",
     "markdownify>=0.14.1",
