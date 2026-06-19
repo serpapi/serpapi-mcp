@@ -739,3 +739,218 @@ async def test_search_dashboard_falls_back_to_generic(monkeypatch):
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
     app = await server.search_dashboard(params={"q": "coffee"})
     assert app.title == "Search dashboard"
+
+
+# --- MCP Apps: Jobs-specific helpers and builder ----------------------------
+
+_SAMPLE_JOBS_PAYLOAD = {
+    "search_parameters": {
+        "engine": "google_jobs",
+        "q": "software engineer",
+    },
+    "jobs_results": [
+        {
+            "title": "Senior Software Engineer",
+            "company_name": "Acme Corp",
+            "location": "Austin, TX",
+            "via": "LinkedIn",
+            "extensions": [
+                "3 days ago",
+                "120K–160K a year",
+                "Full-time",
+                "Health insurance",
+                "Dental insurance",
+                "Paid time off",
+            ],
+            "detected_extensions": {
+                "posted_at": "3 days ago",
+                "salary": "120K–160K a year",
+                "schedule_type": "Full-time",
+            },
+            "description": "We are looking for a senior engineer to join our platform team and build scalable distributed systems.",
+            "job_highlights": [
+                {
+                    "title": "Qualifications",
+                    "items": ["5+ years experience", "Python or Go proficiency"],
+                },
+                {
+                    "title": "Benefits",
+                    "items": ["Health insurance", "401(k) matching", "Remote-friendly"],
+                },
+            ],
+            "apply_options": [
+                {"title": "LinkedIn", "link": "https://linkedin.com/jobs/123"},
+                {"title": "Indeed", "link": "https://indeed.com/jobs/456"},
+            ],
+            "source_link": "https://acme.com/careers/senior-swe",
+        },
+        {
+            "title": "Frontend Developer",
+            "company_name": "StartupCo",
+            "location": "Remote",
+            "via": "Indeed",
+            "extensions": ["1 day ago", "Work from home", "Contract"],
+            "detected_extensions": {
+                "posted_at": "1 day ago",
+                "schedule_type": "Contract",
+                "work_from_home": True,
+            },
+            "description": "Build beautiful user interfaces with React and TypeScript.",
+            "job_highlights": [],
+            "apply_options": [],
+            "source_link": "",
+        },
+        {
+            "title": "Junior Developer",
+            "company_name": "BigTech",
+            "location": "San Francisco, CA",
+            "via": "Glassdoor",
+            "extensions": ["5 days ago", "Full-time", "No degree mentioned"],
+            "detected_extensions": {
+                "posted_at": "5 days ago",
+                "schedule_type": "Full-time",
+                "qualifications": "No degree mentioned",
+            },
+            "description": "Entry-level position for new graduates.",
+        },
+    ],
+}
+
+
+def test_jobs_rows_extracts_all_jobs():
+    rows = server.jobs_rows(_SAMPLE_JOBS_PAYLOAD)
+    assert len(rows) == 3
+
+    # Rich job with salary and benefits
+    assert rows[0]["title"] == "Senior Software Engineer"
+    assert rows[0]["company"] == "Acme Corp"
+    assert rows[0]["location"] == "Austin, TX"
+    assert rows[0]["salary"] == "120K–160K a year"
+    assert rows[0]["schedule"] == "Full-time"
+    assert rows[0]["posted"] == "3 days ago"
+    assert rows[0]["work_from_home"] is False
+    assert "Health insurance" in rows[0]["benefits"]
+    assert "Dental insurance" in rows[0]["benefits"]
+    assert "Paid time off" in rows[0]["benefits"]
+    assert (
+        rows[0]["benefits_fmt"] == "Health insurance, Dental insurance, Paid time off"
+    )
+    assert rows[0]["source_link"] == "https://acme.com/careers/senior-swe"
+    assert len(rows[0]["highlights"]) == 2
+    assert len(rows[0]["apply_options"]) == 2
+
+    # Remote job
+    assert rows[1]["work_from_home"] is True
+    assert rows[1]["salary"] == ""
+    assert rows[1]["benefits_fmt"] == "—"
+
+    # Minimal job (no highlights, no apply_options keys)
+    assert rows[2]["qualifications"] == "No degree mentioned"
+    assert rows[2]["highlights"] == []
+    assert rows[2]["apply_options"] == []
+
+
+def test_jobs_rows_handles_empty_data():
+    assert server.jobs_rows({}) == []
+    assert server.jobs_rows({"jobs_results": None}) == []
+
+
+def test_jobs_rows_handles_missing_extensions():
+    data = {
+        "jobs_results": [
+            {
+                "title": "Intern",
+                "company_name": "Small Co",
+                "location": "Remote",
+            }
+        ]
+    }
+    rows = server.jobs_rows(data)
+    assert len(rows) == 1
+    assert rows[0]["salary"] == ""
+    assert rows[0]["schedule"] == ""
+    assert rows[0]["posted"] == ""
+    assert rows[0]["benefits"] == []
+    assert rows[0]["description"] == ""
+
+
+def test_jobs_summary_computes_metrics():
+    summary = server.jobs_summary(_SAMPLE_JOBS_PAYLOAD)
+    assert summary["total"] == 3
+    assert summary["with_salary"] == 1
+    assert summary["remote"] == 1
+    assert summary["salary_pct"] == "33%"
+    assert summary["remote_pct"] == "33%"
+    assert len(summary["rows"]) == 3
+    # Schedule breakdown for pie chart
+    breakdown = summary["schedule_breakdown"]
+    assert len(breakdown) == 2
+    assert {"schedule": "Full-time", "count": 2} in breakdown
+    assert {"schedule": "Contract", "count": 1} in breakdown
+
+
+def test_jobs_summary_handles_empty():
+    summary = server.jobs_summary({})
+    assert summary["total"] == 0
+    assert summary["salary_pct"] == "—"
+    assert summary["remote_pct"] == "—"
+    assert summary["schedule_breakdown"] == []
+
+
+def test_jobs_schedule_breakdown_groups_unspecified():
+    rows = [{"schedule": ""}, {"schedule": ""}, {"schedule": "Full-time"}]
+    breakdown = server.jobs_schedule_breakdown(rows)
+    assert {"schedule": "Unspecified", "count": 2} in breakdown
+    assert {"schedule": "Full-time", "count": 1} in breakdown
+
+
+def test_build_jobs_app_produces_valid_app():
+    app = server.build_jobs_app(_SAMPLE_JOBS_PAYLOAD)
+    assert app.title == "Jobs: software engineer"
+    assert app.state == {"selected": None}
+    body = ui_json(app)
+    assert "PieChart" in body
+    assert "DataTable" in body
+    assert "Senior Software Engineer" in body
+    assert "Acme Corp" in body
+    assert "120K" in body
+    # Detail panel elements
+    assert "selected.salary" in body
+    assert "selected.title" in body
+    assert "source_link" in body
+
+
+def test_build_jobs_app_without_query():
+    data = {"search_parameters": {"engine": "google_jobs"}, "jobs_results": []}
+    app = server.build_jobs_app(data)
+    assert app.title == "Jobs dashboard"
+
+
+def test_build_jobs_app_description_truncated():
+    long_desc = "x" * 500
+    data = {
+        "search_parameters": {"q": "test"},
+        "jobs_results": [
+            {
+                "title": "Role",
+                "company_name": "Co",
+                "location": "NYC",
+                "description": long_desc,
+            }
+        ],
+    }
+    app = server.build_jobs_app(data)
+    rows = server.jobs_rows(data)
+    assert len(rows[0]["description"]) == 300
+
+
+async def test_search_dashboard_dispatches_to_jobs(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_JOBS_PAYLOAD))
+    app = await server.search_dashboard(
+        params={"engine": "google_jobs", "q": "software engineer"}
+    )
+    assert "software engineer" in app.title
+    body = ui_json(app)
+    assert "Senior Software Engineer" in body
+    assert "DataTable" in body

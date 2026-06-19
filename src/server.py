@@ -752,10 +752,176 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
     return app
 
 
+# ---------------------------------------------------------------------------
+# Jobs-specific App builder
+# ---------------------------------------------------------------------------
+
+# Benefits detected from extensions that get badge treatment.
+_JOB_BENEFIT_LABELS = {
+    "Health insurance",
+    "Dental insurance",
+    "Paid time off",
+    "401(k)",
+    "Vision insurance",
+    "Life insurance",
+    "Disability insurance",
+    "Commuter benefits",
+    "Tuition reimbursement",
+}
+
+
+def jobs_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Flatten jobs_results into table-ready rows with structured metadata."""
+    rows: list[dict[str, Any]] = []
+    for job in data.get("jobs_results") or []:
+        ext = job.get("detected_extensions") or {}
+        extensions = job.get("extensions") or []
+        benefits = [e for e in extensions if e in _JOB_BENEFIT_LABELS]
+        rows.append(
+            {
+                "title": job.get("title", ""),
+                "company": job.get("company_name", ""),
+                "location": job.get("location", ""),
+                "salary": ext.get("salary", ""),
+                "schedule": ext.get("schedule_type", ""),
+                "posted": ext.get("posted_at", ""),
+                "qualifications": ext.get("qualifications", ""),
+                "work_from_home": ext.get("work_from_home", False),
+                "benefits": benefits,
+                "benefits_fmt": ", ".join(benefits) if benefits else "—",
+                "via": job.get("via", ""),
+                "description": (job.get("description") or "")[:300],
+                "highlights": job.get("job_highlights") or [],
+                "apply_options": job.get("apply_options") or [],
+                "source_link": job.get("source_link", ""),
+            }
+        )
+    return rows
+
+
+def jobs_summary(data: dict[str, Any]) -> dict[str, Any]:
+    """Derive summary metrics from a jobs response."""
+    rows = jobs_rows(data)
+    total = len(rows)
+    with_salary = sum(1 for r in rows if r["salary"])
+    remote = sum(1 for r in rows if r["work_from_home"])
+    return {
+        "total": total,
+        "with_salary": with_salary,
+        "remote": remote,
+        "salary_pct": f"{with_salary * 100 // total}%" if total else "—",
+        "remote_pct": f"{remote * 100 // total}%" if total else "—",
+        "rows": rows,
+        "schedule_breakdown": jobs_schedule_breakdown(rows),
+    }
+
+
+def jobs_schedule_breakdown(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Count jobs per schedule type for the pie chart."""
+    counts = Counter(r["schedule"] or "Unspecified" for r in rows)
+    return [
+        {"schedule": schedule, "count": count}
+        for schedule, count in counts.most_common()
+    ]
+
+
+_JOBS_COLUMNS = [
+    DataTableColumn(key="title", header="Title", sortable=True),
+    DataTableColumn(key="company", header="Company", sortable=True),
+    DataTableColumn(key="location", header="Location", sortable=True),
+    DataTableColumn(key="salary", header="Salary", sortable=True),
+    DataTableColumn(key="schedule", header="Type", sortable=True),
+    DataTableColumn(key="posted", header="Posted", sortable=True),
+    DataTableColumn(key="benefits_fmt", header="Benefits"),
+]
+
+
+def build_jobs_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the jobs explorer dashboard."""
+    summary = jobs_summary(data)
+    rows = summary["rows"]
+    params = data.get("search_parameters") or {}
+    query = params.get("q", "")
+
+    title = f"Jobs: {query}" if query else "Jobs dashboard"
+
+    with PrefabApp(title=title, state={"selected": None}) as app:
+        with Column(gap=4, css_class="p-4"):
+            # Metrics row
+            with Grid(columns=[1, 1, 1, 1], gap=4):
+                Metric(label="Jobs found", value=str(summary["total"]))
+                Metric(
+                    label="With salary",
+                    value=str(summary["with_salary"]),
+                    description=summary["salary_pct"],
+                )
+                Metric(
+                    label="Remote",
+                    value=str(summary["remote"]),
+                    description=summary["remote_pct"],
+                )
+                Metric(
+                    label="Query",
+                    value=query or "—",
+                )
+
+            # Schedule type breakdown
+            if summary["schedule_breakdown"]:
+                PieChart(
+                    data=summary["schedule_breakdown"],
+                    data_key="count",
+                    name_key="schedule",
+                    show_legend=True,
+                    height=220,
+                )
+
+            # Jobs table
+            DataTable(
+                columns=_JOBS_COLUMNS,
+                rows=rows,
+                search=True,
+                paginated=True,
+                page_size=10,
+                on_row_click=SetState("selected", Rx("$event")),
+            )
+
+            # Detail panel
+            with If(STATE.selected):
+                with Card():
+                    with CardHeader():
+                        H3(Rx("selected.title"))
+                        with Row(gap=2):
+                            Small(content=Rx("selected.company"))
+                            Text(content="·")
+                            Small(content=Rx("selected.location"))
+                        with Row(gap=2, css_class="mt-2"):
+                            with If(Rx("selected.salary")):
+                                Badge(label=Rx("selected.salary"), variant="default")
+                            with If(Rx("selected.schedule")):
+                                Badge(
+                                    label=Rx("selected.schedule"),
+                                    variant="secondary",
+                                )
+                            with If(Rx("selected.work_from_home")):
+                                Badge(label="Remote", variant="success")
+                    with CardContent():
+                        with Column(gap=3):
+                            Text(content=Rx("selected.description"))
+                            with If(Rx("selected.source_link")):
+                                Link(
+                                    content="View full listing →",
+                                    href=Rx("selected.source_link"),
+                                    target="_blank",
+                                )
+
+    return app
+
+
 # Engine-specific app dispatch: maps engine names to their dedicated builders.
 # Falls back to the generic dashboard for unregistered engines.
 ENGINE_APP_BUILDERS: dict[str, Any] = {
     "google_flights": build_flights_app,
+    "google_jobs": build_jobs_app,
 }
 
 
