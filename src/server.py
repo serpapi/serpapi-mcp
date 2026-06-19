@@ -39,7 +39,7 @@ from prefab_ui.components import (
     Small,
     Text,
 )
-from prefab_ui.components.charts import AreaChart, ChartSeries, PieChart
+from prefab_ui.components.charts import AreaChart, BarChart, ChartSeries, PieChart
 from prefab_ui.rx import STATE, Rx
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -917,11 +917,156 @@ def build_jobs_app(data: dict[str, Any]) -> PrefabApp:
     return app
 
 
+# ---------------------------------------------------------------------------
+# Shopping-specific App builder
+# ---------------------------------------------------------------------------
+
+
+def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Flatten shopping_results into table-ready rows."""
+    rows: list[dict[str, Any]] = []
+    for item in data.get("shopping_results") or []:
+        price = item.get("extracted_price")
+        old_price = item.get("extracted_old_price")
+        extensions = item.get("extensions") or []
+        discount_tag = next((e for e in extensions if "OFF" in e), "")
+        rows.append(
+            {
+                "title": item.get("title", ""),
+                "source": item.get("source", ""),
+                "price": price or 0,
+                "price_fmt": item.get("price", "—"),
+                "old_price_fmt": item.get("old_price", ""),
+                "discount": discount_tag,
+                "rating": item.get("rating") or 0,
+                "reviews": item.get("reviews") or 0,
+                "snippet": item.get("snippet", ""),
+                "product_link": item.get("product_link", ""),
+            }
+        )
+    return rows
+
+
+def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
+    """Derive summary metrics and price-by-source chart data."""
+    rows = shopping_rows(data)
+    prices = [r["price"] for r in rows if r["price"] > 0]
+    on_sale = sum(1 for r in rows if r["old_price_fmt"])
+    avg_rating = (
+        sum(r["rating"] for r in rows if r["rating"])
+        / max(1, sum(1 for r in rows if r["rating"]))
+        if rows
+        else 0
+    )
+
+    # Price by source (top 10 cheapest for the bar chart)
+    priced = sorted([r for r in rows if r["price"] > 0], key=lambda r: r["price"])
+    price_chart = [{"source": r["source"], "price": r["price"]} for r in priced[:10]]
+
+    return {
+        "total": len(rows),
+        "price_min": min(prices) if prices else 0,
+        "price_max": max(prices) if prices else 0,
+        "on_sale": on_sale,
+        "avg_rating": round(avg_rating, 1),
+        "rows": rows,
+        "price_chart": price_chart,
+    }
+
+
+_SHOPPING_COLUMNS = [
+    DataTableColumn(key="title", header="Product", sortable=True),
+    DataTableColumn(key="source", header="Seller", sortable=True),
+    DataTableColumn(key="price", header="Price", sortable=True, format="currency"),
+    DataTableColumn(key="old_price_fmt", header="Was"),
+    DataTableColumn(key="discount", header="Discount"),
+    DataTableColumn(key="rating", header="Rating", sortable=True),
+    DataTableColumn(key="reviews", header="Reviews", sortable=True),
+]
+
+
+def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the shopping price comparison dashboard."""
+    summary = shopping_summary(data)
+    rows = summary["rows"]
+    params = data.get("search_parameters") or {}
+    query = params.get("q", "")
+
+    title = f"Shopping: {query}" if query else "Shopping dashboard"
+
+    with PrefabApp(title=title, state={"selected": None}) as app:
+        with Column(gap=4, css_class="p-4"):
+            # Metrics row
+            with Grid(columns=[1, 1, 1, 1], gap=4):
+                Metric(label="Products", value=str(summary["total"]))
+                Metric(
+                    label="Price range",
+                    value=f"${summary['price_min']:,.0f}–${summary['price_max']:,.0f}"
+                    if summary["price_min"]
+                    else "—",
+                )
+                Metric(label="On sale", value=str(summary["on_sale"]))
+                Metric(
+                    label="Avg rating",
+                    value=str(summary["avg_rating"]) if summary["avg_rating"] else "—",
+                )
+
+            # Price comparison bar chart (top 10 cheapest sellers)
+            if summary["price_chart"]:
+                BarChart(
+                    data=summary["price_chart"],
+                    series=[ChartSeries(data_key="price", label="Price ($)")],
+                    x_axis="source",
+                    height=240,
+                    horizontal=True,
+                )
+
+            # Products table
+            DataTable(
+                columns=_SHOPPING_COLUMNS,
+                rows=rows,
+                search=True,
+                paginated=True,
+                page_size=15,
+                on_row_click=SetState("selected", Rx("$event")),
+            )
+
+            # Detail panel
+            with If(STATE.selected):
+                with Card():
+                    with CardHeader():
+                        H3(Rx("selected.title"))
+                        with Row(gap=2):
+                            Small(content=Rx("selected.source"))
+                            with If(Rx("selected.discount")):
+                                Badge(
+                                    label=Rx("selected.discount"),
+                                    variant="destructive",
+                                )
+                    with CardContent():
+                        with Column(gap=2):
+                            with Row(gap=4):
+                                Text(content=Rx("selected.price_fmt"))
+                                with If(Rx("selected.old_price_fmt")):
+                                    Small(content=Rx("selected.old_price_fmt"))
+                            with If(Rx("selected.snippet")):
+                                Text(content=Rx("selected.snippet"))
+                            with If(Rx("selected.product_link")):
+                                Link(
+                                    content="View on Google Shopping →",
+                                    href=Rx("selected.product_link"),
+                                    target="_blank",
+                                )
+
+    return app
+
+
 # Engine-specific app dispatch: maps engine names to their dedicated builders.
 # Falls back to the generic dashboard for unregistered engines.
 ENGINE_APP_BUILDERS: dict[str, Any] = {
     "google_flights": build_flights_app,
     "google_jobs": build_jobs_app,
+    "google_shopping": build_shopping_app,
 }
 
 

@@ -954,3 +954,166 @@ async def test_search_dashboard_dispatches_to_jobs(monkeypatch):
     body = ui_json(app)
     assert "Senior Software Engineer" in body
     assert "DataTable" in body
+
+
+# --- MCP Apps: Shopping-specific helpers and builder ------------------------
+
+_SAMPLE_SHOPPING_PAYLOAD = {
+    "search_parameters": {
+        "engine": "google_shopping",
+        "q": "Sony WH-1000XM5",
+    },
+    "shopping_results": [
+        {
+            "position": 1,
+            "title": "Sony WH-1000XM5 Wireless Headphones",
+            "source": "Best Buy",
+            "price": "$278.00",
+            "extracted_price": 278.0,
+            "old_price": "$398",
+            "extracted_old_price": 398,
+            "rating": 4.6,
+            "reviews": 26000,
+            "snippet": "Good sound quality",
+            "extensions": ["30% OFF", "Nearby, 11 mi"],
+            "product_link": "https://google.com/shopping/product/123",
+        },
+        {
+            "position": 2,
+            "title": "Sony WH-1000XM5 Wireless Headphones",
+            "source": "Amazon",
+            "price": "$298.00",
+            "extracted_price": 298.0,
+            "rating": 4.7,
+            "reviews": 45000,
+            "snippet": "Comfortable fit",
+            "product_link": "https://google.com/shopping/product/456",
+        },
+        {
+            "position": 3,
+            "title": "Sony WH-1000XM5 Wireless Headphones - Black",
+            "source": "Walmart",
+            "price": "$249.99",
+            "extracted_price": 249.99,
+            "old_price": "$349.99",
+            "extracted_old_price": 349.99,
+            "rating": 4.5,
+            "reviews": 8200,
+            "extensions": ["29% OFF"],
+            "product_link": "",
+        },
+        {
+            "position": 4,
+            "title": "Sony WH-1000XM5 Refurbished",
+            "source": "eBay",
+            "price": "$189.00",
+            "extracted_price": 189.0,
+            "rating": 0,
+            "reviews": 0,
+            "product_link": "https://google.com/shopping/product/789",
+        },
+    ],
+}
+
+
+def test_shopping_rows_extracts_all_products():
+    rows = server.shopping_rows(_SAMPLE_SHOPPING_PAYLOAD)
+    assert len(rows) == 4
+
+    # Product with discount
+    assert rows[0]["title"] == "Sony WH-1000XM5 Wireless Headphones"
+    assert rows[0]["source"] == "Best Buy"
+    assert rows[0]["price"] == 278.0
+    assert rows[0]["price_fmt"] == "$278.00"
+    assert rows[0]["old_price_fmt"] == "$398"
+    assert rows[0]["discount"] == "30% OFF"
+    assert rows[0]["rating"] == 4.6
+    assert rows[0]["reviews"] == 26000
+    assert rows[0]["snippet"] == "Good sound quality"
+
+    # Product without discount
+    assert rows[1]["source"] == "Amazon"
+    assert rows[1]["old_price_fmt"] == ""
+    assert rows[1]["discount"] == ""
+
+    # Product with no rating
+    assert rows[3]["rating"] == 0
+    assert rows[3]["reviews"] == 0
+
+
+def test_shopping_rows_handles_empty():
+    assert server.shopping_rows({}) == []
+    assert server.shopping_rows({"shopping_results": None}) == []
+
+
+def test_shopping_rows_handles_missing_fields():
+    data = {"shopping_results": [{"title": "Widget", "source": "Store"}]}
+    rows = server.shopping_rows(data)
+    assert rows[0]["price"] == 0
+    assert rows[0]["price_fmt"] == "—"
+    assert rows[0]["rating"] == 0
+    assert rows[0]["discount"] == ""
+
+
+def test_shopping_summary_computes_metrics():
+    summary = server.shopping_summary(_SAMPLE_SHOPPING_PAYLOAD)
+    assert summary["total"] == 4
+    assert summary["price_min"] == 189.0
+    assert summary["price_max"] == 298.0
+    assert summary["on_sale"] == 2
+    assert summary["avg_rating"] == 4.6  # (4.6+4.7+4.5)/3 rounded
+    assert len(summary["price_chart"]) == 4
+    # Chart sorted by cheapest first
+    assert summary["price_chart"][0]["source"] == "eBay"
+    assert summary["price_chart"][0]["price"] == 189.0
+
+
+def test_shopping_summary_handles_empty():
+    summary = server.shopping_summary({})
+    assert summary["total"] == 0
+    assert summary["price_min"] == 0
+    assert summary["price_max"] == 0
+    assert summary["price_chart"] == []
+
+
+def test_build_shopping_app_produces_valid_app():
+    app = server.build_shopping_app(_SAMPLE_SHOPPING_PAYLOAD)
+    assert app.title == "Shopping: Sony WH-1000XM5"
+    assert app.state == {"selected": None}
+    body = ui_json(app)
+    assert "BarChart" in body
+    assert "DataTable" in body
+    assert "Best Buy" in body
+    assert "278" in body
+    # Detail panel
+    assert "selected.discount" in body
+    assert "selected.product_link" in body
+
+
+def test_build_shopping_app_without_query():
+    data = {"search_parameters": {"engine": "google_shopping"}, "shopping_results": []}
+    app = server.build_shopping_app(data)
+    assert app.title == "Shopping dashboard"
+
+
+def test_build_shopping_app_no_chart_without_prices():
+    data = {
+        "search_parameters": {"q": "test"},
+        "shopping_results": [{"title": "Free thing", "source": "Store"}],
+    }
+    app = server.build_shopping_app(data)
+    body = ui_json(app)
+    assert "BarChart" not in body
+    assert "DataTable" in body
+
+
+async def test_search_dashboard_dispatches_to_shopping(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_SHOPPING_PAYLOAD))
+    app = await server.search_dashboard(
+        params={"engine": "google_shopping", "q": "Sony WH-1000XM5"}
+    )
+    assert "Sony WH-1000XM5" in app.title
+    body = ui_json(app)
+    assert "BarChart" in body
+    assert "Best Buy" in body
