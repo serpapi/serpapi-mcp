@@ -447,3 +447,295 @@ async def test_search_dashboard_maps_http_error_to_error_app(monkeypatch):
     app = await server.search_dashboard(params={"q": "x"})
     assert app.title == "Search error"
     assert "Rate limit exceeded" in ui_json(app)
+
+
+# --- MCP Apps: Flights-specific helpers and builder -------------------------
+
+_SAMPLE_FLIGHTS_PAYLOAD = {
+    "search_parameters": {
+        "engine": "google_flights",
+        "departure_id": "SFO",
+        "arrival_id": "JFK",
+    },
+    "best_flights": [
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "San Francisco",
+                        "id": "SFO",
+                        "time": "2026-07-01 08:00",
+                    },
+                    "arrival_airport": {
+                        "name": "New York JFK",
+                        "id": "JFK",
+                        "time": "2026-07-01 16:30",
+                    },
+                    "airline": "United",
+                    "flight_number": "UA 123",
+                    "duration": 330,
+                }
+            ],
+            "layovers": [],
+            "total_duration": 330,
+            "price": 289,
+            "type": "One way",
+            "carbon_emissions": {
+                "this_flight": 250000,
+                "typical_for_this_route": 280000,
+                "difference_percent": -11,
+            },
+        },
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "San Francisco",
+                        "id": "SFO",
+                        "time": "2026-07-01 06:00",
+                    },
+                    "arrival_airport": {
+                        "name": "Denver",
+                        "id": "DEN",
+                        "time": "2026-07-01 09:30",
+                    },
+                    "airline": "Delta",
+                    "duration": 150,
+                },
+                {
+                    "departure_airport": {
+                        "name": "Denver",
+                        "id": "DEN",
+                        "time": "2026-07-01 10:45",
+                    },
+                    "arrival_airport": {
+                        "name": "New York JFK",
+                        "id": "JFK",
+                        "time": "2026-07-01 16:00",
+                    },
+                    "airline": "Delta",
+                    "duration": 195,
+                },
+            ],
+            "layovers": [
+                {"duration": 75, "name": "Denver International Airport", "id": "DEN"}
+            ],
+            "total_duration": 420,
+            "price": 199,
+            "type": "One way",
+            "carbon_emissions": {
+                "this_flight": 310000,
+                "typical_for_this_route": 280000,
+                "difference_percent": 11,
+            },
+        },
+    ],
+    "other_flights": [
+        {
+            "flights": [
+                {
+                    "departure_airport": {
+                        "name": "San Francisco",
+                        "id": "SFO",
+                        "time": "2026-07-01 14:00",
+                    },
+                    "arrival_airport": {
+                        "name": "New York JFK",
+                        "id": "JFK",
+                        "time": "2026-07-01 22:45",
+                    },
+                    "airline": "JetBlue",
+                    "duration": 345,
+                }
+            ],
+            "layovers": [],
+            "total_duration": 345,
+            "price": 329,
+            "type": "One way",
+            "carbon_emissions": {},
+        },
+    ],
+    "price_insights": {
+        "lowest_price": 199,
+        "price_level": "low",
+        "typical_price_range": [250, 420],
+        "price_history": [
+            [1719792000, 310],
+            [1719878400, 305],
+            [1719964800, 289],
+            [1720051200, 275],
+            [1720137600, 199],
+        ],
+    },
+}
+
+
+def test_flights_rows_extracts_all_flights():
+    rows = server.flights_rows(_SAMPLE_FLIGHTS_PAYLOAD)
+    assert len(rows) == 3
+    # Direct flight
+    assert rows[0]["airline"] == "United"
+    assert rows[0]["route"] == "SFO → JFK"
+    assert rows[0]["price"] == 289
+    assert rows[0]["price_fmt"] == "$289"
+    assert rows[0]["stops"] == "Direct"
+    assert rows[0]["departure"] == "2026-07-01 08:00"
+    assert rows[0]["arrival"] == "2026-07-01 16:30"
+    assert rows[0]["duration"] == "5h 30m"
+    assert rows[0]["carbon_delta"] == -11
+    assert rows[0]["carbon_fmt"] == "-11% vs typical"
+    assert rows[0]["type"] == "One way"
+    # Multi-segment flight
+    assert rows[1]["airline"] == "Delta"
+    assert rows[1]["stops"] == "1 stop"
+    assert rows[1]["price"] == 199
+    assert rows[1]["arrival"] == "2026-07-01 16:00"
+    assert rows[1]["duration"] == "7h 0m"
+    assert rows[1]["carbon_fmt"] == "+11% vs typical"
+    # other_flights section
+    assert rows[2]["airline"] == "JetBlue"
+    assert rows[2]["carbon_fmt"] == "—"
+
+
+def test_flights_rows_handles_empty_data():
+    assert server.flights_rows({}) == []
+    assert server.flights_rows({"best_flights": None, "other_flights": None}) == []
+
+
+def test_flights_rows_handles_missing_airports():
+    data = {
+        "best_flights": [
+            {"flights": [], "layovers": [], "total_duration": 0, "price": 100}
+        ]
+    }
+    rows = server.flights_rows(data)
+    assert len(rows) == 1
+    assert rows[0]["route"] == "? → ?"
+    assert rows[0]["price"] == 100
+    assert rows[0]["departure"] == ""
+    assert rows[0]["arrival"] == ""
+
+
+def test_flights_rows_zero_price_defaults():
+    data = {"best_flights": [{"flights": [], "layovers": [], "total_duration": 120}]}
+    rows = server.flights_rows(data)
+    assert rows[0]["price"] == 0
+    assert rows[0]["price_fmt"] == "—"
+
+
+def test_format_duration():
+    assert server._format_duration(330) == "5h 30m"
+    assert server._format_duration(45) == "45m"
+    assert server._format_duration(60) == "1h 0m"
+    assert server._format_duration(None) == "—"
+    assert server._format_duration(0) == "—"
+
+
+def test_price_history_points_converts_timestamps():
+    points = server.price_history_points(_SAMPLE_FLIGHTS_PAYLOAD)
+    assert len(points) == 5
+    assert points[0]["price"] == 310
+    assert "date" in points[0]
+    # Dates should be human-readable month/day format
+    assert len(points[0]["date"]) > 0
+
+
+def test_price_history_points_handles_empty():
+    assert server.price_history_points({}) == []
+    assert server.price_history_points({"price_insights": {}}) == []
+    assert server.price_history_points({"price_insights": {"price_history": []}}) == []
+
+
+def test_price_history_points_skips_malformed_entries():
+    data = {
+        "price_insights": {"price_history": [[1719792000], "bad", [1719878400, 300]]}
+    }
+    points = server.price_history_points(data)
+    assert len(points) == 1
+    assert points[0]["price"] == 300
+
+
+def test_flights_price_insights_extracts_metrics():
+    insights = server.flights_price_insights(_SAMPLE_FLIGHTS_PAYLOAD)
+    assert insights["lowest_price"] == 199
+    assert insights["price_level"] == "low"
+    assert insights["typical_low"] == 250
+    assert insights["typical_high"] == 420
+
+
+def test_flights_price_insights_handles_missing():
+    insights = server.flights_price_insights({})
+    assert insights["lowest_price"] is None
+    assert insights["price_level"] == "unknown"
+    assert insights["typical_low"] is None
+    assert insights["typical_high"] is None
+
+
+def test_build_flights_app_produces_valid_app():
+    app = server.build_flights_app(_SAMPLE_FLIGHTS_PAYLOAD)
+    assert "SFO → JFK" in app.title
+    assert app.state == {"selected": None}
+    body = ui_json(app)
+    assert "AreaChart" in body
+    assert "DataTable" in body
+    assert "United" in body
+    # Numeric price in table for correct sorting
+    assert "199" in body
+    # Carbon and arrival visible in detail panel
+    assert "carbon_fmt" in body
+    assert "Arrival" in body
+    assert "Carbon emissions" in body
+
+
+def test_build_flights_app_without_price_history():
+    data = {
+        "search_parameters": {
+            "engine": "google_flights",
+            "departure_id": "LAX",
+            "arrival_id": "ORD",
+        },
+        "best_flights": [
+            {
+                "flights": [
+                    {
+                        "departure_airport": {"id": "LAX", "time": "10:00"},
+                        "arrival_airport": {"id": "ORD", "time": "16:00"},
+                        "airline": "AA",
+                    }
+                ],
+                "layovers": [],
+                "total_duration": 240,
+                "price": 350,
+            }
+        ],
+        "price_insights": {},
+    }
+    app = server.build_flights_app(data)
+    body = ui_json(app)
+    # Should still render table without crashing, just no chart
+    assert "DataTable" in body
+    assert "AreaChart" not in body
+
+
+def test_build_flights_app_generic_title_without_route():
+    data = {"search_parameters": {"engine": "google_flights"}, "best_flights": []}
+    app = server.build_flights_app(data)
+    assert app.title == "Flights dashboard"
+
+
+async def test_search_dashboard_dispatches_to_flights(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_FLIGHTS_PAYLOAD))
+    app = await server.search_dashboard(
+        params={"engine": "google_flights", "departure_id": "SFO", "arrival_id": "JFK"}
+    )
+    assert "SFO → JFK" in app.title
+    body = ui_json(app)
+    assert "AreaChart" in body
+
+
+async def test_search_dashboard_falls_back_to_generic(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
+    app = await server.search_dashboard(params={"q": "coffee"})
+    assert app.title == "Search dashboard"
