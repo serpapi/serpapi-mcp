@@ -395,7 +395,7 @@ def test_dashboard_summary_shape():
 
 def ui_json(app):
     """Serialize a Prefab app via its canonical serializer for assertions."""
-    return json.dumps(app.to_json())
+    return json.dumps(app.to_json(), ensure_ascii=False)
 
 
 _SAMPLE_PAYLOAD = {
@@ -721,6 +721,47 @@ def test_build_flights_app_generic_title_without_route():
     data = {"search_parameters": {"engine": "google_flights"}, "best_flights": []}
     app = server.build_flights_app(data)
     assert app.title == "Flights dashboard"
+
+
+def test_flights_currency_inr():
+    """Flights with currency=INR should use ₹ not $."""
+    data = {
+        "search_parameters": {
+            "engine": "google_flights",
+            "currency": "INR",
+            "departure_id": "COK",
+            "arrival_id": "DXB",
+        },
+        "best_flights": [
+            {
+                "flights": [
+                    {
+                        "departure_airport": {"id": "COK", "time": "10:00"},
+                        "arrival_airport": {"id": "DXB", "time": "13:00"},
+                        "airline": "IndiGo",
+                    }
+                ],
+                "layovers": [],
+                "total_duration": 240,
+                "price": 35906,
+            }
+        ],
+        "price_insights": {
+            "lowest_price": 35758,
+            "typical_price_range": [20500, 44000],
+            "price_level": "typical",
+        },
+    }
+    rows = server.flights_rows(data)
+    assert rows[0]["price_fmt"] == "₹35,906"
+    app = server.build_flights_app(data)
+    body = ui_json(app)
+    assert "₹35,758" in body
+    assert "₹20,500" in body
+    # No dollar-prefixed prices ($ appears in $prefab/$event but not before digits)
+    import re
+
+    assert not re.search(r"\$\d", body)
 
 
 async def test_search_dashboard_dispatches_to_flights(monkeypatch):
@@ -1105,6 +1146,61 @@ def test_build_shopping_app_no_chart_without_prices():
     body = ui_json(app)
     assert "BarChart" not in body
     assert "DataTable" in body
+
+
+def test_shopping_currency_inr():
+    """Shopping with INR prices should show ₹ in metrics, not $."""
+    data = {
+        "search_parameters": {"q": "headphones", "gl": "in"},
+        "shopping_results": [
+            {
+                "title": "Sony WH-1000XM5",
+                "source": "Amazon India",
+                "price": "₹24,990",
+                "extracted_price": 24990,
+                "rating": 4.5,
+                "reviews": 100,
+            },
+            {
+                "title": "Sony WH-1000XM4",
+                "source": "Flipkart",
+                "price": "₹19,990",
+                "extracted_price": 19990,
+                "rating": 4.4,
+                "reviews": 200,
+            },
+        ],
+    }
+    summary = server.shopping_summary(data)
+    assert summary["currency_symbol"] == "₹"
+
+    app = server.build_shopping_app(data)
+    body = ui_json(app)
+    assert "₹19,990" in body
+    assert "₹24,990" in body
+    import re
+
+    assert not re.search(r"\$\d", body)
+
+
+def test_extract_currency_prefix_various():
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]})
+        == "$"
+    )
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]})
+        == "₹"
+    )
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]})
+        == "€"
+    )
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]})
+        == "R$"
+    )
+    assert server._extract_currency_prefix({}) == "$"
 
 
 async def test_search_dashboard_dispatches_to_shopping(monkeypatch):

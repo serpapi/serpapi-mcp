@@ -554,12 +554,44 @@ def build_dashboard_app(data: dict[str, Any]) -> PrefabApp:
 
 
 # ---------------------------------------------------------------------------
+# Currency helpers
+# ---------------------------------------------------------------------------
+
+_CURRENCY_SYMBOLS: dict[str, str] = {
+    "USD": "$",
+    "EUR": "€",
+    "GBP": "£",
+    "JPY": "¥",
+    "CNY": "¥",
+    "INR": "₹",
+    "KRW": "₩",
+    "BRL": "R$",
+    "AUD": "A$",
+    "CAD": "C$",
+}
+
+
+def _currency_symbol(data: dict[str, Any]) -> str:
+    """Extract currency symbol from a SerpApi response's search_parameters."""
+    code = (data.get("search_parameters") or {}).get("currency", "USD")
+    return _CURRENCY_SYMBOLS.get(code, code + " ")
+
+
+def _fmt_price(amount: int | float | None, symbol: str) -> str:
+    """Format a numeric price with the given currency symbol."""
+    if not amount:
+        return "—"
+    return f"{symbol}{amount:,.0f}"
+
+
+# ---------------------------------------------------------------------------
 # Flights-specific App builder
 # ---------------------------------------------------------------------------
 
 
 def flights_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Flatten best_flights + other_flights into table-ready rows."""
+    symbol = _currency_symbol(data)
     rows: list[dict[str, Any]] = []
     for section in ("best_flights", "other_flights"):
         for itinerary in data.get(section) or []:
@@ -583,9 +615,7 @@ def flights_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
                     if stops == 0
                     else f"{stops} stop{'s' if stops > 1 else ''}",
                     "price": itinerary.get("price") or 0,
-                    "price_fmt": f"${itinerary['price']:,}"
-                    if itinerary.get("price")
-                    else "—",
+                    "price_fmt": _fmt_price(itinerary.get("price"), symbol),
                     "carbon_delta": carbon_pct,
                     "carbon_fmt": f"{carbon_pct:+d}% vs typical"
                     if isinstance(carbon_pct, int)
@@ -655,6 +685,7 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
     insights = flights_price_insights(data)
     rows = flights_rows(data)
     history = price_history_points(data)
+    symbol = _currency_symbol(data)
 
     lowest = insights["lowest_price"]
     level = insights["price_level"]
@@ -674,12 +705,12 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
             with Grid(columns=[1, 1, 1, 1], gap=4):
                 Metric(
                     label="Lowest price",
-                    value=f"${lowest:,}" if lowest else "—",
+                    value=_fmt_price(lowest, symbol),
                 )
                 Metric(
                     label="Typical range",
                     value=(
-                        f"${typical_low:,}–${typical_high:,}"
+                        f"{_fmt_price(typical_low, symbol)}–{_fmt_price(typical_high, symbol)}"
                         if typical_low and typical_high
                         else "—"
                     ),
@@ -947,6 +978,21 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def _extract_currency_prefix(data: dict[str, Any]) -> str:
+    """Extract the currency symbol from the first shopping result's price string."""
+    for item in data.get("shopping_results") or []:
+        price_str = item.get("price", "")
+        if price_str:
+            prefix = ""
+            for ch in price_str:
+                if ch.isdigit() or ch in ".,":
+                    break
+                prefix += ch
+            if prefix:
+                return prefix
+    return "$"
+
+
 def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     """Derive summary metrics and price-by-source chart data."""
     rows = shopping_rows(data)
@@ -963,6 +1009,8 @@ def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     priced = sorted([r for r in rows if r["price"] > 0], key=lambda r: r["price"])
     price_chart = [{"source": r["source"], "price": r["price"]} for r in priced[:10]]
 
+    symbol = _extract_currency_prefix(data)
+
     return {
         "total": len(rows),
         "price_min": min(prices) if prices else 0,
@@ -971,6 +1019,7 @@ def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
         "avg_rating": round(avg_rating, 1),
         "rows": rows,
         "price_chart": price_chart,
+        "currency_symbol": symbol,
     }
 
 
@@ -991,6 +1040,7 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
     rows = summary["rows"]
     params = data.get("search_parameters") or {}
     query = params.get("q", "")
+    sym = summary["currency_symbol"]
 
     title = f"Shopping: {query}" if query else "Shopping dashboard"
 
@@ -1001,7 +1051,7 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
                 Metric(label="Products", value=str(summary["total"]))
                 Metric(
                     label="Price range",
-                    value=f"${summary['price_min']:,.0f}–${summary['price_max']:,.0f}"
+                    value=f"{sym}{summary['price_min']:,.0f}–{sym}{summary['price_max']:,.0f}"
                     if summary["price_min"]
                     else "—",
                 )
