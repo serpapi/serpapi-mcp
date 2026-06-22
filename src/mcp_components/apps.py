@@ -69,10 +69,15 @@ def organic_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
-def source_breakdown(rows: list[dict[str, Any]], limit: int = 8) -> list[dict[str, Any]]:
+def source_breakdown(
+    rows: list[dict[str, Any]], limit: int = 8
+) -> list[dict[str, Any]]:
     """Count results per source for the dashboard pie chart (top `limit`)."""
     counts = Counter(row["source"] for row in rows if row["source"])
-    return [{"source": source, "count": count} for source, count in counts.most_common(limit)]
+    return [
+        {"source": source, "count": count}
+        for source, count in counts.most_common(limit)
+    ]
 
 
 def dashboard_summary(data: dict[str, Any]) -> dict[str, Any]:
@@ -134,7 +139,9 @@ def build_dashboard_app(data: dict[str, Any]) -> PrefabApp:
                 Metric(
                     label="Results shown",
                     value=str(summary["result_count"]),
-                    description=(f"of ~{total:,} total" if isinstance(total, int) else None),
+                    description=(
+                        f"of ~{total:,} total" if isinstance(total, int) else None
+                    ),
                 )
 
             with Grid(columns=[1, 2], gap=4):
@@ -227,12 +234,16 @@ def flights_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
                     "departure": dep_airport.get("time", ""),
                     "arrival": arr_airport.get("time", ""),
                     "duration": _format_duration(itinerary.get("total_duration")),
-                    "stops": "Direct" if stops == 0 else f"{stops} stop{'s' if stops > 1 else ''}",
+                    "stops": "Direct"
+                    if stops == 0
+                    else f"{stops} stop{'s' if stops > 1 else ''}",
                     "price": itinerary.get("price") or 0,
                     "price_fmt": _fmt_price(itinerary.get("price"), symbol),
                     "carbon_delta": carbon_pct,
                     "carbon_fmt": (
-                        f"{carbon_pct:+d}% vs typical" if isinstance(carbon_pct, int) else "—"
+                        f"{carbon_pct:+d}% vs typical"
+                        if isinstance(carbon_pct, int)
+                        else "—"
                     ),
                     "type": itinerary.get("type", ""),
                 }
@@ -464,7 +475,10 @@ def jobs_summary(data: dict[str, Any]) -> dict[str, Any]:
 def jobs_schedule_breakdown(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Count jobs per schedule type for the pie chart."""
     counts = Counter(r["schedule"] or "Unspecified" for r in rows)
-    return [{"schedule": schedule, "count": count} for schedule, count in counts.most_common()]
+    return [
+        {"schedule": schedule, "count": count}
+        for schedule, count in counts.most_common()
+    ]
 
 
 _JOBS_COLUMNS = [
@@ -609,7 +623,8 @@ def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     prices = [r["price"] for r in rows if r["price"] > 0]
     on_sale = sum(1 for r in rows if r["old_price_fmt"])
     avg_rating = (
-        sum(r["rating"] for r in rows if r["rating"]) / max(1, sum(1 for r in rows if r["rating"]))
+        sum(r["rating"] for r in rows if r["rating"])
+        / max(1, sum(1 for r in rows if r["rating"]))
         if rows
         else 0
     )
@@ -751,7 +766,9 @@ async def search_table(params: dict[str, Any] = None) -> PrefabApp:
     try:
         data = fetch_search_data(params)
     except Exception as exc:
-        return _error_app(str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc))
+        return _error_app(
+            str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)
+        )
     return build_table_app(data)
 
 
@@ -777,7 +794,9 @@ async def search_dashboard(params: dict[str, Any] = None) -> PrefabApp:
     try:
         data = fetch_search_data(params)
     except Exception as exc:
-        return _error_app(str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc))
+        return _error_app(
+            str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)
+        )
     engine = (params or {}).get("engine", "google_light")
     builder = ENGINE_APP_BUILDERS.get(engine, build_dashboard_app)
     return builder(data)
