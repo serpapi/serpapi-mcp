@@ -39,7 +39,7 @@ from prefab_ui.components import (
     Small,
     Text,
 )
-from prefab_ui.components.charts import AreaChart, ChartSeries, PieChart
+from prefab_ui.components.charts import AreaChart, BarChart, ChartSeries, PieChart
 from prefab_ui.rx import STATE, Rx
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -554,12 +554,44 @@ def build_dashboard_app(data: dict[str, Any]) -> PrefabApp:
 
 
 # ---------------------------------------------------------------------------
+# Currency helpers
+# ---------------------------------------------------------------------------
+
+_CURRENCY_SYMBOLS: dict[str, str] = {
+    "USD": "$",
+    "EUR": "€",
+    "GBP": "£",
+    "JPY": "¥",
+    "CNY": "¥",
+    "INR": "₹",
+    "KRW": "₩",
+    "BRL": "R$",
+    "AUD": "A$",
+    "CAD": "C$",
+}
+
+
+def _currency_symbol(data: dict[str, Any]) -> str:
+    """Extract currency symbol from a SerpApi response's search_parameters."""
+    code = (data.get("search_parameters") or {}).get("currency", "USD")
+    return _CURRENCY_SYMBOLS.get(code, code + " ")
+
+
+def _fmt_price(amount: int | float | None, symbol: str) -> str:
+    """Format a numeric price with the given currency symbol."""
+    if not amount:
+        return "—"
+    return f"{symbol}{amount:,.0f}"
+
+
+# ---------------------------------------------------------------------------
 # Flights-specific App builder
 # ---------------------------------------------------------------------------
 
 
 def flights_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Flatten best_flights + other_flights into table-ready rows."""
+    symbol = _currency_symbol(data)
     rows: list[dict[str, Any]] = []
     for section in ("best_flights", "other_flights"):
         for itinerary in data.get(section) or []:
@@ -583,9 +615,7 @@ def flights_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
                     if stops == 0
                     else f"{stops} stop{'s' if stops > 1 else ''}",
                     "price": itinerary.get("price") or 0,
-                    "price_fmt": f"${itinerary['price']:,}"
-                    if itinerary.get("price")
-                    else "—",
+                    "price_fmt": _fmt_price(itinerary.get("price"), symbol),
                     "carbon_delta": carbon_pct,
                     "carbon_fmt": f"{carbon_pct:+d}% vs typical"
                     if isinstance(carbon_pct, int)
@@ -655,6 +685,7 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
     insights = flights_price_insights(data)
     rows = flights_rows(data)
     history = price_history_points(data)
+    symbol = _currency_symbol(data)
 
     lowest = insights["lowest_price"]
     level = insights["price_level"]
@@ -674,12 +705,12 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
             with Grid(columns=[1, 1, 1, 1], gap=4):
                 Metric(
                     label="Lowest price",
-                    value=f"${lowest:,}" if lowest else "—",
+                    value=_fmt_price(lowest, symbol),
                 )
                 Metric(
                     label="Typical range",
                     value=(
-                        f"${typical_low:,}–${typical_high:,}"
+                        f"{_fmt_price(typical_low, symbol)}–{_fmt_price(typical_high, symbol)}"
                         if typical_low and typical_high
                         else "—"
                     ),
@@ -752,10 +783,340 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
     return app
 
 
+# ---------------------------------------------------------------------------
+# Jobs-specific App builder
+# ---------------------------------------------------------------------------
+
+# Benefits detected from extensions that get badge treatment.
+_JOB_BENEFIT_LABELS = {
+    "Health insurance",
+    "Dental insurance",
+    "Paid time off",
+    "401(k)",
+    "Vision insurance",
+    "Life insurance",
+    "Disability insurance",
+    "Commuter benefits",
+    "Tuition reimbursement",
+}
+
+
+def jobs_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Flatten jobs_results into table-ready rows with structured metadata."""
+    rows: list[dict[str, Any]] = []
+    for job in data.get("jobs_results") or []:
+        ext = job.get("detected_extensions") or {}
+        extensions = job.get("extensions") or []
+        benefits = [e for e in extensions if e in _JOB_BENEFIT_LABELS]
+        rows.append(
+            {
+                "title": job.get("title", ""),
+                "company": job.get("company_name", ""),
+                "location": job.get("location", ""),
+                "salary": ext.get("salary", ""),
+                "schedule": ext.get("schedule_type", ""),
+                "posted": ext.get("posted_at", ""),
+                "qualifications": ext.get("qualifications", ""),
+                "work_from_home": ext.get("work_from_home", False),
+                "benefits": benefits,
+                "benefits_fmt": ", ".join(benefits) if benefits else "—",
+                "via": job.get("via", ""),
+                "description": (job.get("description") or "")[:300],
+                "highlights": job.get("job_highlights") or [],
+                "apply_options": job.get("apply_options") or [],
+                "source_link": job.get("source_link", ""),
+            }
+        )
+    return rows
+
+
+def jobs_summary(data: dict[str, Any]) -> dict[str, Any]:
+    """Derive summary metrics from a jobs response."""
+    rows = jobs_rows(data)
+    total = len(rows)
+    with_salary = sum(1 for r in rows if r["salary"])
+    remote = sum(1 for r in rows if r["work_from_home"])
+    return {
+        "total": total,
+        "with_salary": with_salary,
+        "remote": remote,
+        "salary_pct": f"{with_salary * 100 // total}%" if total else "—",
+        "remote_pct": f"{remote * 100 // total}%" if total else "—",
+        "rows": rows,
+        "schedule_breakdown": jobs_schedule_breakdown(rows),
+    }
+
+
+def jobs_schedule_breakdown(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Count jobs per schedule type for the pie chart."""
+    counts = Counter(r["schedule"] or "Unspecified" for r in rows)
+    return [
+        {"schedule": schedule, "count": count}
+        for schedule, count in counts.most_common()
+    ]
+
+
+_JOBS_COLUMNS = [
+    DataTableColumn(key="title", header="Title", sortable=True),
+    DataTableColumn(key="company", header="Company", sortable=True),
+    DataTableColumn(key="location", header="Location", sortable=True),
+    DataTableColumn(key="salary", header="Salary", sortable=True),
+    DataTableColumn(key="schedule", header="Type", sortable=True),
+    DataTableColumn(key="posted", header="Posted", sortable=True),
+    DataTableColumn(key="benefits_fmt", header="Benefits"),
+]
+
+
+def build_jobs_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the jobs explorer dashboard."""
+    summary = jobs_summary(data)
+    rows = summary["rows"]
+    params = data.get("search_parameters") or {}
+    query = params.get("q", "")
+
+    title = f"Jobs: {query}" if query else "Jobs dashboard"
+
+    with PrefabApp(title=title, state={"selected": None}) as app:
+        with Column(gap=4, css_class="p-4"):
+            # Metrics row
+            with Grid(columns=[1, 1, 1, 1], gap=4):
+                Metric(label="Jobs found", value=str(summary["total"]))
+                Metric(
+                    label="With salary",
+                    value=str(summary["with_salary"]),
+                    description=summary["salary_pct"],
+                )
+                Metric(
+                    label="Remote",
+                    value=str(summary["remote"]),
+                    description=summary["remote_pct"],
+                )
+                Metric(
+                    label="Query",
+                    value=query or "—",
+                )
+
+            # Schedule type breakdown
+            if summary["schedule_breakdown"]:
+                PieChart(
+                    data=summary["schedule_breakdown"],
+                    data_key="count",
+                    name_key="schedule",
+                    show_legend=True,
+                    height=220,
+                )
+
+            # Jobs table
+            DataTable(
+                columns=_JOBS_COLUMNS,
+                rows=rows,
+                search=True,
+                paginated=True,
+                page_size=10,
+                on_row_click=SetState("selected", Rx("$event")),
+            )
+
+            # Detail panel
+            with If(STATE.selected):
+                with Card():
+                    with CardHeader():
+                        H3(Rx("selected.title"))
+                        with Row(gap=2):
+                            Small(content=Rx("selected.company"))
+                            Text(content="·")
+                            Small(content=Rx("selected.location"))
+                        with Row(gap=2, css_class="mt-2"):
+                            with If(Rx("selected.salary")):
+                                Badge(label=Rx("selected.salary"), variant="default")
+                            with If(Rx("selected.schedule")):
+                                Badge(
+                                    label=Rx("selected.schedule"),
+                                    variant="secondary",
+                                )
+                            with If(Rx("selected.work_from_home")):
+                                Badge(label="Remote", variant="success")
+                    with CardContent():
+                        with Column(gap=3):
+                            Text(content=Rx("selected.description"))
+                            with If(Rx("selected.source_link")):
+                                Link(
+                                    content="View full listing →",
+                                    href=Rx("selected.source_link"),
+                                    target="_blank",
+                                )
+
+    return app
+
+
+# ---------------------------------------------------------------------------
+# Shopping-specific App builder
+# ---------------------------------------------------------------------------
+
+
+def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Flatten shopping_results into table-ready rows."""
+    rows: list[dict[str, Any]] = []
+    for item in data.get("shopping_results") or []:
+        price = item.get("extracted_price")
+        old_price = item.get("extracted_old_price")
+        extensions = item.get("extensions") or []
+        discount_tag = next((e for e in extensions if "OFF" in e), "")
+        rows.append(
+            {
+                "title": item.get("title", ""),
+                "source": item.get("source", ""),
+                "price": price or 0,
+                "price_fmt": item.get("price", "—"),
+                "old_price_fmt": item.get("old_price", ""),
+                "discount": discount_tag,
+                "rating": item.get("rating") or 0,
+                "reviews": item.get("reviews") or 0,
+                "snippet": item.get("snippet", ""),
+                "product_link": item.get("product_link", ""),
+            }
+        )
+    return rows
+
+
+def _extract_currency_prefix(data: dict[str, Any]) -> str:
+    """Extract the currency symbol from the first shopping result's price string."""
+    for item in data.get("shopping_results") or []:
+        price_str = item.get("price", "")
+        if price_str:
+            prefix = ""
+            for ch in price_str:
+                if ch.isdigit() or ch in ".,":
+                    break
+                prefix += ch
+            if prefix:
+                return prefix
+    return "$"
+
+
+def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
+    """Derive summary metrics and price-by-source chart data."""
+    rows = shopping_rows(data)
+    prices = [r["price"] for r in rows if r["price"] > 0]
+    on_sale = sum(1 for r in rows if r["old_price_fmt"])
+    avg_rating = (
+        sum(r["rating"] for r in rows if r["rating"])
+        / max(1, sum(1 for r in rows if r["rating"]))
+        if rows
+        else 0
+    )
+
+    # Price by source (top 10 cheapest for the bar chart)
+    priced = sorted([r for r in rows if r["price"] > 0], key=lambda r: r["price"])
+    price_chart = [{"source": r["source"], "price": r["price"]} for r in priced[:10]]
+
+    symbol = _extract_currency_prefix(data)
+
+    return {
+        "total": len(rows),
+        "price_min": min(prices) if prices else 0,
+        "price_max": max(prices) if prices else 0,
+        "on_sale": on_sale,
+        "avg_rating": round(avg_rating, 1),
+        "rows": rows,
+        "price_chart": price_chart,
+        "currency_symbol": symbol,
+    }
+
+
+_SHOPPING_COLUMNS = [
+    DataTableColumn(key="title", header="Product", sortable=True),
+    DataTableColumn(key="source", header="Seller", sortable=True),
+    DataTableColumn(key="price", header="Price", sortable=True, format="currency"),
+    DataTableColumn(key="old_price_fmt", header="Was"),
+    DataTableColumn(key="discount", header="Discount"),
+    DataTableColumn(key="rating", header="Rating", sortable=True),
+    DataTableColumn(key="reviews", header="Reviews", sortable=True),
+]
+
+
+def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
+    """Compose the shopping price comparison dashboard."""
+    summary = shopping_summary(data)
+    rows = summary["rows"]
+    params = data.get("search_parameters") or {}
+    query = params.get("q", "")
+    sym = summary["currency_symbol"]
+
+    title = f"Shopping: {query}" if query else "Shopping dashboard"
+
+    with PrefabApp(title=title, state={"selected": None}) as app:
+        with Column(gap=4, css_class="p-4"):
+            # Metrics row
+            with Grid(columns=[1, 1, 1, 1], gap=4):
+                Metric(label="Products", value=str(summary["total"]))
+                Metric(
+                    label="Price range",
+                    value=f"{sym}{summary['price_min']:,.0f}–{sym}{summary['price_max']:,.0f}"
+                    if summary["price_min"]
+                    else "—",
+                )
+                Metric(label="On sale", value=str(summary["on_sale"]))
+                Metric(
+                    label="Avg rating",
+                    value=str(summary["avg_rating"]) if summary["avg_rating"] else "—",
+                )
+
+            # Price comparison bar chart (top 10 cheapest sellers)
+            if summary["price_chart"]:
+                BarChart(
+                    data=summary["price_chart"],
+                    series=[ChartSeries(data_key="price", label="Price ($)")],
+                    x_axis="source",
+                    height=240,
+                    horizontal=True,
+                )
+
+            # Products table
+            DataTable(
+                columns=_SHOPPING_COLUMNS,
+                rows=rows,
+                search=True,
+                paginated=True,
+                page_size=15,
+                on_row_click=SetState("selected", Rx("$event")),
+            )
+
+            # Detail panel
+            with If(STATE.selected):
+                with Card():
+                    with CardHeader():
+                        H3(Rx("selected.title"))
+                        with Row(gap=2):
+                            Small(content=Rx("selected.source"))
+                            with If(Rx("selected.discount")):
+                                Badge(
+                                    label=Rx("selected.discount"),
+                                    variant="destructive",
+                                )
+                    with CardContent():
+                        with Column(gap=2):
+                            with Row(gap=4):
+                                Text(content=Rx("selected.price_fmt"))
+                                with If(Rx("selected.old_price_fmt")):
+                                    Small(content=Rx("selected.old_price_fmt"))
+                            with If(Rx("selected.snippet")):
+                                Text(content=Rx("selected.snippet"))
+                            with If(Rx("selected.product_link")):
+                                Link(
+                                    content="View on Google Shopping →",
+                                    href=Rx("selected.product_link"),
+                                    target="_blank",
+                                )
+
+    return app
+
+
 # Engine-specific app dispatch: maps engine names to their dedicated builders.
 # Falls back to the generic dashboard for unregistered engines.
 ENGINE_APP_BUILDERS: dict[str, Any] = {
     "google_flights": build_flights_app,
+    "google_jobs": build_jobs_app,
+    "google_shopping": build_shopping_app,
 }
 
 

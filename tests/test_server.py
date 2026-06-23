@@ -395,7 +395,7 @@ def test_dashboard_summary_shape():
 
 def ui_json(app):
     """Serialize a Prefab app via its canonical serializer for assertions."""
-    return json.dumps(app.to_json())
+    return json.dumps(app.to_json(), ensure_ascii=False)
 
 
 _SAMPLE_PAYLOAD = {
@@ -723,6 +723,47 @@ def test_build_flights_app_generic_title_without_route():
     assert app.title == "Flights dashboard"
 
 
+def test_flights_currency_inr():
+    """Flights with currency=INR should use ₹ not $."""
+    data = {
+        "search_parameters": {
+            "engine": "google_flights",
+            "currency": "INR",
+            "departure_id": "COK",
+            "arrival_id": "DXB",
+        },
+        "best_flights": [
+            {
+                "flights": [
+                    {
+                        "departure_airport": {"id": "COK", "time": "10:00"},
+                        "arrival_airport": {"id": "DXB", "time": "13:00"},
+                        "airline": "IndiGo",
+                    }
+                ],
+                "layovers": [],
+                "total_duration": 240,
+                "price": 35906,
+            }
+        ],
+        "price_insights": {
+            "lowest_price": 35758,
+            "typical_price_range": [20500, 44000],
+            "price_level": "typical",
+        },
+    }
+    rows = server.flights_rows(data)
+    assert rows[0]["price_fmt"] == "₹35,906"
+    app = server.build_flights_app(data)
+    body = ui_json(app)
+    assert "₹35,758" in body
+    assert "₹20,500" in body
+    # No dollar-prefixed prices ($ appears in $prefab/$event but not before digits)
+    import re
+
+    assert not re.search(r"\$\d", body)
+
+
 async def test_search_dashboard_dispatches_to_flights(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_FLIGHTS_PAYLOAD))
@@ -739,3 +780,436 @@ async def test_search_dashboard_falls_back_to_generic(monkeypatch):
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
     app = await server.search_dashboard(params={"q": "coffee"})
     assert app.title == "Search dashboard"
+
+
+# --- MCP Apps: Jobs-specific helpers and builder ----------------------------
+
+_SAMPLE_JOBS_PAYLOAD = {
+    "search_parameters": {
+        "engine": "google_jobs",
+        "q": "software engineer",
+    },
+    "jobs_results": [
+        {
+            "title": "Senior Software Engineer",
+            "company_name": "Acme Corp",
+            "location": "Austin, TX",
+            "via": "LinkedIn",
+            "extensions": [
+                "3 days ago",
+                "120K–160K a year",
+                "Full-time",
+                "Health insurance",
+                "Dental insurance",
+                "Paid time off",
+            ],
+            "detected_extensions": {
+                "posted_at": "3 days ago",
+                "salary": "120K–160K a year",
+                "schedule_type": "Full-time",
+            },
+            "description": "We are looking for a senior engineer to join our platform team and build scalable distributed systems.",
+            "job_highlights": [
+                {
+                    "title": "Qualifications",
+                    "items": ["5+ years experience", "Python or Go proficiency"],
+                },
+                {
+                    "title": "Benefits",
+                    "items": ["Health insurance", "401(k) matching", "Remote-friendly"],
+                },
+            ],
+            "apply_options": [
+                {"title": "LinkedIn", "link": "https://linkedin.com/jobs/123"},
+                {"title": "Indeed", "link": "https://indeed.com/jobs/456"},
+            ],
+            "source_link": "https://acme.com/careers/senior-swe",
+        },
+        {
+            "title": "Frontend Developer",
+            "company_name": "StartupCo",
+            "location": "Remote",
+            "via": "Indeed",
+            "extensions": ["1 day ago", "Work from home", "Contract"],
+            "detected_extensions": {
+                "posted_at": "1 day ago",
+                "schedule_type": "Contract",
+                "work_from_home": True,
+            },
+            "description": "Build beautiful user interfaces with React and TypeScript.",
+            "job_highlights": [],
+            "apply_options": [],
+            "source_link": "",
+        },
+        {
+            "title": "Junior Developer",
+            "company_name": "BigTech",
+            "location": "San Francisco, CA",
+            "via": "Glassdoor",
+            "extensions": ["5 days ago", "Full-time", "No degree mentioned"],
+            "detected_extensions": {
+                "posted_at": "5 days ago",
+                "schedule_type": "Full-time",
+                "qualifications": "No degree mentioned",
+            },
+            "description": "Entry-level position for new graduates.",
+        },
+    ],
+}
+
+
+def test_jobs_rows_extracts_all_jobs():
+    rows = server.jobs_rows(_SAMPLE_JOBS_PAYLOAD)
+    assert len(rows) == 3
+
+    # Rich job with salary and benefits
+    assert rows[0]["title"] == "Senior Software Engineer"
+    assert rows[0]["company"] == "Acme Corp"
+    assert rows[0]["location"] == "Austin, TX"
+    assert rows[0]["salary"] == "120K–160K a year"
+    assert rows[0]["schedule"] == "Full-time"
+    assert rows[0]["posted"] == "3 days ago"
+    assert rows[0]["work_from_home"] is False
+    assert "Health insurance" in rows[0]["benefits"]
+    assert "Dental insurance" in rows[0]["benefits"]
+    assert "Paid time off" in rows[0]["benefits"]
+    assert (
+        rows[0]["benefits_fmt"] == "Health insurance, Dental insurance, Paid time off"
+    )
+    assert rows[0]["source_link"] == "https://acme.com/careers/senior-swe"
+    assert len(rows[0]["highlights"]) == 2
+    assert len(rows[0]["apply_options"]) == 2
+
+    # Remote job
+    assert rows[1]["work_from_home"] is True
+    assert rows[1]["salary"] == ""
+    assert rows[1]["benefits_fmt"] == "—"
+
+    # Minimal job (no highlights, no apply_options keys)
+    assert rows[2]["qualifications"] == "No degree mentioned"
+    assert rows[2]["highlights"] == []
+    assert rows[2]["apply_options"] == []
+
+
+def test_jobs_rows_handles_empty_data():
+    assert server.jobs_rows({}) == []
+    assert server.jobs_rows({"jobs_results": None}) == []
+
+
+def test_jobs_rows_handles_missing_extensions():
+    data = {
+        "jobs_results": [
+            {
+                "title": "Intern",
+                "company_name": "Small Co",
+                "location": "Remote",
+            }
+        ]
+    }
+    rows = server.jobs_rows(data)
+    assert len(rows) == 1
+    assert rows[0]["salary"] == ""
+    assert rows[0]["schedule"] == ""
+    assert rows[0]["posted"] == ""
+    assert rows[0]["benefits"] == []
+    assert rows[0]["description"] == ""
+
+
+def test_jobs_summary_computes_metrics():
+    summary = server.jobs_summary(_SAMPLE_JOBS_PAYLOAD)
+    assert summary["total"] == 3
+    assert summary["with_salary"] == 1
+    assert summary["remote"] == 1
+    assert summary["salary_pct"] == "33%"
+    assert summary["remote_pct"] == "33%"
+    assert len(summary["rows"]) == 3
+    # Schedule breakdown for pie chart
+    breakdown = summary["schedule_breakdown"]
+    assert len(breakdown) == 2
+    assert {"schedule": "Full-time", "count": 2} in breakdown
+    assert {"schedule": "Contract", "count": 1} in breakdown
+
+
+def test_jobs_summary_handles_empty():
+    summary = server.jobs_summary({})
+    assert summary["total"] == 0
+    assert summary["salary_pct"] == "—"
+    assert summary["remote_pct"] == "—"
+    assert summary["schedule_breakdown"] == []
+
+
+def test_jobs_schedule_breakdown_groups_unspecified():
+    rows = [{"schedule": ""}, {"schedule": ""}, {"schedule": "Full-time"}]
+    breakdown = server.jobs_schedule_breakdown(rows)
+    assert {"schedule": "Unspecified", "count": 2} in breakdown
+    assert {"schedule": "Full-time", "count": 1} in breakdown
+
+
+def test_build_jobs_app_produces_valid_app():
+    app = server.build_jobs_app(_SAMPLE_JOBS_PAYLOAD)
+    assert app.title == "Jobs: software engineer"
+    assert app.state == {"selected": None}
+    body = ui_json(app)
+    assert "PieChart" in body
+    assert "DataTable" in body
+    assert "Senior Software Engineer" in body
+    assert "Acme Corp" in body
+    assert "120K" in body
+    # Detail panel elements
+    assert "selected.salary" in body
+    assert "selected.title" in body
+    assert "source_link" in body
+
+
+def test_build_jobs_app_without_query():
+    data = {"search_parameters": {"engine": "google_jobs"}, "jobs_results": []}
+    app = server.build_jobs_app(data)
+    assert app.title == "Jobs dashboard"
+
+
+def test_build_jobs_app_description_truncated():
+    long_desc = "x" * 500
+    data = {
+        "search_parameters": {"q": "test"},
+        "jobs_results": [
+            {
+                "title": "Role",
+                "company_name": "Co",
+                "location": "NYC",
+                "description": long_desc,
+            }
+        ],
+    }
+    app = server.build_jobs_app(data)
+    rows = server.jobs_rows(data)
+    assert len(rows[0]["description"]) == 300
+
+
+async def test_search_dashboard_dispatches_to_jobs(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_JOBS_PAYLOAD))
+    app = await server.search_dashboard(
+        params={"engine": "google_jobs", "q": "software engineer"}
+    )
+    assert "software engineer" in app.title
+    body = ui_json(app)
+    assert "Senior Software Engineer" in body
+    assert "DataTable" in body
+
+
+# --- MCP Apps: Shopping-specific helpers and builder ------------------------
+
+_SAMPLE_SHOPPING_PAYLOAD = {
+    "search_parameters": {
+        "engine": "google_shopping",
+        "q": "Sony WH-1000XM5",
+    },
+    "shopping_results": [
+        {
+            "position": 1,
+            "title": "Sony WH-1000XM5 Wireless Headphones",
+            "source": "Best Buy",
+            "price": "$278.00",
+            "extracted_price": 278.0,
+            "old_price": "$398",
+            "extracted_old_price": 398,
+            "rating": 4.6,
+            "reviews": 26000,
+            "snippet": "Good sound quality",
+            "extensions": ["30% OFF", "Nearby, 11 mi"],
+            "product_link": "https://google.com/shopping/product/123",
+        },
+        {
+            "position": 2,
+            "title": "Sony WH-1000XM5 Wireless Headphones",
+            "source": "Amazon",
+            "price": "$298.00",
+            "extracted_price": 298.0,
+            "rating": 4.7,
+            "reviews": 45000,
+            "snippet": "Comfortable fit",
+            "product_link": "https://google.com/shopping/product/456",
+        },
+        {
+            "position": 3,
+            "title": "Sony WH-1000XM5 Wireless Headphones - Black",
+            "source": "Walmart",
+            "price": "$249.99",
+            "extracted_price": 249.99,
+            "old_price": "$349.99",
+            "extracted_old_price": 349.99,
+            "rating": 4.5,
+            "reviews": 8200,
+            "extensions": ["29% OFF"],
+            "product_link": "",
+        },
+        {
+            "position": 4,
+            "title": "Sony WH-1000XM5 Refurbished",
+            "source": "eBay",
+            "price": "$189.00",
+            "extracted_price": 189.0,
+            "rating": 0,
+            "reviews": 0,
+            "product_link": "https://google.com/shopping/product/789",
+        },
+    ],
+}
+
+
+def test_shopping_rows_extracts_all_products():
+    rows = server.shopping_rows(_SAMPLE_SHOPPING_PAYLOAD)
+    assert len(rows) == 4
+
+    # Product with discount
+    assert rows[0]["title"] == "Sony WH-1000XM5 Wireless Headphones"
+    assert rows[0]["source"] == "Best Buy"
+    assert rows[0]["price"] == 278.0
+    assert rows[0]["price_fmt"] == "$278.00"
+    assert rows[0]["old_price_fmt"] == "$398"
+    assert rows[0]["discount"] == "30% OFF"
+    assert rows[0]["rating"] == 4.6
+    assert rows[0]["reviews"] == 26000
+    assert rows[0]["snippet"] == "Good sound quality"
+
+    # Product without discount
+    assert rows[1]["source"] == "Amazon"
+    assert rows[1]["old_price_fmt"] == ""
+    assert rows[1]["discount"] == ""
+
+    # Product with no rating
+    assert rows[3]["rating"] == 0
+    assert rows[3]["reviews"] == 0
+
+
+def test_shopping_rows_handles_empty():
+    assert server.shopping_rows({}) == []
+    assert server.shopping_rows({"shopping_results": None}) == []
+
+
+def test_shopping_rows_handles_missing_fields():
+    data = {"shopping_results": [{"title": "Widget", "source": "Store"}]}
+    rows = server.shopping_rows(data)
+    assert rows[0]["price"] == 0
+    assert rows[0]["price_fmt"] == "—"
+    assert rows[0]["rating"] == 0
+    assert rows[0]["discount"] == ""
+
+
+def test_shopping_summary_computes_metrics():
+    summary = server.shopping_summary(_SAMPLE_SHOPPING_PAYLOAD)
+    assert summary["total"] == 4
+    assert summary["price_min"] == 189.0
+    assert summary["price_max"] == 298.0
+    assert summary["on_sale"] == 2
+    assert summary["avg_rating"] == 4.6  # (4.6+4.7+4.5)/3 rounded
+    assert len(summary["price_chart"]) == 4
+    # Chart sorted by cheapest first
+    assert summary["price_chart"][0]["source"] == "eBay"
+    assert summary["price_chart"][0]["price"] == 189.0
+
+
+def test_shopping_summary_handles_empty():
+    summary = server.shopping_summary({})
+    assert summary["total"] == 0
+    assert summary["price_min"] == 0
+    assert summary["price_max"] == 0
+    assert summary["price_chart"] == []
+
+
+def test_build_shopping_app_produces_valid_app():
+    app = server.build_shopping_app(_SAMPLE_SHOPPING_PAYLOAD)
+    assert app.title == "Shopping: Sony WH-1000XM5"
+    assert app.state == {"selected": None}
+    body = ui_json(app)
+    assert "BarChart" in body
+    assert "DataTable" in body
+    assert "Best Buy" in body
+    assert "278" in body
+    # Detail panel
+    assert "selected.discount" in body
+    assert "selected.product_link" in body
+
+
+def test_build_shopping_app_without_query():
+    data = {"search_parameters": {"engine": "google_shopping"}, "shopping_results": []}
+    app = server.build_shopping_app(data)
+    assert app.title == "Shopping dashboard"
+
+
+def test_build_shopping_app_no_chart_without_prices():
+    data = {
+        "search_parameters": {"q": "test"},
+        "shopping_results": [{"title": "Free thing", "source": "Store"}],
+    }
+    app = server.build_shopping_app(data)
+    body = ui_json(app)
+    assert "BarChart" not in body
+    assert "DataTable" in body
+
+
+def test_shopping_currency_inr():
+    """Shopping with INR prices should show ₹ in metrics, not $."""
+    data = {
+        "search_parameters": {"q": "headphones", "gl": "in"},
+        "shopping_results": [
+            {
+                "title": "Sony WH-1000XM5",
+                "source": "Amazon India",
+                "price": "₹24,990",
+                "extracted_price": 24990,
+                "rating": 4.5,
+                "reviews": 100,
+            },
+            {
+                "title": "Sony WH-1000XM4",
+                "source": "Flipkart",
+                "price": "₹19,990",
+                "extracted_price": 19990,
+                "rating": 4.4,
+                "reviews": 200,
+            },
+        ],
+    }
+    summary = server.shopping_summary(data)
+    assert summary["currency_symbol"] == "₹"
+
+    app = server.build_shopping_app(data)
+    body = ui_json(app)
+    assert "₹19,990" in body
+    assert "₹24,990" in body
+    import re
+
+    assert not re.search(r"\$\d", body)
+
+
+def test_extract_currency_prefix_various():
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]})
+        == "$"
+    )
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]})
+        == "₹"
+    )
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]})
+        == "€"
+    )
+    assert (
+        server._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]})
+        == "R$"
+    )
+    assert server._extract_currency_prefix({}) == "$"
+
+
+async def test_search_dashboard_dispatches_to_shopping(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_SHOPPING_PAYLOAD))
+    app = await server.search_dashboard(
+        params={"engine": "google_shopping", "q": "Sony WH-1000XM5"}
+    )
+    assert "Sony WH-1000XM5" in app.title
+    body = ui_json(app)
+    assert "BarChart" in body
+    assert "Best Buy" in body
