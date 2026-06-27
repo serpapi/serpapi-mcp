@@ -68,7 +68,9 @@ def engines_index() -> ResourceResult:
 )
 def get_engine_schema(engine_name: str) -> ResourceResult:
     if not re.fullmatch(r"[a-z0-9_]+", engine_name):
-        raise NotFoundError(f"Invalid engine name: {engine_name!r}. Expected [a-z0-9_]+.")
+        raise NotFoundError(
+            f"Invalid engine name: {engine_name!r}. Expected [a-z0-9_]+."
+        )
     engine_path = ENGINES_DIR / f"{engine_name}.json"
     if not engine_path.exists():
         raise NotFoundError(

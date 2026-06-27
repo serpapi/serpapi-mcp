@@ -20,7 +20,9 @@ import src.mcp_components.tools as mcp_tools
 import src.server as server
 
 
-def make_serpapi_http_error(status, body, reason="Error", url="https://serpapi.com/search?q=x"):
+def make_serpapi_http_error(
+    status, body, reason="Error", url="https://serpapi.com/search?q=x"
+):
     """Build the exception the way the serpapi client does: a requests HTTPError
     from raise_for_status(), wrapped in serpapi's HTTPError. The wrapper's own
     .response is None; the body lives on args[0].response."""
@@ -79,12 +81,20 @@ def test_server_discovers_mcp_components_from_filesystem_provider():
 async def test_filesystem_provider_registers_tools_apps_and_resources():
     tools = {tool.name: tool for tool in await server.mcp.list_tools()}
     resources = {str(resource.uri) for resource in await server.mcp.list_resources()}
-    templates = {template.uri_template for template in await server.mcp.list_resource_templates()}
+    templates = {
+        template.uri_template for template in await server.mcp.list_resource_templates()
+    }
 
     assert {"search", "search_table", "search_dashboard"} <= set(tools)
     assert tools["search"].meta is None
-    assert tools["search_table"].meta["ui"]["resourceUri"].startswith("ui://prefab/tool/")
-    assert tools["search_dashboard"].meta["ui"]["resourceUri"].startswith("ui://prefab/tool/")
+    assert (
+        tools["search_table"].meta["ui"]["resourceUri"].startswith("ui://prefab/tool/")
+    )
+    assert (
+        tools["search_dashboard"]
+        .meta["ui"]["resourceUri"]
+        .startswith("ui://prefab/tool/")
+    )
     assert "serpapi://engines" in resources
     assert "serpapi://engines/{engine_name}" in templates
 
@@ -141,8 +151,12 @@ def nest(depth, leaf):
 
 def test_extract_error_response_reads_json_body_from_wrapped_request_error():
     err = make_serpapi_http_error(400, {"error": "Invalid API key."})
-    assert err.response is None  # the wrapper has no response; the body is one level down
-    assert json.loads(mcp_tools.extract_error_response(err)) == {"error": "Invalid API key."}
+    assert (
+        err.response is None
+    )  # the wrapper has no response; the body is one level down
+    assert json.loads(mcp_tools.extract_error_response(err)) == {
+        "error": "Invalid API key."
+    }
 
 
 def test_extract_error_response_falls_back_to_response_text_when_not_json():
@@ -158,7 +172,9 @@ def test_extract_error_response_falls_back_to_response_text_when_not_json():
 
 
 def test_extract_error_response_falls_back_to_str():
-    assert mcp_tools.extract_error_response(ValueError("plain message")) == "plain message"
+    assert (
+        mcp_tools.extract_error_response(ValueError("plain message")) == "plain message"
+    )
 
 
 def test_extract_error_response_terminates_and_returns_innermost_message():
@@ -276,7 +292,9 @@ async def test_search_maps_real_http_errors(monkeypatch, status, fragment):
 
 async def test_search_unmapped_http_error_returns_json_body(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
-    use_search(monkeypatch, raiser(make_serpapi_http_error(500, {"error": "server boom"})))
+    use_search(
+        monkeypatch, raiser(make_serpapi_http_error(500, {"error": "server boom"}))
+    )
     out = await mcp_tools.search(params={"q": "x"})
     assert out.startswith("Error:")
     assert "server boom" in out
@@ -354,7 +372,9 @@ def test_map_search_error_maps_known_statuses(status, fragment):
 
 
 def test_map_search_error_falls_back_to_json_body():
-    out = mcp_tools.map_search_error(make_serpapi_http_error(500, {"error": "server boom"}))
+    out = mcp_tools.map_search_error(
+        make_serpapi_http_error(500, {"error": "server boom"})
+    )
     assert "server boom" in out
 
 
@@ -547,7 +567,9 @@ _SAMPLE_FLIGHTS_PAYLOAD = {
                     "duration": 195,
                 },
             ],
-            "layovers": [{"duration": 75, "name": "Denver International Airport", "id": "DEN"}],
+            "layovers": [
+                {"duration": 75, "name": "Denver International Airport", "id": "DEN"}
+            ],
             "total_duration": 420,
             "price": 199,
             "type": "One way",
@@ -631,7 +653,11 @@ def test_flights_rows_handles_empty_data():
 
 
 def test_flights_rows_handles_missing_airports():
-    data = {"best_flights": [{"flights": [], "layovers": [], "total_duration": 0, "price": 100}]}
+    data = {
+        "best_flights": [
+            {"flights": [], "layovers": [], "total_duration": 0, "price": 100}
+        ]
+    }
     rows = mcp_apps.flights_rows(data)
     assert len(rows) == 1
     assert rows[0]["route"] == "? → ?"
@@ -667,11 +693,15 @@ def test_price_history_points_converts_timestamps():
 def test_price_history_points_handles_empty():
     assert mcp_apps.price_history_points({}) == []
     assert mcp_apps.price_history_points({"price_insights": {}}) == []
-    assert mcp_apps.price_history_points({"price_insights": {"price_history": []}}) == []
+    assert (
+        mcp_apps.price_history_points({"price_insights": {"price_history": []}}) == []
+    )
 
 
 def test_price_history_points_skips_malformed_entries():
-    data = {"price_insights": {"price_history": [[1719792000], "bad", [1719878400, 300]]}}
+    data = {
+        "price_insights": {"price_history": [[1719792000], "bad", [1719878400, 300]]}
+    }
     points = mcp_apps.price_history_points(data)
     assert len(points) == 1
     assert points[0]["price"] == 300
@@ -895,7 +925,9 @@ def test_jobs_rows_extracts_all_jobs():
     assert "Health insurance" in rows[0]["benefits"]
     assert "Dental insurance" in rows[0]["benefits"]
     assert "Paid time off" in rows[0]["benefits"]
-    assert rows[0]["benefits_fmt"] == "Health insurance, Dental insurance, Paid time off"
+    assert (
+        rows[0]["benefits_fmt"] == "Health insurance, Dental insurance, Paid time off"
+    )
     assert rows[0]["source_link"] == "https://acme.com/careers/senior-swe"
     assert len(rows[0]["highlights"]) == 2
     assert len(rows[0]["apply_options"]) == 2
@@ -1203,10 +1235,22 @@ def test_shopping_currency_inr():
 
 
 def test_extract_currency_prefix_various():
-    assert mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]}) == "$"
-    assert mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]}) == "₹"
-    assert mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]}) == "€"
-    assert mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]}) == "R$"
+    assert (
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]})
+        == "$"
+    )
+    assert (
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]})
+        == "₹"
+    )
+    assert (
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]})
+        == "€"
+    )
+    assert (
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]})
+        == "R$"
+    )
     assert mcp_apps._extract_currency_prefix({}) == "$"
 
 
