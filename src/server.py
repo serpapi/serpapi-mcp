@@ -35,8 +35,7 @@ def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
                     "Namespace": namespace,
                     "Dimensions": [list(dimensions.keys())] if dimensions else [],
                     "Metrics": [
-                        {"Name": name, "Unit": unit}
-                        for name, (_, unit) in metrics.items()
+                        {"Name": name, "Unit": unit} for name, (_, unit) in metrics.items()
                     ],
                 }
             ],
@@ -128,9 +127,7 @@ def main():
             allow_headers=["*"],
         ),
     ]
-    starlette_app = mcp.http_app(
-        middleware=middleware, stateless_http=True, json_response=True
-    )
+    starlette_app = mcp.http_app(middleware=middleware, stateless_http=True, json_response=True)
 
     starlette_app.add_route("/healthcheck", healthcheck_handler, methods=["GET"])
 

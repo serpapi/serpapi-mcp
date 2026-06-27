@@ -61,10 +61,7 @@ def map_search_error(exception) -> str:
                 "Check your API key in the path or Authorization header."
             )
         if "403" in text:
-            return (
-                "Error: SerpApi API key forbidden. "
-                "Verify your subscription and key validity."
-            )
+            return "Error: SerpApi API key forbidden. " "Verify your subscription and key validity."
     return f"Error: {extract_error_response(exception)}"
 
 
