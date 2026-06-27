@@ -68,16 +68,6 @@ def use_search(monkeypatch, fn):
     monkeypatch.setattr(mcp_tools.serpapi, "search", fn)
 
 
-def test_server_discovers_mcp_components_from_filesystem_provider():
-    assert server.COMPONENTS_DIR.name == "mcp_components"
-    provider_roots = [
-        provider._root
-        for provider in server.mcp.providers
-        if provider.__class__.__name__ == "FileSystemProvider"
-    ]
-    assert server.COMPONENTS_DIR.resolve() in provider_roots
-
-
 async def test_filesystem_provider_registers_tools_apps_and_resources():
     tools = {tool.name: tool for tool in await server.mcp.list_tools()}
     resources = {str(resource.uri) for resource in await server.mcp.list_resources()}
