@@ -14,6 +14,9 @@ import serpapi
 from serpapi.models import SerpResults
 from starlette.requests import Request
 
+import src.mcp_components.apps as mcp_apps
+import src.mcp_components.resources as mcp_resources
+import src.mcp_components.tools as mcp_tools
 import src.server as server
 
 
@@ -58,11 +61,46 @@ def serp_results(payload):
 
 
 def use_request(monkeypatch, request):
-    monkeypatch.setattr(server, "get_http_request", lambda: request)
+    monkeypatch.setattr(mcp_tools, "get_http_request", lambda: request)
 
 
 def use_search(monkeypatch, fn):
-    monkeypatch.setattr(server.serpapi, "search", fn)
+    monkeypatch.setattr(mcp_tools.serpapi, "search", fn)
+
+
+async def test_filesystem_provider_registers_tools_apps_and_resources():
+    tools = {tool.name: tool for tool in await server.mcp.list_tools()}
+    resources = {str(resource.uri) for resource in await server.mcp.list_resources()}
+    templates = {
+        template.uri_template for template in await server.mcp.list_resource_templates()
+    }
+
+    assert {"search", "search_table", "search_dashboard"} <= set(tools)
+    assert tools["search"].meta is None
+    assert (
+        tools["search_table"].meta["ui"]["resourceUri"].startswith("ui://prefab/tool/")
+    )
+    assert (
+        tools["search_dashboard"]
+        .meta["ui"]["resourceUri"]
+        .startswith("ui://prefab/tool/")
+    )
+    assert "serpapi://engines" in resources
+    assert "serpapi://engines/{engine_name}" in templates
+
+
+def test_engines_dir_resolves_to_repo_engines_directory():
+    assert mcp_resources.ENGINES_DIR.exists()
+    assert (mcp_resources.ENGINES_DIR / "google_light.json").exists()
+
+
+async def test_engines_index_resource_reads_engine_files():
+    result = await server.mcp.read_resource("serpapi://engines")
+    body = json.loads(result.contents[0].content)
+
+    assert body["count"] == len(list(mcp_resources.ENGINES_DIR.glob("*.json")))
+    assert "google_light" in body["engines"]
+    assert "serpapi://engines/google_light" in body["resources"]
 
 
 def raiser(exc):
@@ -106,7 +144,7 @@ def test_extract_error_response_reads_json_body_from_wrapped_request_error():
     assert (
         err.response is None
     )  # the wrapper has no response; the body is one level down
-    assert json.loads(server.extract_error_response(err)) == {
+    assert json.loads(mcp_tools.extract_error_response(err)) == {
         "error": "Invalid API key."
     }
 
@@ -120,11 +158,13 @@ def test_extract_error_response_falls_back_to_response_text_when_not_json():
         resp.raise_for_status()
     except requests.exceptions.HTTPError as exc:
         err = serpapi.exceptions.HTTPError(exc)
-    assert server.extract_error_response(err) == "upstream boom"
+    assert mcp_tools.extract_error_response(err) == "upstream boom"
 
 
 def test_extract_error_response_falls_back_to_str():
-    assert server.extract_error_response(ValueError("plain message")) == "plain message"
+    assert (
+        mcp_tools.extract_error_response(ValueError("plain message")) == "plain message"
+    )
 
 
 def test_extract_error_response_terminates_and_returns_innermost_message():
@@ -133,27 +173,27 @@ def test_extract_error_response_terminates_and_returns_innermost_message():
         err = ValueError(err)
     # 20 levels deep with no .response anywhere: the walk must terminate (not
     # hang) and fall back to the chain's message string.
-    assert server.extract_error_response(err) == "deepest"
+    assert mcp_tools.extract_error_response(err) == "deepest"
 
 
 def test_extract_error_response_finds_response_at_depth_cap_boundary():
     leaf = _WithResponse(_Resp({"error": "deep"}))
     # index 9 is the last position the depth cap (10) still inspects.
     err = nest(9, leaf)
-    assert json.loads(server.extract_error_response(err)) == {"error": "deep"}
+    assert json.loads(mcp_tools.extract_error_response(err)) == {"error": "deep"}
 
 
 def test_extract_error_response_stops_one_past_the_depth_cap():
     leaf = _WithResponse(_Resp({"error": "too deep"}))
     # index 10 is one past the cap: the body must never be reached.
     err = nest(10, leaf)
-    out = server.extract_error_response(err)
+    out = mcp_tools.extract_error_response(err)
     assert "too deep" not in out  # cap enforced, not just "returns a string"
     assert out == "boom"  # falls back to str() of the chain
 
 
 async def test_search_rejects_invalid_mode():
-    out = await server.search(params={"q": "x"}, mode="bogus")
+    out = await mcp_tools.search(params={"q": "x"}, mode="bogus")
     assert out == "Error: Invalid mode. Must be 'complete' or 'compact'"
 
 
@@ -161,7 +201,7 @@ async def test_search_without_api_key_returns_graceful_error(monkeypatch):
     # A real starlette Request with empty state: request.state.api_key would raise
     # AttributeError, so the guard must use getattr, not attribute access.
     use_request(monkeypatch, real_request(state={}))
-    out = await server.search(params={"q": "x"})
+    out = await mcp_tools.search(params={"q": "x"})
     assert out == "Error: Unable to access API key from request context"
 
 
@@ -169,7 +209,7 @@ async def test_search_complete_returns_full_payload(monkeypatch):
     payload = {"search_metadata": {"id": "1"}, "organic_results": [{"title": "hit"}]}
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(payload))
-    assert json.loads(await server.search(params={"q": "x"})) == payload
+    assert json.loads(await mcp_tools.search(params={"q": "x"})) == payload
 
 
 async def test_search_compact_strips_serpapi_metadata(monkeypatch):
@@ -183,7 +223,7 @@ async def test_search_compact_strips_serpapi_metadata(monkeypatch):
     }
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(payload))
-    out = json.loads(await server.search(params={"q": "x"}, mode="compact"))
+    out = json.loads(await mcp_tools.search(params={"q": "x"}, mode="compact"))
     assert out == {"organic_results": [{"title": "hit"}]}
 
 
@@ -192,7 +232,7 @@ async def test_search_compact_does_not_mutate_the_live_result(monkeypatch):
     results = serp_results(payload)
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: results)
-    await server.search(params={"q": "x"}, mode="compact")
+    await mcp_tools.search(params={"q": "x"}, mode="compact")
     assert "search_metadata" in results.as_dict()
 
 
@@ -205,7 +245,7 @@ async def test_search_forwards_api_key_and_default_engine(monkeypatch):
 
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, capture)
-    await server.search(params={"q": "x"})
+    await mcp_tools.search(params={"q": "x"})
     assert captured["api_key"] == "KEY"
     assert captured["engine"] == "google_light"
     assert captured["q"] == "x"
@@ -220,7 +260,7 @@ async def test_search_caller_overrides_default_engine(monkeypatch):
 
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, capture)
-    await server.search(params={"q": "x", "engine": "google_news"})
+    await mcp_tools.search(params={"q": "x", "engine": "google_news"})
     assert captured["engine"] == "google_news"
 
 
@@ -235,7 +275,7 @@ async def test_search_caller_overrides_default_engine(monkeypatch):
 async def test_search_maps_real_http_errors(monkeypatch, status, fragment):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, raiser(make_serpapi_http_error(status, {"error": "x"})))
-    out = await server.search(params={"q": "x"})
+    out = await mcp_tools.search(params={"q": "x"})
     assert out.startswith("Error:")
     assert fragment in out
 
@@ -245,7 +285,7 @@ async def test_search_unmapped_http_error_returns_json_body(monkeypatch):
     use_search(
         monkeypatch, raiser(make_serpapi_http_error(500, {"error": "server boom"}))
     )
-    out = await server.search(params={"q": "x"})
+    out = await mcp_tools.search(params={"q": "x"})
     assert out.startswith("Error:")
     assert "server boom" in out
 
@@ -253,7 +293,7 @@ async def test_search_unmapped_http_error_returns_json_body(monkeypatch):
 async def test_search_generic_exception_uses_extractor(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, raiser(ValueError("weird failure")))
-    assert await server.search(params={"q": "x"}) == "Error: weird failure"
+    assert await mcp_tools.search(params={"q": "x"}) == "Error: weird failure"
 
 
 async def passthrough(request):
@@ -316,20 +356,20 @@ async def test_healthcheck_returns_healthy_with_utc_timestamp():
     ],
 )
 def test_map_search_error_maps_known_statuses(status, fragment):
-    out = server.map_search_error(make_serpapi_http_error(status, {"error": "x"}))
+    out = mcp_tools.map_search_error(make_serpapi_http_error(status, {"error": "x"}))
     assert out.startswith("Error:")
     assert fragment in out
 
 
 def test_map_search_error_falls_back_to_json_body():
-    out = server.map_search_error(
+    out = mcp_tools.map_search_error(
         make_serpapi_http_error(500, {"error": "server boom"})
     )
     assert "server boom" in out
 
 
 def test_map_search_error_handles_generic_exception():
-    assert server.map_search_error(ValueError("weird")) == "Error: weird"
+    assert mcp_tools.map_search_error(ValueError("weird")) == "Error: weird"
 
 
 # --- MCP Apps: pure view-model helpers -------------------------------------
@@ -348,7 +388,7 @@ def test_organic_rows_flattens_results():
             {"position": 2, "title": "B", "link": "https://b.com/y", "snippet": "s2"},
         ]
     }
-    rows = server.organic_rows(data)
+    rows = mcp_apps.organic_rows(data)
     assert rows[0] == {
         "position": 1,
         "title": "A",
@@ -362,17 +402,17 @@ def test_organic_rows_flattens_results():
 
 def test_organic_rows_strips_www_from_derived_source():
     data = {"organic_results": [{"title": "x", "link": "https://www.example.com/p"}]}
-    assert server.organic_rows(data)[0]["source"] == "example.com"
+    assert mcp_apps.organic_rows(data)[0]["source"] == "example.com"
 
 
 def test_organic_rows_empty_without_results():
-    assert server.organic_rows({}) == []
-    assert server.organic_rows({"organic_results": None}) == []
+    assert mcp_apps.organic_rows({}) == []
+    assert mcp_apps.organic_rows({"organic_results": None}) == []
 
 
 def test_source_breakdown_counts_and_limits():
     rows = [{"source": "a"}, {"source": "a"}, {"source": "b"}, {"source": ""}]
-    breakdown = server.source_breakdown(rows, limit=1)
+    breakdown = mcp_apps.source_breakdown(rows, limit=1)
     assert breakdown == [{"source": "a", "count": 2}]
 
 
@@ -382,7 +422,7 @@ def test_dashboard_summary_shape():
         "search_information": {"total_results": 999},
         "organic_results": [{"title": "A", "link": "https://a.com", "source": "A"}],
     }
-    summary = server.dashboard_summary(data)
+    summary = mcp_apps.dashboard_summary(data)
     assert summary["query"] == "coffee"
     assert summary["engine"] == "google_light"
     assert summary["total_results"] == 999
@@ -415,7 +455,7 @@ _SAMPLE_PAYLOAD = {
 async def test_search_table_returns_results_app(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
-    app = await server.search_table(params={"q": "coffee"})
+    app = await mcp_apps.search_table(params={"q": "coffee"})
     assert app.title == "Search results"
     body = ui_json(app)
     assert "DataTable" in body
@@ -425,7 +465,7 @@ async def test_search_table_returns_results_app(monkeypatch):
 async def test_search_dashboard_returns_dashboard_app(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
-    app = await server.search_dashboard(params={"q": "coffee"})
+    app = await mcp_apps.search_dashboard(params={"q": "coffee"})
     assert app.title == "Search dashboard"
     # click-to-expand detail panel starts collapsed.
     assert app.state == {"selected": None}
@@ -436,7 +476,7 @@ async def test_search_dashboard_returns_dashboard_app(monkeypatch):
 
 async def test_search_table_without_api_key_renders_error_app(monkeypatch):
     use_request(monkeypatch, real_request(state={}))
-    app = await server.search_table(params={"q": "x"})
+    app = await mcp_apps.search_table(params={"q": "x"})
     assert app.title == "Search error"
     assert "Unable to access API key" in ui_json(app)
 
@@ -444,7 +484,7 @@ async def test_search_table_without_api_key_renders_error_app(monkeypatch):
 async def test_search_dashboard_maps_http_error_to_error_app(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, raiser(make_serpapi_http_error(429, {"error": "x"})))
-    app = await server.search_dashboard(params={"q": "x"})
+    app = await mcp_apps.search_dashboard(params={"q": "x"})
     assert app.title == "Search error"
     assert "Rate limit exceeded" in ui_json(app)
 
@@ -571,7 +611,7 @@ _SAMPLE_FLIGHTS_PAYLOAD = {
 
 
 def test_flights_rows_extracts_all_flights():
-    rows = server.flights_rows(_SAMPLE_FLIGHTS_PAYLOAD)
+    rows = mcp_apps.flights_rows(_SAMPLE_FLIGHTS_PAYLOAD)
     assert len(rows) == 3
     # Direct flight
     assert rows[0]["airline"] == "United"
@@ -598,8 +638,8 @@ def test_flights_rows_extracts_all_flights():
 
 
 def test_flights_rows_handles_empty_data():
-    assert server.flights_rows({}) == []
-    assert server.flights_rows({"best_flights": None, "other_flights": None}) == []
+    assert mcp_apps.flights_rows({}) == []
+    assert mcp_apps.flights_rows({"best_flights": None, "other_flights": None}) == []
 
 
 def test_flights_rows_handles_missing_airports():
@@ -608,7 +648,7 @@ def test_flights_rows_handles_missing_airports():
             {"flights": [], "layovers": [], "total_duration": 0, "price": 100}
         ]
     }
-    rows = server.flights_rows(data)
+    rows = mcp_apps.flights_rows(data)
     assert len(rows) == 1
     assert rows[0]["route"] == "? → ?"
     assert rows[0]["price"] == 100
@@ -618,21 +658,21 @@ def test_flights_rows_handles_missing_airports():
 
 def test_flights_rows_zero_price_defaults():
     data = {"best_flights": [{"flights": [], "layovers": [], "total_duration": 120}]}
-    rows = server.flights_rows(data)
+    rows = mcp_apps.flights_rows(data)
     assert rows[0]["price"] == 0
     assert rows[0]["price_fmt"] == "—"
 
 
 def test_format_duration():
-    assert server._format_duration(330) == "5h 30m"
-    assert server._format_duration(45) == "45m"
-    assert server._format_duration(60) == "1h 0m"
-    assert server._format_duration(None) == "—"
-    assert server._format_duration(0) == "—"
+    assert mcp_apps._format_duration(330) == "5h 30m"
+    assert mcp_apps._format_duration(45) == "45m"
+    assert mcp_apps._format_duration(60) == "1h 0m"
+    assert mcp_apps._format_duration(None) == "—"
+    assert mcp_apps._format_duration(0) == "—"
 
 
 def test_price_history_points_converts_timestamps():
-    points = server.price_history_points(_SAMPLE_FLIGHTS_PAYLOAD)
+    points = mcp_apps.price_history_points(_SAMPLE_FLIGHTS_PAYLOAD)
     assert len(points) == 5
     assert points[0]["price"] == 310
     assert "date" in points[0]
@@ -641,22 +681,24 @@ def test_price_history_points_converts_timestamps():
 
 
 def test_price_history_points_handles_empty():
-    assert server.price_history_points({}) == []
-    assert server.price_history_points({"price_insights": {}}) == []
-    assert server.price_history_points({"price_insights": {"price_history": []}}) == []
+    assert mcp_apps.price_history_points({}) == []
+    assert mcp_apps.price_history_points({"price_insights": {}}) == []
+    assert (
+        mcp_apps.price_history_points({"price_insights": {"price_history": []}}) == []
+    )
 
 
 def test_price_history_points_skips_malformed_entries():
     data = {
         "price_insights": {"price_history": [[1719792000], "bad", [1719878400, 300]]}
     }
-    points = server.price_history_points(data)
+    points = mcp_apps.price_history_points(data)
     assert len(points) == 1
     assert points[0]["price"] == 300
 
 
 def test_flights_price_insights_extracts_metrics():
-    insights = server.flights_price_insights(_SAMPLE_FLIGHTS_PAYLOAD)
+    insights = mcp_apps.flights_price_insights(_SAMPLE_FLIGHTS_PAYLOAD)
     assert insights["lowest_price"] == 199
     assert insights["price_level"] == "low"
     assert insights["typical_low"] == 250
@@ -664,7 +706,7 @@ def test_flights_price_insights_extracts_metrics():
 
 
 def test_flights_price_insights_handles_missing():
-    insights = server.flights_price_insights({})
+    insights = mcp_apps.flights_price_insights({})
     assert insights["lowest_price"] is None
     assert insights["price_level"] == "unknown"
     assert insights["typical_low"] is None
@@ -672,7 +714,7 @@ def test_flights_price_insights_handles_missing():
 
 
 def test_build_flights_app_produces_valid_app():
-    app = server.build_flights_app(_SAMPLE_FLIGHTS_PAYLOAD)
+    app = mcp_apps.build_flights_app(_SAMPLE_FLIGHTS_PAYLOAD)
     assert "SFO → JFK" in app.title
     assert app.state == {"selected": None}
     body = ui_json(app)
@@ -710,7 +752,7 @@ def test_build_flights_app_without_price_history():
         ],
         "price_insights": {},
     }
-    app = server.build_flights_app(data)
+    app = mcp_apps.build_flights_app(data)
     body = ui_json(app)
     # Should still render table without crashing, just no chart
     assert "DataTable" in body
@@ -719,7 +761,7 @@ def test_build_flights_app_without_price_history():
 
 def test_build_flights_app_generic_title_without_route():
     data = {"search_parameters": {"engine": "google_flights"}, "best_flights": []}
-    app = server.build_flights_app(data)
+    app = mcp_apps.build_flights_app(data)
     assert app.title == "Flights dashboard"
 
 
@@ -752,9 +794,9 @@ def test_flights_currency_inr():
             "price_level": "typical",
         },
     }
-    rows = server.flights_rows(data)
+    rows = mcp_apps.flights_rows(data)
     assert rows[0]["price_fmt"] == "₹35,906"
-    app = server.build_flights_app(data)
+    app = mcp_apps.build_flights_app(data)
     body = ui_json(app)
     assert "₹35,758" in body
     assert "₹20,500" in body
@@ -767,7 +809,7 @@ def test_flights_currency_inr():
 async def test_search_dashboard_dispatches_to_flights(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_FLIGHTS_PAYLOAD))
-    app = await server.search_dashboard(
+    app = await mcp_apps.search_dashboard(
         params={"engine": "google_flights", "departure_id": "SFO", "arrival_id": "JFK"}
     )
     assert "SFO → JFK" in app.title
@@ -778,7 +820,7 @@ async def test_search_dashboard_dispatches_to_flights(monkeypatch):
 async def test_search_dashboard_falls_back_to_generic(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
-    app = await server.search_dashboard(params={"q": "coffee"})
+    app = await mcp_apps.search_dashboard(params={"q": "coffee"})
     assert app.title == "Search dashboard"
 
 
@@ -859,7 +901,7 @@ _SAMPLE_JOBS_PAYLOAD = {
 
 
 def test_jobs_rows_extracts_all_jobs():
-    rows = server.jobs_rows(_SAMPLE_JOBS_PAYLOAD)
+    rows = mcp_apps.jobs_rows(_SAMPLE_JOBS_PAYLOAD)
     assert len(rows) == 3
 
     # Rich job with salary and benefits
@@ -892,8 +934,8 @@ def test_jobs_rows_extracts_all_jobs():
 
 
 def test_jobs_rows_handles_empty_data():
-    assert server.jobs_rows({}) == []
-    assert server.jobs_rows({"jobs_results": None}) == []
+    assert mcp_apps.jobs_rows({}) == []
+    assert mcp_apps.jobs_rows({"jobs_results": None}) == []
 
 
 def test_jobs_rows_handles_missing_extensions():
@@ -906,7 +948,7 @@ def test_jobs_rows_handles_missing_extensions():
             }
         ]
     }
-    rows = server.jobs_rows(data)
+    rows = mcp_apps.jobs_rows(data)
     assert len(rows) == 1
     assert rows[0]["salary"] == ""
     assert rows[0]["schedule"] == ""
@@ -916,7 +958,7 @@ def test_jobs_rows_handles_missing_extensions():
 
 
 def test_jobs_summary_computes_metrics():
-    summary = server.jobs_summary(_SAMPLE_JOBS_PAYLOAD)
+    summary = mcp_apps.jobs_summary(_SAMPLE_JOBS_PAYLOAD)
     assert summary["total"] == 3
     assert summary["with_salary"] == 1
     assert summary["remote"] == 1
@@ -931,7 +973,7 @@ def test_jobs_summary_computes_metrics():
 
 
 def test_jobs_summary_handles_empty():
-    summary = server.jobs_summary({})
+    summary = mcp_apps.jobs_summary({})
     assert summary["total"] == 0
     assert summary["salary_pct"] == "—"
     assert summary["remote_pct"] == "—"
@@ -940,13 +982,13 @@ def test_jobs_summary_handles_empty():
 
 def test_jobs_schedule_breakdown_groups_unspecified():
     rows = [{"schedule": ""}, {"schedule": ""}, {"schedule": "Full-time"}]
-    breakdown = server.jobs_schedule_breakdown(rows)
+    breakdown = mcp_apps.jobs_schedule_breakdown(rows)
     assert {"schedule": "Unspecified", "count": 2} in breakdown
     assert {"schedule": "Full-time", "count": 1} in breakdown
 
 
 def test_build_jobs_app_produces_valid_app():
-    app = server.build_jobs_app(_SAMPLE_JOBS_PAYLOAD)
+    app = mcp_apps.build_jobs_app(_SAMPLE_JOBS_PAYLOAD)
     assert app.title == "Jobs: software engineer"
     assert app.state == {"selected": None}
     body = ui_json(app)
@@ -963,7 +1005,7 @@ def test_build_jobs_app_produces_valid_app():
 
 def test_build_jobs_app_without_query():
     data = {"search_parameters": {"engine": "google_jobs"}, "jobs_results": []}
-    app = server.build_jobs_app(data)
+    app = mcp_apps.build_jobs_app(data)
     assert app.title == "Jobs dashboard"
 
 
@@ -980,15 +1022,14 @@ def test_build_jobs_app_description_truncated():
             }
         ],
     }
-    app = server.build_jobs_app(data)
-    rows = server.jobs_rows(data)
+    rows = mcp_apps.jobs_rows(data)
     assert len(rows[0]["description"]) == 300
 
 
 async def test_search_dashboard_dispatches_to_jobs(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_JOBS_PAYLOAD))
-    app = await server.search_dashboard(
+    app = await mcp_apps.search_dashboard(
         params={"engine": "google_jobs", "q": "software engineer"}
     )
     assert "software engineer" in app.title
@@ -1058,7 +1099,7 @@ _SAMPLE_SHOPPING_PAYLOAD = {
 
 
 def test_shopping_rows_extracts_all_products():
-    rows = server.shopping_rows(_SAMPLE_SHOPPING_PAYLOAD)
+    rows = mcp_apps.shopping_rows(_SAMPLE_SHOPPING_PAYLOAD)
     assert len(rows) == 4
 
     # Product with discount
@@ -1083,13 +1124,13 @@ def test_shopping_rows_extracts_all_products():
 
 
 def test_shopping_rows_handles_empty():
-    assert server.shopping_rows({}) == []
-    assert server.shopping_rows({"shopping_results": None}) == []
+    assert mcp_apps.shopping_rows({}) == []
+    assert mcp_apps.shopping_rows({"shopping_results": None}) == []
 
 
 def test_shopping_rows_handles_missing_fields():
     data = {"shopping_results": [{"title": "Widget", "source": "Store"}]}
-    rows = server.shopping_rows(data)
+    rows = mcp_apps.shopping_rows(data)
     assert rows[0]["price"] == 0
     assert rows[0]["price_fmt"] == "—"
     assert rows[0]["rating"] == 0
@@ -1097,7 +1138,7 @@ def test_shopping_rows_handles_missing_fields():
 
 
 def test_shopping_summary_computes_metrics():
-    summary = server.shopping_summary(_SAMPLE_SHOPPING_PAYLOAD)
+    summary = mcp_apps.shopping_summary(_SAMPLE_SHOPPING_PAYLOAD)
     assert summary["total"] == 4
     assert summary["price_min"] == 189.0
     assert summary["price_max"] == 298.0
@@ -1110,7 +1151,7 @@ def test_shopping_summary_computes_metrics():
 
 
 def test_shopping_summary_handles_empty():
-    summary = server.shopping_summary({})
+    summary = mcp_apps.shopping_summary({})
     assert summary["total"] == 0
     assert summary["price_min"] == 0
     assert summary["price_max"] == 0
@@ -1118,7 +1159,7 @@ def test_shopping_summary_handles_empty():
 
 
 def test_build_shopping_app_produces_valid_app():
-    app = server.build_shopping_app(_SAMPLE_SHOPPING_PAYLOAD)
+    app = mcp_apps.build_shopping_app(_SAMPLE_SHOPPING_PAYLOAD)
     assert app.title == "Shopping: Sony WH-1000XM5"
     assert app.state == {"selected": None}
     body = ui_json(app)
@@ -1133,7 +1174,7 @@ def test_build_shopping_app_produces_valid_app():
 
 def test_build_shopping_app_without_query():
     data = {"search_parameters": {"engine": "google_shopping"}, "shopping_results": []}
-    app = server.build_shopping_app(data)
+    app = mcp_apps.build_shopping_app(data)
     assert app.title == "Shopping dashboard"
 
 
@@ -1142,7 +1183,7 @@ def test_build_shopping_app_no_chart_without_prices():
         "search_parameters": {"q": "test"},
         "shopping_results": [{"title": "Free thing", "source": "Store"}],
     }
-    app = server.build_shopping_app(data)
+    app = mcp_apps.build_shopping_app(data)
     body = ui_json(app)
     assert "BarChart" not in body
     assert "DataTable" in body
@@ -1171,10 +1212,10 @@ def test_shopping_currency_inr():
             },
         ],
     }
-    summary = server.shopping_summary(data)
+    summary = mcp_apps.shopping_summary(data)
     assert summary["currency_symbol"] == "₹"
 
-    app = server.build_shopping_app(data)
+    app = mcp_apps.build_shopping_app(data)
     body = ui_json(app)
     assert "₹19,990" in body
     assert "₹24,990" in body
@@ -1185,28 +1226,28 @@ def test_shopping_currency_inr():
 
 def test_extract_currency_prefix_various():
     assert (
-        server._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]})
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]})
         == "$"
     )
     assert (
-        server._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]})
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]})
         == "₹"
     )
     assert (
-        server._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]})
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]})
         == "€"
     )
     assert (
-        server._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]})
+        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]})
         == "R$"
     )
-    assert server._extract_currency_prefix({}) == "$"
+    assert mcp_apps._extract_currency_prefix({}) == "$"
 
 
 async def test_search_dashboard_dispatches_to_shopping(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(_SAMPLE_SHOPPING_PAYLOAD))
-    app = await server.search_dashboard(
+    app = await mcp_apps.search_dashboard(
         params={"engine": "google_shopping", "q": "Sony WH-1000XM5"}
     )
     assert "Sony WH-1000XM5" in app.title
