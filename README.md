@@ -39,7 +39,7 @@ You can also add the hosted server to these MCP clients:
 
 **OpenClaw**
 ```bash
-openclaw mcp add serpapi --url https://mcp.serpapi.com/YOUR_SERPAPI_API_KEY/mcp
+openclaw mcp add serpapi --url https://mcp.serpapi.com/YOUR_SERPAPI_API_KEY/mcp --transport streamable-http
 ```
 
 **Claude Code**
