@@ -14,8 +14,8 @@ memory: 4096
 platform: linux/x86_64
 count:
   range:
-    min: 3
-    max: 6
+    min: 5
+    max: 15
   cpu_percentage: 70
 exec: true
 network:

@@ -116,29 +116,26 @@ async def healthcheck_handler(request):
     )
 
 
-def main():
-    middleware = [
-        Middleware(RequestMetricsMiddleware),
-        Middleware(ApiKeyMiddleware),
-        Middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        ),
-    ]
-    starlette_app = mcp.http_app(
-        middleware=middleware, stateless_http=True, json_response=True
-    )
+middleware = [
+    Middleware(RequestMetricsMiddleware),
+    Middleware(ApiKeyMiddleware),
+    Middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    ),
+]
+starlette_app = mcp.http_app(
+    middleware=middleware, stateless_http=True, json_response=True
+)
 
-    starlette_app.add_route("/healthcheck", healthcheck_handler, methods=["GET"])
+starlette_app.add_route("/healthcheck", healthcheck_handler, methods=["GET"])
 
+if __name__ == "__main__":
     host = os.getenv("MCP_HOST", "0.0.0.0")
     port = int(os.getenv("MCP_PORT", "8000"))
 
-    uvicorn.run(starlette_app, host=host, port=port, ws="none")
-
-
-if __name__ == "__main__":
-    main()
+    workers = int(os.getenv("WEB_CONCURRENCY", "4"))
+    uvicorn.run(starlette_app, host=host, port=port, ws="none", workers=workers)
