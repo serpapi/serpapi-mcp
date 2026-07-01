@@ -137,7 +137,8 @@ def main():
     host = os.getenv("MCP_HOST", "0.0.0.0")
     port = int(os.getenv("MCP_PORT", "8000"))
 
-    uvicorn.run(starlette_app, host=host, port=port, ws="none")
+    workers = int(os.getenv("WEB_CONCURRENCY", "4"))
+    uvicorn.run(starlette_app, host=host, port=port, ws="none", workers=workers)
 
 
 if __name__ == "__main__":
