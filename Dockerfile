@@ -19,4 +19,4 @@ RUN python /app/build-engines.py
 
 EXPOSE 8000
 
-CMD ["python", "src/server.py"]
+CMD ["sh", "-c", "exec uvicorn src.server:starlette_app --host ${MCP_HOST:-0.0.0.0} --port ${MCP_PORT:-8000} --workers ${WEB_CONCURRENCY:-4} --ws none"]
