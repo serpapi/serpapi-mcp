@@ -186,9 +186,10 @@ def fetch_search_data(params: dict[str, Any] | None) -> dict[str, Any]:
     if not api_key:
         raise RuntimeError("Error: Unable to access API key from request context")
 
+    # api_key set last so caller params can never override the trusted key.
     search_params = {
-        "api_key": api_key,
         "engine": "google_light",
         **(params or {}),
+        "api_key": api_key,
     }
     return serpapi.search(search_params).as_dict()
