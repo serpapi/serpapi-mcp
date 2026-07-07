@@ -264,6 +264,35 @@ async def test_search_caller_overrides_default_engine(monkeypatch):
     assert captured["engine"] == "google_news"
 
 
+async def test_search_ignores_caller_supplied_api_key(monkeypatch):
+    # Caller-supplied api_key must never override the authenticated key.
+    captured = {}
+
+    def capture(params):
+        captured.update(params)
+        return serp_results({})
+
+    use_request(monkeypatch, real_request(state={"api_key": "TRUSTED"}))
+    use_search(monkeypatch, capture)
+    await mcp_tools.search(params={"q": "x", "api_key": "CALLER_CONTROLLED"})
+    assert captured["api_key"] == "TRUSTED"
+    assert captured["q"] == "x"
+
+
+async def test_search_apps_ignore_caller_supplied_api_key(monkeypatch):
+    # App variants share fetch_search_data, so the same guard must hold.
+    captured = {}
+
+    def capture(params):
+        captured.update(params)
+        return serp_results(_SAMPLE_PAYLOAD)
+
+    use_request(monkeypatch, real_request(state={"api_key": "TRUSTED"}))
+    use_search(monkeypatch, capture)
+    await mcp_apps.search_table(params={"q": "x", "api_key": "CALLER_CONTROLLED"})
+    assert captured["api_key"] == "TRUSTED"
+
+
 @pytest.mark.parametrize(
     "status, fragment",
     [
