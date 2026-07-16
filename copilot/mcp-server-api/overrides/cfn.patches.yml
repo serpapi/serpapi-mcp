@@ -1,0 +1,11 @@
+- op: replace
+  path: /Resources/DynamicDesiredCountFunction/Properties/Runtime
+  value: nodejs24.x
+
+- op: replace
+  path: /Resources/EnvControllerFunction/Properties/Runtime
+  value: nodejs24.x
+
+- op: replace
+  path: /Resources/RulePriorityFunction/Properties/Runtime
+  value: nodejs24.x
