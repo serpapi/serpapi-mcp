@@ -2,6 +2,7 @@
   "engine": "amazon_product",
   "params": {
     "asin": {
+      "required": true,
       "description": "Parameter defines the Amazon Standard Identification Number (ASIN) of the product you want to retrieve. This is a unique identifier assigned to each product on Amazon.",
       "group": "search_query"
     },

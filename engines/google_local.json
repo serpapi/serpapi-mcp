@@ -12,7 +12,7 @@
       "group": "geographic_location"
     },
     "uule": {
-      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together.",
+      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together. For consistent results with coordinates-based uule parameter, a matching gl parameter is required. Head to UULE Generator if you need to convert a location or GPS coordinates to uule parameter, and vice versa.",
       "group": "geographic_location"
     },
     "google_domain": {
@@ -632,7 +632,7 @@
     },
     "start": {
       "type": "number",
-      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. On desktop, parameter only accepts multiples of `20` (e.g. `20` for the second page results, `40` for the third page results, etc.). On mobile, parameter only accepts multiples of `10` (e.g. `10` for the second page results, `20` for the third page results, etc.).",
+      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. The value depends on the number of results returned which can either be `10` or `20`. For eg, on mobile `10` results are returned, so `start` should be `10`, `20`, `30`. It's advised to use serpapi\\_pagination.next where we handle this automatically.",
       "group": "pagination"
     }
   },

@@ -1,31 +1,48 @@
 {
-  "engine": "naver_ai_overview",
+  "engine": "search_index",
   "params": {
-    "query": {
+    "q": {
       "required": true,
       "description": "Parameter defines the query you want to search.",
       "group": "search_query"
+    },
+    "num": {
+      "type": "number",
+      "description": "Parameter defines the number of results to return. (default: `10`).",
+      "group": "pagination"
+    },
+    "start": {
+      "type": "number",
+      "description": "Parameter defines the result offset for pagination. (e.g., `0` (default) is the first page, `10` is the second page, etc.).",
+      "group": "pagination"
+    },
+    "safe": {
+      "type": "select",
+      "options": [
+        "active",
+        "off"
+      ],
+      "description": "Parameter defines the level of filtering for adult content. It can be set to `active` (default) or `off`.",
+      "group": "filters"
+    },
+    "mode": {
+      "type": "select",
+      "options": [
+        "deep"
+      ],
+      "description": "Parameter defines the search mode. Set to `deep` for expanded recall via parallel sub-query fan-out. Returns more diverse results by decomposing the query into multiple aspects.",
+      "group": "filters"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `naver_ai_overview` to use the Naver AI Overview API engine.",
-      "group": "serpapi_parameters"
-    },
-    "device": {
-      "type": "device",
-      "options": [
-        "desktop",
-        "tablet",
-        "mobile"
-      ],
-      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "description": "Set parameter to `search_index` to use the Search Index API engine.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Naver AI Overview results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Search Index results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

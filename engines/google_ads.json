@@ -1,10 +1,16 @@
 {
-  "engine": "google_hotels_reviews",
+  "engine": "google_ads",
   "params": {
-    "property_token": {
+    "q": {
       "required": true,
-      "description": "Parameter defines the specific property. You can find property\\_token from Google Hotels Properties API.",
+      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Google search. e.g. `inurl:`, `site:`, `intitle:`.",
       "group": "search_query"
+    },
+    "location": {
+      "type": "location",
+      "required": true,
+      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control.",
+      "group": "geographic_location"
     },
     "hl": {
       "type": "select",
@@ -167,55 +173,43 @@
         "yo",
         "zu"
       ],
-      "description": "Parameter defines the language to use for the Google Hotels search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
+      "description": "Parameter defines the language to use for the Google search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
       "group": "localization"
     },
-    "category_token": {
-      "description": "Parameter is used to get reviews filtered by a specific category. You can find category\\_token from Google Hotels API under reviews\\_breakdown.",
-      "group": "advanced_google_hotels_reviews_parameters"
-    },
-    "sort_by": {
+    "safe": {
       "type": "select",
       "options": [
-        [
-          "1",
-          "Most helpful (Default)"
-        ],
-        [
-          "2",
-          "Most recent"
-        ],
-        [
-          "3",
-          "Highest score"
-        ],
-        [
-          "4",
-          "Lowest score"
-        ]
+        "active",
+        "off"
       ],
-      "description": "Parameter defines the sorting order of the reviews. Available options: `1` - Most helpful (Default) `2` - Most recent `3` - Highest score `4` - Lowest score",
-      "group": "advanced_google_hotels_reviews_parameters"
+      "description": "Parameter defines the level of filtering for adult content. It can be set to `active` or `off`, by default Google will blur explicit content.",
+      "group": "advanced_filters"
     },
-    "source_number": {
-      "type": "number",
-      "description": "Parameter filter the reviews based on their originating source. Standard options (always availbable): `0` - All reviews (Default) `-1` - Google For property-specific source numbers, refer to the other\\_reviews field in Google Hotels Property Details API. Available sources vary by property.",
-      "group": "advanced_google_hotels_reviews_parameters"
-    },
-    "next_page_token": {
-      "description": "Parameter defines the next page token. It is used for retrieving the next page results.",
-      "group": "pagination"
+    "nfpr": {
+      "type": "checkbox",
+      "description": "Parameter defines the exclusion of results from an auto-corrected query when the original query is spelled wrong. It can be set to `1` to exclude these results, or `0` to include them (default). Note that this parameter may not prevent Google from returning results for an auto-corrected query if no other results are available.",
+      "group": "advanced_filters"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `google_hotels` to use the Google Hotels API engine.",
+      "description": "Set parameter to `google_ads` to use the Google Ads API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Hotels results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Ads results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

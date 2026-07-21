@@ -7,6 +7,7 @@
       "group": "search_query"
     },
     "store_id": {
+      "required": true,
       "description": "Store ID to filter the products by the specific store only. Head to the Walmart Stores Locations for a full list of supported stores. It's possible for the product pricing to differ between stores.",
       "group": "advanced_filters"
     }

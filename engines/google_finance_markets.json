@@ -4,16 +4,10 @@
     "trend": {
       "type": "select",
       "options": [
-        "indexes",
-        "most-active",
-        "gainers",
-        "losers",
-        "climate-leaders",
-        "cryptocurrencies",
-        "currencies"
+        "indexes"
       ],
       "required": true,
-      "description": "Parameter is used for retrieving different market trends. Available options: `indexes` - Market indexes `most-active` - Most active `gainers` - Gainers `losers` - Losers `climate-leaders` - Climate leaders `cryptocurrencies` - Crypto `currencies` - Currencies",
+      "description": "Parameter is used for retrieving different market trends. Due to a recent Google Finance update, this parameter now only accepts `indexes` as a valid value.",
       "group": "search_query"
     },
     "hl": {
@@ -430,16 +424,6 @@
       ],
       "description": "Parameter defines the country to use for the Google Finance Markets search. It's a two-letter country code. (e.g., `us` for the United States, `uk` for United Kingdom, or `fr` for France). Head to the Google countries page for a full list of supported Google countries.",
       "group": "localization"
-    },
-    "index_market": {
-      "type": "select",
-      "options": [
-        "americas",
-        "europe-middle-east-africa",
-        "asia-pacific"
-      ],
-      "description": "Parameter is used for expanding market indexes by region and retrieving more results. Available options: `americas` - Americas `europe-middle-east-africa` - Europe, Middle East, and Africa `asia-pacific` - Asia Pacific Parameter can be used only when trend parameter is set to: `indexes`.",
-      "group": "advanced_google_finance_parameters"
     }
   },
   "common_params": {

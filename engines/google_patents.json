@@ -59,11 +59,11 @@
       "group": "date_range"
     },
     "inventor": {
-      "description": "Parameter defines the inventors of the patents. Split multiple inventors with `,` (comma)",
+      "description": "Parameter defines the inventors of the patents. Split multiple inventors with `,` (comma). Wrap names containing commas in parentheses, e.g. `(Doe, John)`.",
       "group": "participants"
     },
     "assignee": {
-      "description": "Parameter defines the assignees of the patents. Split multiple assignees with `,` (comma)",
+      "description": "Parameter defines the assignees of the patents. Split multiple assignees with `,` (comma). Wrap names containing commas in parentheses, e.g. `(Tesla, Inc)`.",
       "group": "participants"
     },
     "country": {
