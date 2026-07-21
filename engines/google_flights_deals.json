@@ -1,9 +1,8 @@
 {
-  "engine": "google_hotels",
+  "engine": "google_flights_deals",
   "params": {
-    "q": {
-      "required": true,
-      "description": "Parameter defines the search query. You can use anything that you would use in a regular Google Hotels search.",
+    "departure_id": {
+      "description": "Parameter defines the departure airport code or location kgmid. An airport code is an uppercase 3-letter code. You can search for it using our Google Flights Autocomplete API or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/` or `/g/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX. You can specify multiple departure airports by separating them with a comma. For example, `CDG,ORY,/m/04jpl`.",
       "group": "search_query"
     },
     "gl": {
@@ -254,7 +253,7 @@
         "zm",
         "zw"
       ],
-      "description": "Parameter defines the country to use for the Google Hotels search. It's a two-letter country code. (e.g., `us` for the United States, `uk` for United Kingdom, or `fr` for France) Head to the Google countries page for a full list of supported Google countries.",
+      "description": "Parameter defines the country to use for the Google Flights Deals search. It's a two-letter country code. (e.g., `us` for the United States, `uk` for United Kingdom, or `fr` for France) Head to the Google countries page for a full list of supported Google countries.",
       "group": "localization"
     },
     "hl": {
@@ -418,7 +417,7 @@
         "yo",
         "zu"
       ],
-      "description": "Parameter defines the language to use for the Google Hotels search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
+      "description": "Parameter defines the language to use for the Google Flights Deals search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
       "group": "localization"
     },
     "currency": {
@@ -499,142 +498,146 @@
       "description": "Parameter defines the currency of the returned prices. Default to `USD`. Head to the Google Travel Currencies page for a full list of supported currency codes.",
       "group": "localization"
     },
-    "check_in_date": {
-      "required": true,
-      "description": "Parameter defines the check-in date. The format is **YYYY-MM-DD**. e.g. `2026-07-22`",
-      "group": "advanced_parameters"
-    },
-    "check_out_date": {
-      "required": true,
-      "description": "Parameter defines the check-out date. The format is **YYYY-MM-DD**. e.g. `2026-07-23`",
-      "group": "advanced_parameters"
-    },
-    "adults": {
-      "type": "number",
-      "description": "Parameter defines the number of adults. Default to `2`.",
-      "group": "advanced_parameters"
-    },
-    "children": {
-      "type": "number",
-      "description": "Parameter defines the number of children. Default to `0`.",
-      "group": "advanced_parameters"
-    },
-    "children_ages": {
-      "description": "Parameter defines the ages of children. The age range is from `1` to `17`, with children who haven't reached 1 year old being considered as `1`. Example for single child only: `5` Example for multiple children (separated by comma `,`): `5,8,10`",
-      "group": "advanced_parameters"
-    },
-    "sort_by": {
+    "type": {
       "type": "select",
       "options": [
         [
-          "3",
-          "Lowest price - 3"
+          "1",
+          "Round trip (default) - 1"
         ],
         [
-          "8",
-          "Highest rating - 8"
-        ],
-        [
-          "13",
-          "Most reviewed - 13"
+          "2",
+          "One way - 2"
         ]
       ],
-      "description": "Parameter is used for sorting the results. Default is sort by `Relevance`. Available options: `3` - Lowest price `8` - Highest rating `13` - Most reviewed",
+      "description": "Parameter defines the type of the flights. Available options: `1` - Round trip (default) `2` - One way",
+      "group": "advanced_google_flights_parameters"
+    },
+    "travel_class": {
+      "type": "select",
+      "options": [
+        [
+          1,
+          "Economy (default) - 1"
+        ],
+        [
+          2,
+          "Premium economy - 2"
+        ],
+        [
+          3,
+          "Business - 3"
+        ],
+        [
+          4,
+          "First - 4"
+        ]
+      ],
+      "description": "Parameter defines the travel class. Available options: `1` - Economy (default) `2` - Premium economy `3` - Business `4` - First",
+      "group": "advanced_google_flights_parameters"
+    },
+    "outbound_date": {
+      "description": "Parameter defines when you want to depart. Use a single YYYY-MM-DD date for an exact departure date, or two comma-separated dates for a flexible departure window. Examples: `2026-07-22` — depart on this exact date `2026-07-22,2026-08-20` — depart anytime within this window With a **single date**: return\\_date (single date) is required for round trip flights. With a **date range**: optionally combine with one of return\\_date (as a range), travel\\_duration, or trip\\_length to control the trip length. If none are provided, deals of any duration are returned. If omitted entirely, deals for any date are returned.",
+      "group": "date_parameters"
+    },
+    "return_date": {
+      "description": "Parameter defines when you want to return. Use a single YYYY-MM-DD date for an exact return date, or two comma-separated dates for a flexible return window. Examples: `2026-07-28` — return on this exact date (use with a single outbound\\_date) `2026-07-28,2026-08-27` — return anytime within this window (use with a range outbound\\_date) Not available for one-way flights (type = `2`). A single return\\_date must be paired with a single outbound\\_date. A range return\\_date must be paired with a range outbound\\_date. Cannot be combined with travel\\_duration or trip\\_length (use one or the other to define trip length).",
+      "group": "date_parameters"
+    },
+    "travel_duration": {
+      "type": "select",
+      "options": [
+        [
+          1,
+          "1 week (default) - 1"
+        ],
+        [
+          2,
+          "Weekend - 2"
+        ],
+        [
+          3,
+          "2 weeks - 3"
+        ]
+      ],
+      "description": "Parameter defines a preset trip duration when searching with flexible dates. Available options: `1` - 1 week (default) `2` - Weekend `3` - 2 weeks Can be used alone (deals of this duration, any departure date) or with outbound\\_date as a date range (e.g., `2026-07-22,2026-08-20`) to limit the departure window. Cannot be combined with return\\_date or trip\\_length. Not available for one-way flights (type = `2`).",
+      "group": "date_parameters"
+    },
+    "trip_length": {
+      "description": "Parameter defines a custom trip length in days when searching with flexible dates. Provide a single number for an exact duration, or two comma-separated numbers for a min/max range. Examples: `7` — exactly 7 days `5,10` — between 5 and 10 days Can be used alone (deals of this length, any departure date) or with outbound\\_date as a date range (e.g., `2026-07-22,2026-08-20`) to limit the departure window. Cannot be combined with return\\_date or travel\\_duration. Not available for one-way flights (type = `2`). Each value must be at least `1`. When two values are provided, the first (min) must be ≤ the second (max).",
+      "group": "date_parameters"
+    },
+    "adults": {
+      "type": "number",
+      "description": "Parameter defines the number of adults. Default to 1.",
+      "group": "number_of_passengers"
+    },
+    "children": {
+      "type": "number",
+      "description": "Parameter defines the number of children. Default to 0.",
+      "group": "number_of_passengers"
+    },
+    "infants_in_seat": {
+      "type": "number",
+      "description": "Parameter defines the number of infants in seat. Default to 0.",
+      "group": "number_of_passengers"
+    },
+    "infants_on_lap": {
+      "type": "number",
+      "description": "Parameter defines the number of infants on lap. Default to 0.",
+      "group": "number_of_passengers"
+    },
+    "stops": {
+      "type": "select",
+      "options": [
+        [
+          0,
+          "Any number of stops (default) - 0"
+        ],
+        [
+          1,
+          "Nonstop only - 1"
+        ],
+        [
+          2,
+          "1 stop or fewer - 2"
+        ],
+        [
+          3,
+          "2 stops or fewer - 3"
+        ]
+      ],
+      "description": "Parameter defines the number of stops during the flight. Available options: `0` - Any number of stops (default) `1` - Nonstop only `2` - 1 stop or fewer `3` - 2 stops or fewer",
       "group": "advanced_filters"
     },
-    "min_price": {
-      "type": "number",
-      "description": "Parameter defines the lower bound of price range.",
+    "exclude_airlines": {
+      "description": "Parameter defines the airline codes to be excluded. Split multiple airlines with comma. It can't be used together with `include_airlines`. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude\\_airlines and include\\_airlines parameters can't be used together.",
+      "group": "advanced_filters"
+    },
+    "include_airlines": {
+      "description": "Parameter defines the airline codes to be included. Split multiple airlines with comma. It can't be used together with `exclude_airlines`. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude\\_airlines and include\\_airlines parameters can't be used together.",
       "group": "advanced_filters"
     },
     "max_price": {
       "type": "number",
-      "description": "Parameter defines the upper bound of price range.",
+      "description": "Parameter defines the maximum ticket price. Default to unlimited.",
       "group": "advanced_filters"
     },
-    "property_types": {
-      "description": "Parameter defines to include only certain type of property in the results. Head to the Google Hotels Property Types page for a full list of supported **Hotels** property types. For Vacation Rentals, please refer to the Google Vacation Rentals Property Types page for a full list of supported **Vacation Rentals** property types. Example for single property type only: `17` Example for multiple property types (separated by comma `,`): `17,12,18`",
-      "group": "advanced_filters"
-    },
-    "amenities": {
-      "description": "Parameter defines to include only results that offer specified amenities. Head to the Google Hotels Amenities page for a full list of supported **Hotels** amenities. For Vacation Rentals, please refer to the Google Vacation Rentals Amenities page for a full list of supported **Vacation Rentals** amenities. Example for single amenity only: `35` Example for multiple amenities (separated by comma `,`): `35,9,19`",
-      "group": "advanced_filters"
-    },
-    "rating": {
-      "type": "select",
-      "options": [
-        [
-          "7",
-          "3.5+ - 7"
-        ],
-        [
-          "8",
-          "4.0+ - 8"
-        ],
-        [
-          "9",
-          "4.5+ - 9"
-        ]
-      ],
-      "description": "Parameter is used for filtering the results to certain rating. Available options: `7` - 3.5+ `8` - 4.0+ `9` - 4.5+",
-      "group": "advanced_filters"
-    },
-    "brands": {
-      "description": "Parameter defines the brands where you want your search to be concentrated. ID values are accessible inside `brands` array, located in our JSON output (e.g. `brands[0].id`). Example for single brand only: `33` Example for multiple brands (separated by comma `,`): `33,67,101`",
-      "group": "hotels_filters"
-    },
-    "hotel_class": {
-      "description": "Parameter defines to include only certain hotel class in the results. Available options: `2` - 2-star `3` - 3-star `4` - 4-star `5` - 5-star Example for single hotel class only: `2` Example for multiple hotel class (separated by comma `,`): `2,3,4`",
-      "group": "hotels_filters"
-    },
-    "free_cancellation": {
-      "type": "checkbox",
-      "description": "Parameter defines to show results that offer free cancellation. This parameter isn't available for Vacation Rentals.",
-      "group": "hotels_filters"
-    },
-    "special_offers": {
-      "type": "checkbox",
-      "description": "Parameter defines to show results that have special offers. This parameter isn't available for Vacation Rentals.",
-      "group": "hotels_filters"
-    },
-    "eco_certified": {
-      "type": "checkbox",
-      "description": "Parameter defines to show results that are eco certified. This parameter isn't available for Vacation Rentals.",
-      "group": "hotels_filters"
-    },
-    "vacation_rentals": {
-      "type": "checkbox",
-      "description": "Parameter defines to search for Vacation Rentals results. Default search is for Hotels.",
-      "group": "vacation_rentals_filters"
-    },
-    "bedrooms": {
+    "max_duration": {
       "type": "number",
-      "description": "Parameter defines the minimum number of bedrooms. Default to `0`. This parameter only available for Vacation Rentals.",
-      "group": "vacation_rentals_filters"
-    },
-    "bathrooms": {
-      "type": "number",
-      "description": "Parameter defines the minimum number of bathrooms. Default to `0`. This parameter only available for Vacation Rentals.",
-      "group": "vacation_rentals_filters"
-    },
-    "next_page_token": {
-      "description": "Parameter defines the next page token. It is used for retrieving the next page results.",
-      "group": "pagination"
-    },
-    "property_token": {
-      "description": "Parameter is used to get property details which consists of name, address, phone, prices, nearby places, and etc. You can find property\\_token from Google Hotels Properties API.",
-      "group": "property_details"
+      "description": "Parameter defines the maximum flight duration, in minutes. For example, specify `1500` for 25 hours. If your search returns no results, try increasing your max\\_duration by up to `200` minutes to account for route-specific scheduling variances.",
+      "group": "advanced_filters"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `google_hotels` to use the Google Hotels API engine.",
+      "description": "Set parameter to `google_flights_deals` to use the Google Flights Deals API engine.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Hotels results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Flights Deals results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

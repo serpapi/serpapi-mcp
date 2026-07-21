@@ -1,0 +1,136 @@
+{
+  "engine": "apple_maps",
+  "params": {
+    "query": {
+      "required": true,
+      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Apple Maps search.",
+      "group": "search_query"
+    },
+    "center": {
+      "description": "Parameter defines coordinates of the center point of the region you want to search within. You can pass the coordinates as `latitude,longitude`. (e.g. `30.324639,-97.7304611` for Austin, TX). Either a center or a location parameter is required. These parameters can't be used together.",
+      "group": "geographic_location"
+    },
+    "span": {
+      "description": "Parameter defines width and height of the search region as `latitudeDelta,longitudeDelta`. Smaller delta values correspond to a higher zoom level. (defaults to `0.5,0.5`).",
+      "group": "geographic_location"
+    },
+    "location": {
+      "type": "location",
+      "description": "Parameter defines the GPS coordinates used for the search origin. (e.g. `Austin, Texas, United States`). Either a center or a location parameter is required. These parameters can't be used together.",
+      "group": "geographic_location"
+    },
+    "sort": {
+      "type": "select",
+      "options": [
+        "default",
+        "distance",
+        "ratings"
+      ],
+      "description": "Parameter defines the sorting refinement for the search. Can be one of the following: `distance` - Sort by distance from the `center`/`location`. `ratings` - Sort by result ratings. `default` - Sort by best match for your query. This is the default.",
+      "group": "refinement"
+    },
+    "toggles": {
+      "description": "Parameter defines the toggle options for the search. A comma separated list of toggle `key` values can be passed to this parameter. See the `refinements.toggles` object of the response to see available toggles for a search.",
+      "group": "refinement"
+    },
+    "multi_select_options": {
+      "description": "Parameter defines the options you want to filter by for multi select refinements. A comma separated list of toggle `key` values can be passed to this parameter. See the `refinement.multi_select..options` object of the response to see available multi select refinements for the search.",
+      "group": "refinement"
+    },
+    "open_at": {
+      "type": "number",
+      "description": "Parameter defines the time at which result locations should be open at. The value must be a Unix timestamp that is in the future, and no more than 24 hours from the current time. (e.g. `1784657409`).",
+      "group": "refinement"
+    },
+    "locale": {
+      "type": "select",
+      "options": [
+        "ar-SA",
+        "bn-BD",
+        "ca-ES",
+        "cs-CZ",
+        "da-DK",
+        "de-DE",
+        "el-GR",
+        "en-AU",
+        "en-GB",
+        "en-US",
+        "es-ES",
+        "es-MX",
+        "fi-FI",
+        "fr-CA",
+        "fr-FR",
+        "gu-IN",
+        "he-IL",
+        "hi-IN",
+        "hr-HR",
+        "hu-HU",
+        "id-ID",
+        "it-IT",
+        "ja-JP",
+        "kn-IN",
+        "ko-KR",
+        "ml-IN",
+        "mr-IN",
+        "ms-MY",
+        "nb-NO",
+        "nl-NL",
+        "or-IN",
+        "pa-IN",
+        "pl-PL",
+        "pt-BR",
+        "pt-PT",
+        "ro-RO",
+        "ru-RU",
+        "sk-SK",
+        "sl-SI",
+        "sv-SE",
+        "ta-IN",
+        "te-IN",
+        "th-TH",
+        "tr-TR",
+        "uk-UA",
+        "ur-PK",
+        "vi-VN",
+        "zh-CN",
+        "zh-HK",
+        "zh-TW"
+      ],
+      "description": "Parameter defines the locale the results should be localized for. Locales for Apple Maps are represented as `-`. (defaults to `en-US`, the locale for U.S. English). Head to Apple Maps Locales for the list of available locales.",
+      "group": "localization"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `apple_maps` to use the Apple Maps API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Apple Maps results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

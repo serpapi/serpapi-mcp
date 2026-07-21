@@ -19,7 +19,6 @@
         "ebay.it",
         "ebay.com.my",
         "ebay.nl",
-        "ebay.ph",
         "ebay.pl",
         "ebay.com.sg",
         "ebay.es",
@@ -972,6 +971,29 @@
       "description": "Parameter defines the buying format you can apply to the results. Available options **(case-sensitive)**: `Auction` - Auction `BIN` - Buy It Now `BO` - Accepts Offers",
       "group": "advanced_filters"
     },
+    "_sasl": {
+      "description": "Parameter defines the seller username(s) to filter results by. You can specify multiple sellers separated by commas (e.g. `iRobot,samsung`). Use with `_saslop` to control whether to include or exclude items from the specified seller(s).",
+      "group": "advanced_filters"
+    },
+    "_saslop": {
+      "type": "select",
+      "options": [
+        [
+          "1",
+          "Only show items from sellers (default)"
+        ],
+        [
+          "2",
+          "Don't show items from sellers"
+        ]
+      ],
+      "description": "Parameter defines whether to include or exclude items from the seller(s) specified in `_sasl`. Available options: `1` - Only show items from sellers (default) `2` - Don't show items from sellers",
+      "group": "advanced_filters"
+    },
+    "popular_filters": {
+      "description": "Parameter allows filtering items based on their attributes. The structure is a list of `key=value` pairs separated by `&` (e.g. `Brand=Nespresso&Size=L`). To pass multiple values for the same filter, join them with `|` (e.g. `Brand=adidas|Majestic`). Values can be obtained from the `popular_filters[].parameter` field of the API response.",
+      "group": "advanced_filters"
+    },
     "_udlo": {
       "type": "number",
       "description": "Parameter defines the lowest price of items that should be included in the results (e.g. `10` will only return items that have higher price than `10`).",
@@ -1079,12 +1101,12 @@
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `ebay` to use the Ebay API engine.",
+      "description": "Set parameter to `ebay` to use the eBay API engine.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Ebay results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the eBay results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

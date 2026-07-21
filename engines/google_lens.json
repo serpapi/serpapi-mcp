@@ -358,6 +358,11 @@
       ],
       "description": "Parameter defines the level of filtering for adult content. It can be set to `active` or `off`, by default Google will blur explicit content.",
       "group": "advanced_parameters"
+    },
+    "auto_crop": {
+      "type": "checkbox",
+      "description": "Parameter defines whether Google auto-crops the image to focus on the detected area of interest. It can be set to `true` or `false` (default). Auto Crop does not work with type set to `about_this_image`",
+      "group": "advanced_parameters"
     }
   },
   "common_params": {

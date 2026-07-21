@@ -1,19 +1,10 @@
 {
-  "engine": "google_events",
+  "engine": "google_sports",
   "params": {
-    "q": {
+    "kgmid": {
       "required": true,
-      "description": "Parameter defines the query you want to search. To search for events in a specific location, just include the location inside your search query (e.g. `Events in Austin, TX`).",
+      "description": "Parameter defines the Google Knowledge Graph ID of the selected entity type. It can be found in Google Search API, Google Sports API, or on Wikidata as \"Freebase ID\".",
       "group": "search_query"
-    },
-    "location": {
-      "type": "location",
-      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. The location and uule parameters can't be used together. It is recommended to specify location at the city level in order to simulate a real user’s search. If location is omitted, the search may take on the location of the proxy.",
-      "group": "geographic_location"
-    },
-    "uule": {
-      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together. For consistent results with coordinates-based uule parameter, a matching gl parameter is required. Head to UULE Generator if you need to convert a location or GPS coordinates to uule parameter, and vice versa.",
-      "group": "geographic_location"
     },
     "gl": {
       "type": "select",
@@ -263,7 +254,7 @@
         "zm",
         "zw"
       ],
-      "description": "Parameter defines the country to use for the Google Events search. It's a two-letter country code. (e.g., `us` for the United States, `uk` for United Kingdom, or `fr` for France). Head to the Google countries page for a full list of supported Google countries.",
+      "description": "Parameter defines the country to use for the Google search. It's a two-letter country code (e.g., `us` for the United States, `uk` for United Kingdom, or `fr` for France). Head to the Google countries page for a full list of supported Google countries.",
       "group": "localization"
     },
     "hl": {
@@ -427,28 +418,75 @@
         "yo",
         "zu"
       ],
-      "description": "Parameter defines the language to use for the Google Events search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
+      "description": "Parameter defines the language to use for the Google search. It's a two-letter language code (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
       "group": "localization"
     },
-    "start": {
-      "type": "number",
-      "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.).",
-      "group": "pagination"
+    "mpd": {
+      "description": "Parameter defines the middle time of the league and team games. Games before and after the specified time will be returned. Format (ISO8601 UTC): `YYYY-MM-DDTHH:mm:ssZ` Example: `2026-05-29T12:30:00Z` Parameter cannot be used with moa and mob parameters.",
+      "group": "time_period"
     },
-    "htichips": {
-      "description": "Parameter allows the use of different filters. `date:today` - Today's Events `date:tomorrow` - Tomorrow's Events `date:week` - This Week's Events `date:today` - Today's Weekend's Events `date:next_week` - Next Week's Events `date:month` - This Month's Events `date:next_month` - Next Month's Events `event_type:Virtual-Event` - Online Events You can also mix different kinds of filters by separating them with a comma. `event_type:Virtual-Event,date:today` Today's Online Events",
-      "group": "advanced_filters"
+    "moa": {
+      "description": "Parameter defines the earliest time of the league and team games. Games after the specified time will be returned. Format (ISO8601 UTC): `YYYY-MM-DDTHH:mm:ssZ` Example: `2026-05-29T12:30:00Z` Parameter cannot be used with mpd parameter. Parameter can be used with mob parameter, but should not be later.",
+      "group": "time_period"
+    },
+    "mob": {
+      "description": "Parameter defines the latest time of the league and team games. Games before the specified time will be returned. Format (ISO8601 UTC): `YYYY-MM-DDTHH:mm:ssZ` Example: `2026-05-29T12:30:00Z` Parameter cannot be used with mpd parameter. Parameter can be used with moa parameter, but should not be earlier.",
+      "group": "time_period"
+    },
+    "season_kgmid": {
+      "description": "Parameter defines the Google Knowledge Graph ID of the specific standings season and should be used alongside the main league or team kgmid. Available seasons can be found in Google Sports API standings results or on Wikidata as \"Freebase ID\". Parameter can be used as a standalone kgmid parameter to fetch tabs other than standings.",
+      "group": "advanced_parameters"
+    },
+    "sp": {
+      "type": "select",
+      "options": [
+        "ft",
+        "bs",
+        "bb",
+        "cr",
+        "af",
+        "ih",
+        "rg"
+      ],
+      "required": true,
+      "description": "Parameter defines the sport of the selected entity type. Options: `ft` - Football `bs` - Basketball `bb` - Baseball `cr` - Cricket `af` - American football `ih` - Ice hockey `rg` - Rugby",
+      "group": "advanced_parameters"
+    },
+    "type": {
+      "type": "select",
+      "options": [
+        "game",
+        "league",
+        "team"
+      ],
+      "required": true,
+      "description": "Parameter defines the entity type. Options: `game` - Game `league` - League `team` - Team",
+      "group": "advanced_parameters"
+    },
+    "tab": {
+      "type": "select",
+      "options": [
+        "gm",
+        "sn",
+        "pl",
+        "br",
+        "st",
+        "rn",
+        "ov"
+      ],
+      "description": "Parameter defines the tab on the page of the selected entity type. Options: `gm` - League/Team - Games `sn` - League/Team - Standings `pl` - League/Team - Players `br` - League/Team - Brackets `st` - League - Stats `rn` - League - Rankings `ov` - Game - Overview (American football) Parameter is required for `league` and `team` entity type. Parameter is optional for `game` entity type and should be used only with American football sp value.",
+      "group": "advanced_parameters"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `google_events` to use the Google Events API engine.",
+      "description": "Set parameter to `google_sports` to use the Google Sports API engine.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Events results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google Sports results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

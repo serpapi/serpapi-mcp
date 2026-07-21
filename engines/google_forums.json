@@ -12,7 +12,7 @@
       "group": "geographic_location"
     },
     "uule": {
-      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together.",
+      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together. For consistent results with coordinates-based uule parameter, a matching gl parameter is required. Head to UULE Generator if you need to convert a location or GPS coordinates to uule parameter, and vice versa.",
       "group": "geographic_location"
     },
     "gl": {
@@ -430,6 +430,33 @@
       "description": "Parameter defines the language to use for the Google Forums search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
       "group": "localization"
     },
+    "period_unit": {
+      "type": "select",
+      "options": [
+        "s",
+        "n",
+        "h",
+        "d",
+        "w",
+        "m",
+        "y"
+      ],
+      "description": "Parameter defines the time period unit to search for the recent images, e.g. from past minute, hour, day etc. Options: `s` - Second `n` - Minute `h` - Hour `d` - Day `w` - Week `m` - Month `y` - Year This parameter can't be used with `start_date`/`end_date` parameters.",
+      "group": "time_period"
+    },
+    "period_value": {
+      "type": "number",
+      "description": "Parameter defines an optional time period value that can be used with `period_unit` to describe time periods like `15 seconds`, `42 hours`, `178 days` etc. Default value: `1` Value range: `1..2147483647`",
+      "group": "time_period"
+    },
+    "start_date": {
+      "description": "Parameter defines the start date of time period you want to limit the image search to. Format: `YYYYMMDD` Example: `20251201` This parameter can't be used with `period_unit`/`period_value` parameters. `start_date` with blank `end_date` produces date range `FROM start_date TO today`.",
+      "group": "time_period"
+    },
+    "end_date": {
+      "description": "Parameter defines the end date of time period you want to limit the image search to. Format: `YYYYMMDD` Example: `20251231` This parameter can't be used with `period_unit`/`period_value` parameters. `end_date` with blank `start_date` produces date range `BEFORE end_date`.",
+      "group": "time_period"
+    },
     "start": {
       "type": "number",
       "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.).",
@@ -443,6 +470,10 @@
     "filter": {
       "type": "checkbox",
       "description": "Parameter defines if the filters for 'Similar Results' and 'Omitted Results' are on or off. It can be set to `1` (default) to enable these filters, or `0` to disable these filters.",
+      "group": "advanced_filters"
+    },
+    "tbs": {
+      "description": "(to be searched) parameter defines advanced search parameters that aren't possible in the regular query field. (e.g., advanced search for dates, time period, etc.).",
       "group": "advanced_filters"
     }
   },
