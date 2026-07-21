@@ -23,7 +23,7 @@ def _get_engine_files() -> list[Path]:
 @resource(
     "serpapi://engines",
     name="serpapi-engines-index",
-    description="Index of available SerpApi engines and their resource URIs.",
+    description="Index of available SerpApi engine identifiers.",
     mime_type="application/json",
     annotations=Annotations(
         audience=["assistant"],
@@ -37,7 +37,6 @@ def engines_index() -> ResourceResult:
         {
             "count": len(engines),
             "engines": engines,
-            "resources": [f"serpapi://engines/{engine}" for engine in engines],
             "schema": {
                 "note": "Each engine resource uses a flat schema: params are engine-specific; common_params are shared SerpApi parameters.",
                 "params_key": "params",
@@ -76,12 +75,13 @@ def get_engine_schema(engine_name: str) -> ResourceResult:
         raise NotFoundError(
             f"Unknown engine: {engine_name!r}. See serpapi://engines for the full list."
         )
+    engine_schema = json.loads(engine_path.read_text())
+    engine_schema.get("common_params", {}).pop("api_key", None)
     return ResourceResult(
         contents=[
-            # The json dump and load chain looks redundant - but it will help remove newlines from the file at `engine_path`,
-            # making the response context efficient for LLMs
+            # Re-encode the file as single-line JSON to keep LLM context compact.
             ResourceContent(
-                content=json.dumps(json.loads(engine_path.read_text())),
+                content=json.dumps(engine_schema),
                 mime_type="application/json",
             ),
         ]
