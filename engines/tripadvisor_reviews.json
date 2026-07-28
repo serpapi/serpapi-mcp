@@ -1,0 +1,178 @@
+{
+  "engine": "tripadvisor_reviews",
+  "params": {
+    "place_id": {
+      "required": true,
+      "description": "Parameter defines the Tripadvisor place ID. To extract the ID of a place, you can use our Tripadvisor Search API. NOTE: Tripadvisor has discontinued support for Vacation Rentals. As a result, requesting details for a Vacation Rental `place_id` may return incomplete incomplete data or no data at all.",
+      "group": "search_query"
+    },
+    "tripadvisor_domain": {
+      "type": "select",
+      "options": [
+        "www.tripadvisor.com",
+        "ar.tripadvisor.com",
+        "www.tripadvisor.com.ar",
+        "www.tripadvisor.com.au",
+        "www.tripadvisor.at",
+        "www.tripadvisor.be",
+        "fr.tripadvisor.be",
+        "www.tripadvisor.com.br",
+        "www.tripadvisor.ca",
+        "fr.tripadvisor.ca",
+        "www.tripadvisor.cl",
+        "cn.tripadvisor.com",
+        "www.tripadvisor.co",
+        "www.tripadvisor.com.pe",
+        "www.tripadvisor.dk",
+        "www.tripadvisor.com.eg",
+        "www.tripadvisor.fr",
+        "www.tripadvisor.de",
+        "www.tripadvisor.com.gr",
+        "www.tripadvisor.com.hk",
+        "en.tripadvisor.com.hk",
+        "www.tripadvisor.in",
+        "www.tripadvisor.co.id",
+        "www.tripadvisor.ie",
+        "www.tripadvisor.co.il",
+        "www.tripadvisor.it",
+        "www.tripadvisor.jp",
+        "www.tripadvisor.co.kr",
+        "www.tripadvisor.com.my",
+        "www.tripadvisor.com.mx",
+        "www.tripadvisor.nl",
+        "www.tripadvisor.co.nz",
+        "no.tripadvisor.com",
+        "www.tripadvisor.com.ph",
+        "www.tripadvisor.pt",
+        "www.tripadvisor.ru",
+        "www.tripadvisor.com.sg",
+        "www.tripadvisor.co.za",
+        "www.tripadvisor.es",
+        "www.tripadvisor.se",
+        "fr.tripadvisor.ch",
+        "www.tripadvisor.ch",
+        "it.tripadvisor.ch",
+        "www.tripadvisor.com.tw",
+        "th.tripadvisor.com",
+        "www.tripadvisor.com.tr",
+        "www.tripadvisor.co.uk",
+        "www.tripadvisor.com.ve",
+        "www.tripadvisor.com.vn"
+      ],
+      "description": "Parameter defines the Tripadvisor domain to use. It defaults to `www.tripadvisor.com`. Head to the Tripadvisor domains page for a full list of supported Tripadvisor domains.",
+      "group": "localization"
+    },
+    "language": {
+      "type": "select",
+      "options": [
+        "ar",
+        "cs",
+        "da",
+        "de",
+        "el",
+        "en",
+        "es",
+        "fi",
+        "fr",
+        "he",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ko",
+        "nb",
+        "nl",
+        "pl",
+        "pt",
+        "ru",
+        "sk",
+        "sr",
+        "sv",
+        "th",
+        "tr",
+        "vi",
+        "zh"
+      ],
+      "description": "Parameter defines the language to use for the Tripadvisor reviews. Head to Tripadvisor reviews languages for a full list of supported Tripadvisor Reviews languages. If translate is enabled, reviews will be translated to the selected language.",
+      "group": "localization"
+    },
+    "sort_by": {
+      "type": "select",
+      "options": [
+        "most_recent",
+        "detailed_review"
+      ],
+      "description": "Parameter defines the sorting order of the results. Available options: `most_recent` - Most Recent (Default) `detailed_review` - Detailed Review",
+      "group": "advanced_parameters"
+    },
+    "translate": {
+      "type": "checkbox",
+      "description": "Parameter defines whether to translate reviews to the choosen language. It can be set to `true` to translate reviews, or `false` to return reviews in their original language. By default, reviews are returned in their original language.",
+      "group": "advanced_parameters"
+    },
+    "rating": {
+      "description": "Parameter defines to include only results with specified ratings. Example for single rating only: `5` Example for multiple ratings (separated by comma `,`): `5,3,2`",
+      "group": "advanced_filters"
+    },
+    "month": {
+      "description": "Parameter defines to include only results from a specific months. Each month is represented by a number from `1` (January) to `12` (December). Example for single month only: `1` (for January) Example for multiple months (separated by comma `,`): `1,6,12`",
+      "group": "advanced_filters"
+    },
+    "type_of_visit": {
+      "options": [
+        "Business",
+        "Couples",
+        "Family",
+        "Friends",
+        "Solo"
+      ],
+      "description": "Parameter defines to include only results from a specific types of visit. Available options: `Business` - Business `Couples` - Couples `Family` - Family `Friends` - Friends `Solo` - Solo To include multiple types of visit, separate values with a comma `,` (e.g. `Business,Couples` to include reviews from 'Business' and 'Couples' types of visit).",
+      "group": "advanced_filters"
+    },
+    "original_language": {
+      "description": "Parameter defines the original languages of the reviews to include. It can be set to a single language (e.g. `en` for English) or multiple languages separated by comma (e.g. `en,fr,es` to include reviews in English, French, and Spanish). Head to Tripadvisor reviews languages for a full list of supported Tripadvisor Reviews languages.",
+      "group": "advanced_filters"
+    },
+    "offset": {
+      "description": "Parameter defines the result offset. It skips the given number of reviews. It's used for pagination. (e.g., `0` (default) is the first page of results, `10` is the 2nd page of results, `20` is the 3rd page of results, etc.).",
+      "group": "pagination"
+    },
+    "limit": {
+      "description": "Parameter defines the maximum number of reviews to return. The maximum value is 20. (e.g., `10` (default) returns 10 results, `20` returns 20 results, etc.).",
+      "group": "pagination"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `tripadvisor_reviews` to use the Tripadvisor Reviews API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Tripadvisor Reviews results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

@@ -3,7 +3,7 @@
   "params": {
     "text": {
       "required": true,
-      "description": "Parameter defines the search query. You can use anything that you would use in a regular Yandex search.",
+      "description": "Parameter defines the search query. You can use anything that you would use in a regular Yandex search. It can be 400 characters at maximum. Yandex usually accepts first 40 words of the query.",
       "group": "search_query"
     },
     "yandex_domain": {
@@ -4070,6 +4070,26 @@
     "groups_on_page": {
       "type": "number",
       "description": "Parameter defines the maximum number of groups displayed on a single results page. It defaults to `20`.",
+      "group": "advanced_yandex_parameters"
+    },
+    "sort_mode": {
+      "type": "select",
+      "options": [
+        "relevance",
+        "time"
+      ],
+      "description": "Parameter defines the sorting mode of search results. It can be set to: `relevance` - by relevance (default) `date` - by date.",
+      "group": "advanced_yandex_parameters"
+    },
+    "period": {
+      "type": "select",
+      "options": [
+        "all",
+        "day",
+        "last_two_weeks",
+        "month"
+      ],
+      "description": "Parameter defines the time period for search results. It can be set to: `all` - all time (Default) `day` - last day `last_two_weeks` - last two weeks `month` - last month",
       "group": "advanced_yandex_parameters"
     },
     "p": {

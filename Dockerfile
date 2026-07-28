@@ -6,12 +6,11 @@ WORKDIR /app
 
 COPY pyproject.toml /app/
 COPY uv.lock /app/uv.lock
-COPY README.md /app/
 COPY src /app/src
 COPY engines /app/engines
 COPY build-engines.py /app/build-engines.py
 
-RUN uv sync --locked
+RUN uv sync --locked --no-dev
 
 ENV PATH="/app/.venv/bin:$PATH"
 

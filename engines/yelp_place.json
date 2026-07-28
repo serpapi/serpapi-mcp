@@ -2,6 +2,7 @@
   "engine": "yelp_place",
   "params": {
     "place_id": {
+      "required": true,
       "description": "Parameter defines the Yelp ID of a place. Each place has two unique IDs (e.g. `ED7A7vDdg8yLNKJTSVHHmg` and `arabica-brooklyn`) and you can use either of them as a value of the place\\_id. To extract the IDs of a place you can use our Yelp Search API.",
       "group": "search_query"
     },

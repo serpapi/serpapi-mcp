@@ -77,6 +77,11 @@
       "description": "Parameter defines the region to use for the DuckDuckGo search. Region code examples: `us-en` for the United States, `uk-en` for United Kingdom, or `fr-fr` for France. Head to the DuckDuckGo regions for a full list of supported regions.",
       "group": "localization"
     },
+    "search_assist": {
+      "type": "checkbox",
+      "description": "Parameter determines if DuckDuckGo's AI Search Assist will be returned in the response. It can be set to `true` or `false` (default). search\\_assist and m can't be used together.",
+      "group": "advanced_parameters"
+    },
     "safe": {
       "type": "select",
       "options": [
@@ -101,7 +106,7 @@
     },
     "m": {
       "type": "number",
-      "description": "Parameter defines the maximum number of results to return. Default value:`50` Min. value:`1` Max. value:`50` When offset is not being used (initial search request, start parameter is set to 0 or left blank), up to 35 `organic_results` can be returned. DuckDuckGo may return duplicated results or a variable number of results. This is more likely to happen with higher start and m parameters.",
+      "description": "Parameter defines the maximum number of results to return. Default value:`50` Min. value:`1` Max. value:`50` When offset is not being used (initial search request, start parameter is set to 0 or left blank), up to 35 `organic_results` can be returned. DuckDuckGo may return duplicated results or a variable number of results. This is more likely to happen with higher start and m parameters. m and search\\_assist can't be used together.",
       "group": "pagination"
     }
   },

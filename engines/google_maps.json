@@ -592,6 +592,155 @@
       "description": "Parameter defines the type of search you want to make. It can be set to: `search` - returns a list of results for the set q parameter, `place` - returns results for a specific place when data parameter is set Parameter is not required when using place\\_id or data\\_cid.",
       "group": "search_type"
     },
+    "min_price": {
+      "type": "number",
+      "description": "Parameter defines the lower bound of the place price range. The places with the price range overlapping with the specified one will be returned. Parameter is applicable to searches expected to return places with numerical `price` data (e.g., cafes, restaurants, bars, etc.)",
+      "group": "advanced_filters"
+    },
+    "max_price": {
+      "type": "number",
+      "description": "Parameter defines the upper bound of the place price range. The places with the price range overlapping with the specified one will be returned. Parameter is applicable to searches expected to return places with numerical `price` data (e.g., cafes, restaurants, bars, etc.)",
+      "group": "advanced_filters"
+    },
+    "min_rating": {
+      "type": "select",
+      "options": [
+        "2.0",
+        "2.5",
+        "3.0",
+        "3.5",
+        "4.0",
+        "4.5"
+      ],
+      "description": "Parameter defines the preferred minimum rating of the place. Places without a rating or with a rating below the specified value can still be returned, but with reduced relevance. Options: `2.0` - 2.0 `2.5` - 2.5 `3.0` - 3.0 `3.5` - 3.5 `4.0` - 4.0 `4.5` - 4.5",
+      "group": "advanced_filters"
+    },
+    "open_state": {
+      "type": "select",
+      "options": [
+        "now",
+        "24h"
+      ],
+      "description": "Parameter defines the open state of the place. Options: `now` - Open now `24h` - Open 24 hours Parameter can't be used with open\\_on\\_day or open\\_at\\_hour parameters.",
+      "group": "advanced_filters"
+    },
+    "open_on_day": {
+      "type": "select",
+      "options": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri",
+        "sat",
+        "sun"
+      ],
+      "description": "Parameter defines the day on which the place is open. Options: `mon` - Monday `tue` - Tuesday `wed` - Wednesday `thu` - Thursday `fri` - Friday `sat` - Saturday `sun` - Sunday Parameter can't be used with open\\_state parameter.",
+      "group": "advanced_filters"
+    },
+    "open_at_hour": {
+      "type": "select",
+      "options": [
+        [
+          "0",
+          "Midnight"
+        ],
+        [
+          "1",
+          "1:00 AM"
+        ],
+        [
+          "2",
+          "2:00 AM"
+        ],
+        [
+          "3",
+          "3:00 AM"
+        ],
+        [
+          "4",
+          "4:00 AM"
+        ],
+        [
+          "5",
+          "5:00 AM"
+        ],
+        [
+          "6",
+          "6:00 AM"
+        ],
+        [
+          "7",
+          "7:00 AM"
+        ],
+        [
+          "8",
+          "8:00 AM"
+        ],
+        [
+          "9",
+          "9:00 AM"
+        ],
+        [
+          "10",
+          "10:00 AM"
+        ],
+        [
+          "11",
+          "11:00 AM"
+        ],
+        [
+          "12",
+          "Noon"
+        ],
+        [
+          "13",
+          "1:00 PM"
+        ],
+        [
+          "14",
+          "2:00 PM"
+        ],
+        [
+          "15",
+          "3:00 PM"
+        ],
+        [
+          "16",
+          "4:00 PM"
+        ],
+        [
+          "17",
+          "5:00 PM"
+        ],
+        [
+          "18",
+          "6:00 PM"
+        ],
+        [
+          "19",
+          "7:00 PM"
+        ],
+        [
+          "20",
+          "8:00 PM"
+        ],
+        [
+          "21",
+          "9:00 PM"
+        ],
+        [
+          "22",
+          "10:00 PM"
+        ],
+        [
+          "23",
+          "11:00 PM"
+        ]
+      ],
+      "description": "Parameter defines the hour at which the place is open. Options: `0` - Midnight `1` - 1:00 AM `2` - 2:00 AM `3` - 3:00 AM `4` - 4:00 AM `5` - 5:00 AM `6` - 6:00 AM `7` - 7:00 AM `8` - 8:00 AM `9` - 9:00 AM `10` - 10:00 AM `11` - 11:00 AM `12` - Noon `13` - 1:00 PM `14` - 2:00 PM `15` - 3:00 PM `16` - 4:00 PM `17` - 5:00 PM `18` - 6:00 PM `19` - 7:00 PM `20` - 8:00 PM `21` - 9:00 PM `22` - 10:00 PM `23` - 11:00 PM Parameter should be used with open\\_on\\_day parameter. Parameter can't be used with open\\_state parameter.",
+      "group": "advanced_filters"
+    },
     "start": {
       "type": "number",
       "description": "Parameter defines the result offset. It skips the given number of results. It's used for pagination. (e.g., `0` (default) is the first page of results, `20` is the 2nd page of results, `40` is the 3rd page of results, etc.). We recommend starting with `0` and increasing by `20` for the next page. There is no hard limit on the maximum offset number, but we recommend a maximum of `100` (page six) which is the same behavior as with the Google Maps web app. More than that, the result might be duplicated or irrelevant.",

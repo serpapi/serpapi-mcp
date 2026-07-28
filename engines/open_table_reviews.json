@@ -1,9 +1,9 @@
 {
   "engine": "open_table_reviews",
   "params": {
-    "place_id": {
+    "rid": {
       "required": true,
-      "description": "Parameter defines the OpenTable ID of a restaurant. This identifier can be found in the URL of the restaurant's page, immediately following `/r/`. For example, in the URL `https://www.opentable.com/r/central-park-boathouse-new-york-2`, the ID is `central-park-boathouse-new-york-2`.",
+      "description": "Parameter defines the OpenTable Restaurant ID. This identifier can be found in the URL of the restaurant's page, it's the path of the URL (the part after the first singular `/`). For example, in the URL `https://www.opentable.com/r/central-park-boathouse-new-york-2`, the Restaurant ID is `r/central-park-boathouse-new-york-2`.",
       "group": "search_query"
     },
     "open_table_domain": {

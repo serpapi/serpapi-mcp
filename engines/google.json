@@ -8,11 +8,26 @@
     },
     "location": {
       "type": "location",
-      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. The location and uule parameters can't be used together. It is recommended to specify location at the city level in order to simulate a real user’s search. If location is omitted, the search may take on the location of the proxy. When only the location parameter is set, Google may still take into account the proxy’s country, which can influence some results. For more consistent country-specific filtering, use the gl parameter alongside location.",
+      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. It is recommended to specify location at the city level in order to simulate a real user’s search. If location is omitted, the search may take on the location of the proxy. When only the location parameter is set, Google may still take into account the proxy’s country, which can influence some results. For more consistent country-specific filtering, use the gl parameter alongside location. Parameter can't be used together with uule, lat, and lon parameters.",
       "group": "geographic_location"
     },
     "uule": {
-      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together.",
+      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together. For consistent results with coordinates-based uule parameter, a matching gl parameter is required. Head to UULE Generator if you need to convert a location or GPS coordinates to uule parameter, and vice versa.",
+      "group": "geographic_location"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Parameter defines a GPS latitude for the search origin. Parameter is required when using lon parameter. For consistent results, a matching gl parameter is required. Parameter can't be used together with location and uule parameters.",
+      "group": "geographic_location"
+    },
+    "lon": {
+      "type": "number",
+      "description": "Parameter defines a GPS longitude for the search origin. Parameter is required when using lat parameter. For consistent results, a matching gl parameter is required. Parameter can't be used together with location and uule parameters.",
+      "group": "geographic_location"
+    },
+    "radius": {
+      "type": "number",
+      "description": "Parameter defines the distance (in meters) within which to bias the search results. Results inside of this region will be ranked higher than results outside of it. However, prominent results from outside of the search radius may still be included. Value range per device: - Desktop: `1..199` - Tablet: `1..1000` - Mobile: `1..1000` Parameter can be used alongside location or lat/lon parameters. When parameter is paired with location, its center point coordinates are used for the search.",
       "group": "geographic_location"
     },
     "ludocid": {
@@ -37,6 +52,15 @@
     },
     "uds": {
       "description": "Parameter enables to filter search. It's a string provided by Google as a filter. `uds` values are provided under the section: `filters` with `uds`, `q` and `serpapi_link` values provided for each filter.",
+      "group": "advanced_google_parameters"
+    },
+    "color_scheme": {
+      "type": "select",
+      "options": [
+        "light",
+        "dark"
+      ],
+      "description": "Parameter forces the selected color scheme to be used on the results page. If the parameter is not set, a random color scheme will be returned. Options: `light` - Light `dark` - Dark",
       "group": "advanced_google_parameters"
     },
     "google_domain": {
@@ -731,7 +755,7 @@
         "vid",
         "pts"
       ],
-      "description": "(to be matched) parameter defines the type of search you want to do. It can be set to: `(no tbm parameter)`: regular Google Search, `isch`: Google Images API, `lcl` - Google Local API `vid`: Google Videos API, `nws`: Google News API, `shop`: Google Shopping API, `pts`: Google Patents API, or any other Google service.",
+      "description": "(to be matched) parameter defines the type of search you want to do. It can be set to: `(no tbm parameter)`: regular Google Search, `isch`: Google Images API, `lcl`: Google Local API, `vid`: Google Videos API, `nws`: Google News API, `shop`: Google Shopping API, `pts`: Google Patents API, or any other Google service.",
       "group": "search_type"
     },
     "start": {

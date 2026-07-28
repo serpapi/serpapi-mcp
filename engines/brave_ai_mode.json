@@ -1,0 +1,176 @@
+{
+  "engine": "brave_ai_mode",
+  "params": {
+    "q": {
+      "required": true,
+      "description": "Parameter defines the query you want to search.",
+      "group": "search_query"
+    },
+    "location": {
+      "type": "location",
+      "description": "Parameter defines from where you want the search to originate. If several locations match the location requested, we'll pick the most popular one. Head to the /locations.json API if you need more precise control. It is recommended to specify location at the city level in order to simulate a real user’s search. If location is omitted, the search may take on the location of the proxy. Parameter can't be used with lat or lon parameters.",
+      "group": "geographic_location"
+    },
+    "lat": {
+      "type": "number",
+      "description": "Parameter defines a GPS latitude for the search origin. Parameter is required when using lon parameter. Parameter can't be used with location parameter.",
+      "group": "geographic_location"
+    },
+    "lon": {
+      "type": "number",
+      "description": "Parameter defines a GPS longitude for the search origin. Parameter is required when using lat parameter. Parameter can't be used with location parameter.",
+      "group": "geographic_location"
+    },
+    "country": {
+      "type": "select",
+      "options": [
+        "ar",
+        "au",
+        "at",
+        "be",
+        "br",
+        "ca",
+        "cl",
+        "cn",
+        "dk",
+        "fi",
+        "fr",
+        "de",
+        "gr",
+        "hk",
+        "in",
+        "id",
+        "it",
+        "jp",
+        "kr",
+        "my",
+        "mx",
+        "nl",
+        "nz",
+        "no",
+        "pl",
+        "pt",
+        "ph",
+        "ru",
+        "sa",
+        "sg",
+        "za",
+        "es",
+        "se",
+        "ch",
+        "tw",
+        "tr",
+        "gb",
+        "us"
+      ],
+      "description": "Parameter defines the country to use for the Brave AI search. It's a two-letter country code. (e.g., `us` for the United States, `uk` for United Kingdom, or `fr` for France). Head to the Brave countries page for a full list of supported Brave AI Mode countries.",
+      "group": "localization"
+    },
+    "language": {
+      "type": "select",
+      "options": [
+        "az",
+        "bg",
+        "br",
+        "ca",
+        "cs",
+        "cy",
+        "da",
+        "de",
+        "el",
+        "en",
+        "es",
+        "et",
+        "eu",
+        "fi",
+        "fr",
+        "gl",
+        "hr",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ka",
+        "ko",
+        "lt",
+        "lv",
+        "ms",
+        "nb",
+        "nl",
+        "pl",
+        "pt",
+        "ro",
+        "ru",
+        "sk",
+        "sl",
+        "sq",
+        "sr",
+        "sv",
+        "sw",
+        "th",
+        "tr",
+        "uk",
+        "vi",
+        "zh"
+      ],
+      "description": "Parameter defines the language to use for the Brave AI search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Brave languages page for a full list of supported Brave AI Mode languages.",
+      "group": "localization"
+    },
+    "safeSearch": {
+      "type": "select",
+      "options": [
+        "off",
+        "moderate",
+        "strict"
+      ],
+      "description": "Parameter defines the level of filtering for adult content. It can be set to: `off` - Off `moderate` - Moderate `strict` - Strict",
+      "group": "advanced_filters"
+    },
+    "units_of_measurement": {
+      "type": "select",
+      "options": [
+        "metric",
+        "us"
+      ],
+      "description": "Parameter defines the units of measurement to use. It can be set to: `metric` - Metric `us` - Imperial (US)",
+      "group": "advanced_filters"
+    },
+    "subsequent_request_token": {
+      "description": "Parameter defines the token used to continue a Brave AI Mode conversation. Pass this token to send a follow-up question that includes the prior exchange as context (multi-turn). The token is returned by SerpApi from your previous request using our Brave AI Mode API. When using this token, include a new q for your follow-up prompt. For consistent behavior, reuse the same localization settings (gl, hl, and location) you used to obtain the token.",
+      "group": "subsequent_request"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `brave_ai_mode` to use the Brave AI Mode API engine.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Brave AI Mode results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the final output you want. It can be set to json (default) to get a structured `JSON` of the results, or `html` to get the raw html retrieved.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to restrict in the outputs for smaller, faster responses. See JSON Restrictor for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

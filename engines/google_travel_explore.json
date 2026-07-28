@@ -2,7 +2,8 @@
   "engine": "google_travel_explore",
   "params": {
     "departure_id": {
-      "description": "Parameter defines the departure airport code or city location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX. You can specify multiple departure airports by separating them with a comma. For example, `CDG,ORY,/m/04jpl`.",
+      "required": true,
+      "description": "Parameter defines the departure airport code or city location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/` or `/g/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX. You can specify multiple departure airports by separating them with a comma. For example, `CDG,ORY,/m/04jpl`.",
       "group": "search_query"
     },
     "gl": {
@@ -499,11 +500,11 @@
       "group": "localization"
     },
     "arrival_area_id": {
-      "description": "Parameter defines the arrival region or country as a location kgmid. A location kgmid is a string that starts with `/m/`. You can search for a region or country on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/02j9z` is the location kgmid for Europe, and `/m/0f8l9c` is the location kgmid for France. This parameter is used when exploring flights to broader areas (regions or countries) rather than specific cities or airports.",
+      "description": "Parameter defines the arrival region or country as a location kgmid. A location kgmid is a string that starts with `/m/` or `/g/`. You can search for a region or country on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/02j9z` is the location kgmid for Europe, and `/m/0f8l9c` is the location kgmid for France. This parameter is used when exploring flights to broader areas (regions or countries) rather than specific cities or airports.",
       "group": "advanced_google_travel_explore_parameters"
     },
     "arrival_id": {
-      "description": "Parameter defines the arrival airport code or city location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX.",
+      "description": "Parameter defines the arrival airport code or city location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/` or `/g/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX.",
       "group": "advanced_google_travel_explore_parameters"
     },
     "type": {
@@ -522,11 +523,11 @@
       "group": "advanced_google_travel_explore_parameters"
     },
     "outbound_date": {
-      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-01-15`",
+      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-07-22`",
       "group": "advanced_google_travel_explore_parameters"
     },
     "return_date": {
-      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-01-21` Parameter is required if type parameter is set to: `1` (Round trip)",
+      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-07-28` Parameter is required if type parameter is set to: `1` (Round trip)",
       "group": "advanced_google_travel_explore_parameters"
     },
     "month": {
@@ -650,7 +651,11 @@
       "group": "advanced_filters"
     },
     "include_airlines": {
-      "description": "Parameter defines the airline codes to be included. Split multiple airlines with comma. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld",
+      "description": "Parameter defines the airline codes to be included. Split multiple airlines with a comma. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also included here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude\\_airlines and include\\_airlines parameters can't be used together.",
+      "group": "advanced_filters"
+    },
+    "exclude_airlines": {
+      "description": "Parameter defines the airline codes to be excluded. Split multiple airlines with a comma. Each airline code should be a 2-character IATA code consisting of either two uppercase letters or one uppercase letter and one digit. You can search for airline codes on IATA. For example, `UA` is United Airlines. Additionally, alliances can be also excluded here: `STAR_ALLIANCE` - Star Alliance `SKYTEAM` - SkyTeam `ONEWORLD` - Oneworld exclude\\_airlines and include\\_airlines parameters can't be used together.",
       "group": "advanced_filters"
     },
     "bags": {
@@ -665,7 +670,7 @@
     },
     "max_duration": {
       "type": "number",
-      "description": "Parameter defines the maximum flight duration, in minutes. For example, specify `1500` for 25 hours.",
+      "description": "Parameter defines the maximum flight duration, in minutes. For example, specify `1500` for 25 hours. If your search returns no results, try increasing your max\\_duration by up to `200` minutes to account for route-specific scheduling variances.",
       "group": "advanced_filters"
     }
   },

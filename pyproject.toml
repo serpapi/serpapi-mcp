@@ -1,29 +1,10 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
 [project]
 name = "serpapi-mcp-server"
-version = "0.4.0"
+version = "0.5.0"
 description = "A Model Context Protocol (MCP) server implementation that integrates with SerpApi for comprehensive search engine results and data extraction"
-readme = "README.md"
-license = "MIT"
-authors = [
-    { name = "SerpApi", email = "hello@serpapi.com" }
-]
-keywords = ["mcp", "serpapi", "search", "api", "model-context-protocol"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-]
 requires-python = ">=3.12"
 dependencies = [
-    "fastmcp[apps]>=3.4.2",
+    "fastmcp[apps]>=3.4.4",
     # Prefab (the MCP Apps UI library) ships frequent breaking changes and
     # fastmcp does not pin an upper bound, so pin it explicitly here.
     "prefab-ui>=0.20.2,<0.21",
@@ -37,7 +18,7 @@ dependencies = [
     "markdownify>=0.14.1",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21.0",
@@ -48,17 +29,8 @@ dev = [
     "mypy>=1.5.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/serpapi/mcp-server"
-Repository = "https://github.com/serpapi/mcp-server"
-Issues = "https://github.com/serpapi/mcp-server/issues"
-Documentation = "https://github.com/serpapi/mcp-server#readme"
-
-[project.scripts]
-serpapi-mcp = "src.server:main"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src"]
+[tool.uv]
+package = false
 
 [tool.black]
 line-length = 100

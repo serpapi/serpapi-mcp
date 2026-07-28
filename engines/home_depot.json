@@ -94,12 +94,12 @@
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `home_depot` to use the Home Depot API engine.",
+      "description": "Set parameter to `home_depot` to use the The Home Depot API engine.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Home Depot results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the The Home Depot results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

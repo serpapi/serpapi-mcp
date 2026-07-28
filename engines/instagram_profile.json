@@ -1,31 +1,25 @@
 {
-  "engine": "naver_ai_overview",
+  "engine": "instagram_profile",
   "params": {
-    "query": {
+    "profile_id": {
       "required": true,
-      "description": "Parameter defines the query you want to search.",
+      "description": "Parameter defines the Instagram profile ID. You can find it in the URL of the profile page. For example, in `https://www.instagram.com/serpapicom`, the profile ID is `serpapicom`.",
       "group": "search_query"
+    },
+    "next_page_token": {
+      "description": "Parameter defines the next page token. It is used for retrieving the next page results. The next page token can be found in the SerpApi JSON response: `serpapi_pagination -> next_page_token`",
+      "group": "pagination"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `naver_ai_overview` to use the Naver AI Overview API engine.",
-      "group": "serpapi_parameters"
-    },
-    "device": {
-      "type": "device",
-      "options": [
-        "desktop",
-        "tablet",
-        "mobile"
-      ],
-      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "description": "Set parameter to `instagram_profile` to use the Instagram Profile API engine.",
       "group": "serpapi_parameters"
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Naver AI Overview results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Instagram Profile results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

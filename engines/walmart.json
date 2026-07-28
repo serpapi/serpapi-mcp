@@ -6,6 +6,15 @@
       "description": "Parameter defines the search query. You can use anything that you would use in a regular Walmart search. Either a `query` or a `cat_id` parameter is required.",
       "group": "search_query"
     },
+    "walmart_domain": {
+      "type": "select",
+      "options": [
+        "walmart.com",
+        "walmart.com.mx"
+      ],
+      "description": "Parameter defines the Walmart domain to use. It defaults to `walmart.com`. Head to the Walmart Stores for a full list of supported stores per domain.",
+      "group": "localization"
+    },
     "sort": {
       "type": "select",
       "options": [
@@ -15,16 +24,16 @@
         "best_match",
         "rating_high"
       ],
-      "description": "Parameter defines sorting. (e.g. `price_low`, `price_high`, `best_seller`, `best_match`, `rating_high`, `new`)",
+      "description": "Parameter defines sorting. (e.g. `price_low`, `price_high`, `best_seller`, `best_match`, `rating_high`, `new`). **Note:** `best_seller`, `rating_high`, and `new` are not supported for `walmart.com.mx`.",
       "group": "advanced_walmart_parameters"
     },
     "soft_sort": {
       "type": "checkbox",
-      "description": "Parameter enables sort by relevance. Walmart is by default showing results sorted by relevance and using the `sort` option. Set to `false` to disable sort by Relevance.",
+      "description": "Parameter enables sort by relevance. Walmart is by default showing results sorted by relevance and using the `sort` option. Set to `false` to disable sort by Relevance. **Note:** not supported for `walmart.com.mx`.",
       "group": "advanced_walmart_parameters"
     },
     "cat_id": {
-      "description": "Category on Walmart Search. (e.g. `0` (default) is all departments, `976759_976787` is 'Cookies', etc.). Either a `query` or a `cat_id` parameter is required.",
+      "description": "Category on Walmart Search. (e.g. `0` (default) is all departments, `976759_976787` is 'Cookies', etc.). Either a `query` or a `cat_id` parameter is required. **Note:** not supported for `walmart.com.mx`.",
       "group": "advanced_filters"
     },
     "facet": {
@@ -52,7 +61,7 @@
     },
     "nd_en": {
       "type": "checkbox",
-      "description": "Show results with NextDay delivery only. Set to `true` to enable or `false` (default) to disable",
+      "description": "Show results with NextDay delivery only. Set to `true` to enable or `false` (default) to disable. **Note:** not supported for `walmart.com.mx`.",
       "group": "advanced_filters"
     },
     "page": {

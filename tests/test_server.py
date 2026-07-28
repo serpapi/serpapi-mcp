@@ -11,6 +11,7 @@ import json
 import pytest
 import requests
 import serpapi
+from fastmcp import Client
 from serpapi.models import SerpResults
 from starlette.requests import Request
 
@@ -18,6 +19,7 @@ import src.mcp_components.apps as mcp_apps
 import src.mcp_components.resources as mcp_resources
 import src.mcp_components.tools as mcp_tools
 import src.server as server
+from src.version import __version__
 
 
 def make_serpapi_http_error(
@@ -94,13 +96,22 @@ def test_engines_dir_resolves_to_repo_engines_directory():
     assert (mcp_resources.ENGINES_DIR / "google_light.json").exists()
 
 
+async def test_protocol_server_identity_uses_application_metadata():
+    async with Client(server.mcp) as client:
+        result = client.initialize_result
+
+    assert result.serverInfo.version == __version__
+    assert str(result.serverInfo.websiteUrl) == "https://github.com/serpapi/mcp-server"
+    assert "serpapi://engines" in result.instructions
+
+
 async def test_engines_index_resource_reads_engine_files():
     result = await server.mcp.read_resource("serpapi://engines")
     body = json.loads(result.contents[0].content)
 
     assert body["count"] == len(list(mcp_resources.ENGINES_DIR.glob("*.json")))
     assert "google_light" in body["engines"]
-    assert "serpapi://engines/google_light" in body["resources"]
+    assert "resources" not in body
 
 
 def raiser(exc):

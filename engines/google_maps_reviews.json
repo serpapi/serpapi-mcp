@@ -181,7 +181,7 @@
         "ratingHigh",
         "ratingLow"
       ],
-      "description": "Parameter is used for sorting and refining results. Available options: `qualityScore` - the most relevant reviews (default). `newestFirst` - the most recent reviews. `ratingHigh` - the highest rating reviews. `ratingLow` - the lowest rating reviews.",
+      "description": "Parameter is used to sort and refine the results. Available options: `qualityScore` - the most relevant reviews (default). `newestFirst` - the most recent reviews. `ratingHigh` - the highest rating reviews. `ratingLow` - the lowest rating reviews. The total number of reviews returned may vary depending on the sorting option selected.",
       "group": "advanced_google_maps_reviews_parameters"
     },
     "topic_id": {
@@ -197,7 +197,7 @@
       "group": "pagination"
     },
     "next_page_token": {
-      "description": "Parameter defines the next page token. It is used for retrieving the next page results. Usage of start parameter (results offset) has been discontinued by Google.",
+      "description": "Parameter defines the next page token. It is used for retrieving the next page results. The next page token can be found in the SerpApi JSON response: `serpapi_pagination -> next_page_token` Usage of start parameter (results offset) has been discontinued by Google.",
       "group": "pagination"
     }
   },

@@ -88,6 +88,25 @@
       "description": "Parameter is used for showing images that appeared in the last 7 days.",
       "group": "advanced_yandex_images_parameters"
     },
+    "family_mode": {
+      "type": "select",
+      "options": [
+        [
+          "0",
+          "Off"
+        ],
+        [
+          "1",
+          "Moderate"
+        ],
+        [
+          "2",
+          "Strict"
+        ]
+      ],
+      "description": "Parameter enables or disables Family Mode (safe search). It can be set to: - Off(`0`) - Moderate(`1`) - Strict(`2`). It defaults to Moderate(`1`).",
+      "group": "advanced_yandex_images_parameters"
+    },
     "url": {
       "description": "Parameter defines the URL for an image to perform the reverse image search.",
       "group": "yandex_reverse_image_parameters"

@@ -12,7 +12,7 @@
       "group": "geographic_location"
     },
     "uule": {
-      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together.",
+      "description": "Parameter is the Google encoded location you want to use for the search. uule and location parameters can't be used together. For consistent results with coordinates-based uule parameter, a matching gl parameter is required. Head to UULE Generator if you need to convert a location or GPS coordinates to uule parameter, and vice versa.",
       "group": "geographic_location"
     },
     "gl": {
@@ -430,15 +430,24 @@
       "description": "Parameter defines the language to use for the Google search. It's a two-letter language code. (e.g., `en` for English, `es` for Spanish, or `fr` for French). Head to the Google languages page for a full list of supported Google languages.",
       "group": "localization"
     },
+    "continuable": {
+      "type": "checkbox",
+      "description": "Set parameter to `true` to make the conversation continuable. It defaults to `false`. When set to `true`, SerpApi will return a subsequent\\_request\\_token in the response which can be used to continue the conversation with a follow-up question that includes the prior exchange as context (multi-turn).",
+      "group": "subsequent_request"
+    },
     "subsequent_request_token": {
       "description": "Parameter defines the token used to continue a Google AI Mode conversation. Pass this token to send a follow-up question that includes the prior exchange as context (multi-turn). The token is returned by SerpApi from your previous request using our Google AI Mode API. When using this token, include a new q for your follow-up prompt. For consistent behavior, reuse the same localization settings (gl, hl, and location) you used to obtain the token.",
       "group": "subsequent_request"
+    },
+    "image_url": {
+      "description": "Parameter defines the URL of an image to include in the prompt. The image will be used as additional context for the AI to generate a response.",
+      "group": "advanced_parameters"
     }
   },
   "common_params": {
     "engine": {
       "required": true,
-      "description": "Set parameter to `google_ai_mode` to use the Google Ai Mode API engine.",
+      "description": "Set parameter to `google_ai_mode` to use the Google AI Mode API engine.",
       "group": "serpapi_parameters"
     },
     "device": {
@@ -453,7 +462,7 @@
     },
     "no_cache": {
       "type": "checkbox",
-      "description": "Parameter will force SerpApi to fetch the Google Ai Mode results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "description": "Parameter will force SerpApi to fetch the Google AI Mode results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
       "group": "serpapi_parameters"
     },
     "async": {

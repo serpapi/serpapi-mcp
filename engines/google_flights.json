@@ -2,11 +2,11 @@
   "engine": "google_flights",
   "params": {
     "departure_id": {
-      "description": "Parameter defines the departure airport code or location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX. You can specify multiple departure airports by separating them with a comma. For example, `CDG,ORY,/m/04jpl`.",
+      "description": "Parameter defines the departure airport code or location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/` or `/g/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX. You can specify multiple departure airports by separating them with a comma. For example, `CDG,ORY,/m/04jpl`.",
       "group": "search_query"
     },
     "arrival_id": {
-      "description": "Parameter defines the arrival airport code or location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX. You can specify multiple arrival airports by separating them with a comma. For example, `CDG,ORY,/m/04jpl`.",
+      "description": "Parameter defines the arrival airport code or location kgmid. An airport code is an uppercase 3-letter code. You can search for it on Google Flights or IATA. For example, `CDG` is Paris Charles de Gaulle Airport and `AUS` is Austin-Bergstrom International Airport. A location kgmid is a string that starts with `/m/` or `/g/`. You can search for a location on Wikidata and use its \"Freebase ID\" as the location kgmid. For example, `/m/0vzm` is the location kgmid for Austin, TX. You can specify multiple arrival airports by separating them with a comma. For example, `CDG,ORY,/m/04jpl`.",
       "group": "search_query"
     },
     "gl": {
@@ -522,11 +522,11 @@
       "group": "advanced_google_flights_parameters"
     },
     "outbound_date": {
-      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-01-15`",
+      "description": "Parameter defines the outbound date. The format is YYYY-MM-DD. e.g. `2026-07-22`",
       "group": "advanced_google_flights_parameters"
     },
     "return_date": {
-      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-01-21` Parameter is required if type parameter is set to: `1` (Round trip)",
+      "description": "Parameter defines the return date. The format is YYYY-MM-DD. e.g. `2026-07-28` Parameter is required if type parameter is set to: `1` (Round trip)",
       "group": "advanced_google_flights_parameters"
     },
     "travel_class": {
@@ -553,12 +553,12 @@
       "group": "advanced_google_flights_parameters"
     },
     "multi_city_json": {
-      "description": "Parameter defines the flight information for multi-city flights. It's a JSON string containing multiple flight information objects. Each object should contain the following fields: `departure_id` - The departure airport code or location kgmid. The format is the same as the main departure\\_id parameter. `arrival_id` - The arrival airport code or location kgmid. The format is the same as the main arrival\\_id parameter. `date` - Flight date. The format is the same as the outbound\\_date parameter. `times` - Time range for the flight. The format is the same as the outbound\\_times parameter. This parameter is optional. Example: `[{\"departure_id\":\"CDG\",\"arrival_id\":\"NRT\",\"date\":\"2026-01-21\"},{\"departure_id\":\"NRT\",\"arrival_id\":\"LAX,SEA\",\"date\":\"2026-01-28\"},{\"departure_id\":\"LAX,SEA\",\"arrival_id\":\"AUS\",\"date\":\"2026-02-04\",\"times\":\"8,18,9,23\"}]` The example is a multi-city flight from `CDG` to `NRT` on `2026-01-21`, then from `NRT` to `LAX` or `SEA` on `2026-01-28`, and finally from `LAX` or `SEA` to `AUS` on `2026-02-04`. The last flight has a departure time range from 8:00 AM to 7:00 PM and an arrival time range from 9:00 AM to 12:00 AM (Midnight).",
+      "description": "Parameter defines the flight information for multi-city flights. It's a JSON string containing multiple flight information objects. Each object should contain the following fields: `departure_id` - The departure airport code or location kgmid. The format is the same as the main departure\\_id parameter. `arrival_id` - The arrival airport code or location kgmid. The format is the same as the main arrival\\_id parameter. `date` - Flight date. The format is the same as the outbound\\_date parameter. `times` - Time range for the flight. The format is the same as the outbound\\_times parameter. This parameter is optional. Example: `[{\"departure_id\":\"CDG\",\"arrival_id\":\"NRT\",\"date\":\"2026-07-28\"},{\"departure_id\":\"NRT\",\"arrival_id\":\"LAX,SEA\",\"date\":\"2026-08-04\"},{\"departure_id\":\"LAX,SEA\",\"arrival_id\":\"AUS\",\"date\":\"2026-08-11\",\"times\":\"8,18,9,23\"}]` The example is a multi-city flight from `CDG` to `NRT` on `2026-07-28`, then from `NRT` to `LAX` or `SEA` on `2026-08-04`, and finally from `LAX` or `SEA` to `AUS` on `2026-08-11`. The last flight has a departure time range from 8:00 AM to 7:00 PM and an arrival time range from 9:00 AM to 12:00 AM (Midnight).",
       "group": "advanced_google_flights_parameters"
     },
     "show_hidden": {
       "type": "checkbox",
-      "description": "Set to `true` to include the hidden flight results. Default to `false`.",
+      "description": "Set to `true` to include the hidden flight results. This is equivalent to clicking 'View more flights' on Google Flights. Default to `false`.",
       "group": "advanced_google_flights_parameters"
     },
     "exclude_basic": {
@@ -692,8 +692,12 @@
     },
     "max_duration": {
       "type": "number",
-      "description": "Parameter defines the maximum flight duration, in minutes. For example, specify `1500` for 25 hours.",
+      "description": "Parameter defines the maximum flight duration, in minutes. For example, specify `1500` for 25 hours. If your search returns no results, try increasing your max\\_duration by up to `200` minutes to account for route-specific scheduling variances.",
       "group": "advanced_filters"
+    },
+    "selected_flights_json": {
+      "description": "Parameter pins the itinerary to specific flights, segment by segment. It's a JSON object with an `outbound` key (required) and a `return` key (required for round-trip, forbidden for one-way). Each value is an ordered array of flight segment objects, each containing: `flight_number` - IATA flight number (2-character airline code + 1–4 digits, e.g. `BA591`). `departure_id` - 3-letter IATA airport code for that segment's departure. `arrival_id` - 3-letter IATA airport code for that segment's arrival. `date` - Departure date of that segment, `YYYY-MM-DD`. Within a leg, each segment's `departure_id` must equal the previous segment's `arrival_id`, and dates must be non-decreasing. Example (round-trip `MXP → LHR → MAD` outbound, `MAD → MXP` nonstop return): `{\"outbound\":[{\"flight_number\":\"BA591\",\"departure_id\":\"MXP\",\"arrival_id\":\"LHR\",\"date\":\"2026-07-22\"},{\"flight_number\":\"BA460\",\"departure_id\":\"LHR\",\"arrival_id\":\"MAD\",\"date\":\"2026-07-22\"}],\"return\":[{\"flight_number\":\"IB675\",\"departure_id\":\"MAD\",\"arrival_id\":\"MXP\",\"date\":\"2026-07-28\"}]}` When this parameter is provided, the top-level departure\\_id, arrival\\_id, outbound\\_date and return\\_date are optional and derived from the first/last segments of each leg. If supplied, they must match. Cannot be used together with departure\\_token, booking\\_token, or multi\\_city\\_json (`type` = 3).",
+      "group": "selected_flights"
     },
     "departure_token": {
       "description": "Parameter is used to select the flight and get returning flights (for Round trip) or flights for the next leg of itinerary (for Multi-city). Find this token in the departure flight results. It cannot be used together with booking\\_token.",

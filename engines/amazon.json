@@ -2,7 +2,7 @@
   "engine": "amazon",
   "params": {
     "k": {
-      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Amazon search.",
+      "description": "Parameter defines the query you want to search. You can use anything that you would use in a regular Amazon search. This parameter can't be used with the node parameter.",
       "group": "search_query"
     },
     "amazon_domain": {
@@ -354,16 +354,16 @@
       "group": "advanced_amazon_parameters"
     },
     "node": {
-      "description": "Parameter specifies the category for Amazon search results. You can find the appropriate node value by browsing Amazon’s website and accessing a specific category. The node ID is typically included in the URL after the format `node=[NODE ID]`. For example, on Amazon.com, the node for Smart Home is `6563140011`, and on Amazon.co.uk, the node for Fashion is `11961407031`. Use this node value to filter search results by category.",
+      "description": "Parameter specifies the category for Amazon search results. You can find the appropriate node value by browsing Amazon’s website and accessing a specific category. The node ID is typically included in the URL after the format `node=[NODE ID]`. For example, on Amazon.com, the node for Smart Home is `6563140011`, and on Amazon.co.uk, the node for Fashion is `11961407031`. Use this node value to filter search results by category. This parameter can't be used with the k parameter. Head to Amazon Category Nodes for a full list of supported Amazon Categories.",
       "group": "advanced_filters"
     },
     "rh": {
-      "description": "Parameter defines items filtering based on their attributes. The structure is a list of `key:value` pairs separated by `,`. For example `n:16318031,p_n_cpf_eligible:21512497011,p_72:1248897011` to filter for products in **Coffee** department (`n:16318031`) that are **Climate Pledge Friendly** (`p_n_cpf_eligible:21512497011`) and rated **4 Stars & Up** (`p_72:1248897011`).",
+      "description": "Parameter defines items filtering based on their attributes. The structure is a list of `key:value` pairs separated by `,`. For example `n:16318031,p_n_cpf_eligible:21512497011,p_72:1248897011` to filter for products in **Coffee** department (`n:16318031`) that are **Climate Pledge Friendly** (`p_n_cpf_eligible:21512497011`) and rated **4 Stars & Up** (`p_72:1248897011`). Head to Amazon Category Nodes for a full list of supported Amazon Categories.",
       "group": "advanced_filters"
     },
     "dc": {
       "type": "checkbox",
-      "description": "Activate spelling fix. `true` (default) includes spelling fix, `false` searches without spelling fix.",
+      "description": "Parameter defines the exclusion of results from an auto-corrected query when the original query is spelled wrong. It can be set to `true` to exclude these results, or `false` to include them (default).",
       "group": "advanced_filters"
     },
     "page": {

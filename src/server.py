@@ -16,9 +16,23 @@ from starlette.responses import JSONResponse
 from fastmcp import FastMCP
 from fastmcp.server.providers import FileSystemProvider
 
+from src.version import __version__
+
 COMPONENTS_DIR = Path(__file__).parent / "mcp_components"
 
-mcp = FastMCP("SerpApi MCP Server", providers=[FileSystemProvider(COMPONENTS_DIR)])
+
+mcp = FastMCP(
+    "SerpApi MCP Server",
+    version=__version__,
+    website_url="https://github.com/serpapi/mcp-server",
+    instructions=(
+        "Use the search tool for live SerpApi results. Use the "
+        "`serpapi://engines` resource to discover valid SerpApi engine names, then read "
+        "the `serpapi://engines/{engine_name}` resource template with the desired engine "
+        "name to inspect its supported parameters."
+    ),
+    providers=[FileSystemProvider(COMPONENTS_DIR)],
+)
 
 load_dotenv()
 

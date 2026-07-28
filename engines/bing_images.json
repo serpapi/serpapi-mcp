@@ -192,6 +192,16 @@
       ],
       "description": "Parameter is used for filtering images by license. It can be set to: `Type-Any` - All Creative Commons `L1` - Public Domain `L2_L3_L4_L5_L6_L7` - Free to share and use `L2_L3_L4` - Free to share and use commercially `L2_L3_L5_L6` - Free to modify, share and use `L2_L3` - Free to modify, share, and use commercially",
       "group": "advanced_bing_images_parameters"
+    },
+    "safeSearch": {
+      "type": "select",
+      "options": [
+        "strict",
+        "moderate",
+        "off"
+      ],
+      "description": "Parameter defines the level of filtering for adult content. It can be set to: `strict` - Strict `moderate` - Moderate (Default) `off` - Off",
+      "group": "advanced_bing_images_parameters"
     }
   },
   "common_params": {
