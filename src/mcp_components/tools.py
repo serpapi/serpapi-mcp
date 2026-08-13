@@ -84,7 +84,6 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
                 - q: Search query. Required for most engines.
                 - engine: SerpApi engine name. Defaults to "google_light".
                 - location: Optional geographic location for localized results.
-                - num: Optional number of results to return.
     
             Engine-specific parameters are available via MCP resources:
                 - serpapi://engines lists all supported engines.
@@ -140,7 +139,6 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
             - q: Search query (required for most engines)
             - engine: Search engine to use (default: "google_light")
             - location: Geographic location filter
-            - num: Number of results to return
 
         mode: Response mode (default: "complete")
             - "complete": Returns full JSON response with all fields
