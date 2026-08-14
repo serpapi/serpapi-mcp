@@ -1,6 +1,6 @@
 [project]
 name = "serpapi-mcp-server"
-version = "0.5.0"
+version = "0.6.0"
 description = "A Model Context Protocol (MCP) server implementation that integrates with SerpApi for comprehensive search engine results and data extraction"
 requires-python = ">=3.12"
 dependencies = [
