@@ -15,7 +15,8 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 - **Stock Market Data**: Company financials and market data through search integration
 - **Dynamic Result Processing**: Automatically detects and formats different result types
 - **Flexible Response Modes**: Complete or compact JSON responses
-- **JSON Responses**: Structured JSON output with complete or compact modes
+- **JSON Responses (default)**: Structured JSON output with complete or compact modes
+- **Markdown Responses**: Cut token usage by 50% on average and by more than 90% for APIs with complex nested JSON.
 - **Interactive UI (MCP Apps)**: Opt-in `search_table` and `search_dashboard` tools that render results as an interactive UI in supporting hosts
 
 ## Quick Start
@@ -103,7 +104,8 @@ The parameters you can provide are specific for each API engine. Some sample par
 - `params.q` (required): Search query
 - `params.engine`: Search engine (default: "google_light") 
 - `params.location`: Geographic filter
-- `mode`: Response mode - "complete" (default) or "compact"
+- `params.output`: Response format; omit for JSON (default), or set to `"md"` for Markdown
+- `mode`: Response mode; `"compact"` removes metadata from JSON, while Markdown is returned unchanged
 - ...see other parameters on the [SerpApi API reference](https://serpapi.com/search-api)
 
 **Examples:**
@@ -114,6 +116,12 @@ The parameters you can provide are specific for each API engine. Some sample par
 {"name": "search", "arguments": {"params": {"q": "AAPL stock"}}}
 {"name": "search", "arguments": {"params": {"q": "news"}, "mode": "compact"}}
 {"name": "search", "arguments": {"params": {"q": "detailed search"}, "mode": "complete"}}
+{"name": "search", "arguments": {"params": {"q": "news", "output": "md"}}}
+{"name": "search", "arguments": {"params": {"engine": "amazon", "k": "mechanical keyboards", "amazon_domain": "amazon.com", "output": "md"}}}
+{"name": "search", "arguments": {"params": {"engine": "google_scholar", "q": "retrieval augmented generation"}}}
+{"name": "search", "arguments": {"params": {"engine": "youtube", "search_query": "how to make espresso"}}}
+{"name": "search", "arguments": {"params": {"engine": "apple_app_store", "term": "habit tracker"}}}
+{"name": "search", "arguments": {"params": {"engine": "ebay", "_nkw": "vintage mechanical keyboard"}}}
 ```
 
 **Supported Engines:** Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and more (see `serpapi://engines`).

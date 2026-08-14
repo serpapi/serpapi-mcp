@@ -208,6 +208,20 @@ async def test_search_rejects_invalid_mode():
     assert out == "Error: Invalid mode. Must be 'complete' or 'compact'"
 
 
+async def test_search_rejects_unsupported_output_before_search(monkeypatch):
+    def should_not_search(params):
+        raise AssertionError("SerpApi should not be called for invalid output")
+
+    use_search(monkeypatch, should_not_search)
+
+    out = await mcp_tools.search(params={"q": "x", "output": "html"})
+
+    assert out == (
+        "Error: Invalid output. Use either 'md' or 'json' "
+        "for the output parameter."
+    )
+
+
 async def test_search_without_api_key_returns_graceful_error(monkeypatch):
     # A real starlette Request with empty state: request.state.api_key would raise
     # AttributeError, so the guard must use getattr, not attribute access.
@@ -223,6 +237,48 @@ async def test_search_complete_returns_full_payload(monkeypatch):
     assert json.loads(await mcp_tools.search(params={"q": "x"})) == payload
 
 
+async def test_search_returns_markdown_response_unchanged(monkeypatch):
+    markdown = "## Organic Results\n\n| Position | Title |\n| --- | --- |\n| 1 | Hit |\n"
+    captured = {}
+
+    def capture(params):
+        captured.update(params)
+        return markdown
+
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, capture)
+
+    assert await mcp_tools.search(params={"q": "x", "output": "md"}) == markdown
+    assert captured["output"] == "md"
+
+
+async def test_search_explicit_json_output_returns_json(monkeypatch):
+    payload = {"organic_results": [{"title": "hit"}]}
+    captured = {}
+
+    def capture(params):
+        captured.update(params)
+        return serp_results(payload)
+
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, capture)
+
+    assert json.loads(
+        await mcp_tools.search(params={"q": "x", "output": "json"})
+    ) == payload
+    assert captured["output"] == "json"
+
+
+async def test_search_json_request_rejects_unexpected_text_response(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: "<html>unexpected response</html>")
+
+    out = await mcp_tools.search(params={"q": "x", "output": "json"})
+
+    assert out == "Error: SerpApi returned text when JSON output was requested."
+    assert "<html>" not in out
+
+
 async def test_search_compact_strips_serpapi_metadata(monkeypatch):
     payload = {
         "search_metadata": {},
@@ -236,6 +292,19 @@ async def test_search_compact_strips_serpapi_metadata(monkeypatch):
     use_search(monkeypatch, lambda params: serp_results(payload))
     out = json.loads(await mcp_tools.search(params={"q": "x"}, mode="compact"))
     assert out == {"organic_results": [{"title": "hit"}]}
+
+
+async def test_search_compact_returns_markdown_unchanged(monkeypatch):
+    markdown = "## Organic Results\n\n- Hit\n"
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, lambda params: markdown)
+
+    assert (
+        await mcp_tools.search(
+            params={"q": "x", "output": "md"}, mode="compact"
+        )
+        == markdown
+    )
 
 
 async def test_search_compact_does_not_mutate_the_live_result(monkeypatch):
@@ -260,6 +329,7 @@ async def test_search_forwards_api_key_and_default_engine(monkeypatch):
     assert captured["api_key"] == "KEY"
     assert captured["engine"] == "google_light"
     assert captured["q"] == "x"
+    assert "output" not in captured
 
 
 async def test_search_caller_overrides_default_engine(monkeypatch):
@@ -302,6 +372,20 @@ async def test_search_apps_ignore_caller_supplied_api_key(monkeypatch):
     use_search(monkeypatch, capture)
     await mcp_apps.search_table(params={"q": "x", "api_key": "CALLER_CONTROLLED"})
     assert captured["api_key"] == "TRUSTED"
+
+
+async def test_search_apps_force_json_output(monkeypatch):
+    captured = {}
+
+    def capture(params):
+        captured.update(params)
+        return serp_results(_SAMPLE_PAYLOAD)
+
+    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
+    use_search(monkeypatch, capture)
+    await mcp_apps.search_table(params={"q": "x", "output": "md"})
+
+    assert captured["output"] == "json"
 
 
 @pytest.mark.parametrize(
