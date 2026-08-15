@@ -217,8 +217,7 @@ async def test_search_rejects_unsupported_output_before_search(monkeypatch):
     out = await mcp_tools.search(params={"q": "x", "output": "html"})
 
     assert out == (
-        "Error: Invalid output. Use either 'md' or 'json' "
-        "for the output parameter."
+        "Error: Invalid output. Use either 'md' or 'json' for the output parameter."
     )
 
 
@@ -238,7 +237,9 @@ async def test_search_complete_returns_full_payload(monkeypatch):
 
 
 async def test_search_returns_markdown_response_unchanged(monkeypatch):
-    markdown = "## Organic Results\n\n| Position | Title |\n| --- | --- |\n| 1 | Hit |\n"
+    markdown = (
+        "## Organic Results\n\n| Position | Title |\n| --- | --- |\n| 1 | Hit |\n"
+    )
     captured = {}
 
     def capture(params):
@@ -263,9 +264,10 @@ async def test_search_explicit_json_output_returns_json(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, capture)
 
-    assert json.loads(
-        await mcp_tools.search(params={"q": "x", "output": "json"})
-    ) == payload
+    assert (
+        json.loads(await mcp_tools.search(params={"q": "x", "output": "json"}))
+        == payload
+    )
     assert captured["output"] == "json"
 
 
@@ -300,9 +302,7 @@ async def test_search_compact_returns_markdown_unchanged(monkeypatch):
     use_search(monkeypatch, lambda params: markdown)
 
     assert (
-        await mcp_tools.search(
-            params={"q": "x", "output": "md"}, mode="compact"
-        )
+        await mcp_tools.search(params={"q": "x", "output": "md"}, mode="compact")
         == markdown
     )
 

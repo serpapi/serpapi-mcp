@@ -159,8 +159,7 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
     output = (params or {}).get("output", "json")
     if output not in {"json", "md"}:
         return (
-            "Error: Invalid output. Use either 'md' or 'json' "
-            "for the output parameter."
+            "Error: Invalid output. Use either 'md' or 'json' for the output parameter."
         )
 
     try:
