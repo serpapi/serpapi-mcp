@@ -5,6 +5,7 @@ import serpapi
 from fastmcp.server.dependencies import get_http_request
 from fastmcp.tools import tool
 from mcp.types import ToolAnnotations
+from serpapi.models import SerpResults
 
 
 def extract_error_response(exception) -> str:
@@ -84,23 +85,25 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
                 - q: Search query. Required for most engines.
                 - engine: SerpApi engine name. Defaults to "google_light".
                 - location: Optional geographic location for localized results.
+                - output: Optional response format. Omit for JSON (default), or set to "md" for Markdown.
     
             Engine-specific parameters are available via MCP resources:
                 - serpapi://engines lists all supported engines.
                 - serpapi://engines/<engine> provides parameters and options for one engine.
     
         mode: Response mode. Defaults to "complete".
-            - "complete": Return the full SerpApi JSON response.
-            - "compact": Return a reduced response with metadata removed.
+            - "complete": Return the full SerpApi response.
+            - "compact": Remove metadata fields from JSON responses. Markdown is returned unchanged.
     
     Output schema:
-        JSON string containing search results, structured engine output, or an error message.
+        Markdown when params.output is "md"; otherwise a JSON string or an error message.
 
     Examples:
         Weather: {"params": {"q": "weather in London", "engine": "google"}, "mode": "complete"}
         Stock: {"params": {"q": "AAPL stock", "engine": "google"}, "mode": "complete"}
         General: {"params": {"q": "coffee shops", "engine": "google_light", "location": "Austin, TX"}, "mode": "complete"}
         Compact: {"params": {"q": "news"}, "mode": "compact"}
+        Markdown: {"params": {"q": "news", "output": "md"}}
 
     Supported engines include (not limited to):
         - google
@@ -139,21 +142,34 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
             - q: Search query (required for most engines)
             - engine: Search engine to use (default: "google_light")
             - location: Geographic location filter
+            - output: Response format; omit for JSON or set to "md" for Markdown
 
         mode: Response mode (default: "complete")
-            - "complete": Returns full JSON response with all fields
-            - "compact": Returns JSON response with metadata fields removed
+            - "complete": Returns the full response
+            - "compact": Removes metadata fields from JSON responses; Markdown is unchanged
 
     Returns:
-        A JSON string containing search results or an error message.
+        A Markdown or JSON string containing search results, or an error message.
     """
 
     # Validate mode parameter
     if mode not in ["complete", "compact"]:
         return "Error: Invalid mode. Must be 'complete' or 'compact'"
 
+    output = (params or {}).get("output", "json")
+    if output not in {"json", "md"}:
+        return (
+            "Error: Invalid output. Use either 'md' or 'json' for the output parameter."
+        )
+
     try:
-        data = fetch_search_data(params)
+        response = fetch_search_response(params)
+        if isinstance(response, str):
+            if output == "md":
+                return response
+            return "Error: SerpApi returned text when JSON output was requested."
+
+        data = response.as_dict()
 
         # Apply mode-specific filtering
         if mode == "compact":
@@ -168,7 +184,6 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
             for field in fields_to_remove:
                 data.pop(field, None)
 
-        # Return JSON response for both modes
         return json.dumps(data, indent=2, ensure_ascii=False)
 
     except RuntimeError as e:
@@ -177,7 +192,7 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
         return map_search_error(e)
 
 
-def fetch_search_data(params: dict[str, Any] | None) -> dict[str, Any]:
+def fetch_search_response(params: dict[str, Any] | None) -> SerpResults | str:
     """Run a SerpApi search using the request's API key. Raises on failure."""
     request = get_http_request()
     api_key = getattr(getattr(request, "state", None), "api_key", None)
@@ -190,4 +205,11 @@ def fetch_search_data(params: dict[str, Any] | None) -> dict[str, Any]:
         **(params or {}),
         "api_key": api_key,
     }
-    return serpapi.search(search_params).as_dict()
+    # The SDK returns raw text for non-JSON responses, including Markdown.
+    return serpapi.search(search_params)
+
+
+def fetch_search_data(params: dict[str, Any] | None) -> dict[str, Any]:
+    """Return structured JSON data for MCP Apps, regardless of text output params."""
+    json_params = {**(params or {}), "output": "json"}
+    return fetch_search_response(json_params).as_dict()
