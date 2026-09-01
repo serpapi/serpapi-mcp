@@ -4,6 +4,7 @@
   "title": "SerpApi",
   "version": "1.0.2",
   "description": "Official SerpApi MCP server for Google, Bing, and other search engines.",
+  "websiteUrl": "https://serpapi.com/",
   "repository": {
     "url": "https://github.com/serpapi/serpapi-mcp",
     "source": "github"
@@ -14,10 +15,10 @@
       "url": "https://mcp.serpapi.com/{SERPAPI_API_KEY}/mcp",
       "variables": {
         "SERPAPI_API_KEY": {
-          "description": "Your SerpApi API key",
+          "description": "Your SerpApi API key. Get one at https://serpapi.com/manage-api-key",
           "isRequired": true,
           "isSecret": true,
-          "placeholder": "Get your API key at https://serpapi.com/manage-api-key"
+          "placeholder": "your-serpapi-api-key"
         }
       }
     }

@@ -23,6 +23,43 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v5
 
+      - name: Check registry version alignment
+        run: |
+          PROJECT_VERSION="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          REGISTRY_VERSION="$(jq -r '.version' server.json)"
+          if [[ "${PROJECT_VERSION}" != "${REGISTRY_VERSION}" ]]; then
+            echo "::error title=Version mismatch::pyproject.toml is ${PROJECT_VERSION}, but server.json is ${REGISTRY_VERSION}. Keep both versions aligned."
+            exit 1
+          fi
+
+      # Registry versions are immutable. Every server.json metadata update must
+      # use a version that has not previously been published.
+      - name: Check registry version is unpublished
+        run: |
+          SERVER_NAME="$(jq -r '.name' server.json)"
+          SERVER_VERSION="$(jq -r '.version' server.json)"
+          ENCODED_NAME="$(jq -rn --arg value "${SERVER_NAME}" '$value | @uri')"
+          ENCODED_VERSION="$(jq -rn --arg value "${SERVER_VERSION}" '$value | @uri')"
+          REGISTRY_URL="https://registry.modelcontextprotocol.io/v0.1/servers/${ENCODED_NAME}/versions/${ENCODED_VERSION}"
+          HTTP_STATUS="$(curl --silent --show-error --location \
+            --output registry-version.json \
+            --write-out '%{http_code}' \
+            "${REGISTRY_URL}")"
+
+          case "${HTTP_STATUS}" in
+            404)
+              ;;
+            200)
+              echo "::error title=Registry version already exists::${SERVER_NAME} ${SERVER_VERSION} is already published. Bump version in server.json and pyproject.toml before publishing metadata changes."
+              exit 1
+              ;;
+            *)
+              echo "::error title=Registry lookup failed::The registry returned HTTP ${HTTP_STATUS} while checking ${SERVER_NAME} ${SERVER_VERSION}."
+              cat registry-version.json
+              exit 1
+              ;;
+          esac
+
       - name: Install MCP publisher
         env:
           MCP_PUBLISHER_VERSION: v1.8.1

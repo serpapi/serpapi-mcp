@@ -30,5 +30,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev --frozen
 
+      - name: Check registry version alignment
+        run: |
+          PROJECT_VERSION="$(uv run --no-sync python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          REGISTRY_VERSION="$(jq -r '.version' server.json)"
+          if [[ "${PROJECT_VERSION}" != "${REGISTRY_VERSION}" ]]; then
+            echo "::error title=Version mismatch::pyproject.toml is ${PROJECT_VERSION}, but server.json is ${REGISTRY_VERSION}. Keep both versions aligned."
+            exit 1
+          fi
+
       - name: Run tests
         run: uv run pytest -q
