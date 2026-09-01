@@ -1,7 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.serpapi/serpapi-mcp",
-  "version": "1.0.1",
+  "title": "SerpApi",
+  "version": "1.0.2",
   "description": "Official SerpApi MCP server for Google, Bing, and other search engines.",
   "repository": {
     "url": "https://github.com/serpapi/serpapi-mcp",
@@ -9,8 +10,16 @@
   },
   "remotes": [
     {
-      "type": "http",
-      "url": "https://mcp.serpapi.com/mcp"
+      "type": "streamable-http",
+      "url": "https://mcp.serpapi.com/{SERPAPI_API_KEY}/mcp",
+      "variables": {
+        "SERPAPI_API_KEY": {
+          "description": "Your SerpApi API key",
+          "isRequired": true,
+          "isSecret": true,
+          "placeholder": "Get your API key at https://serpapi.com/manage-api-key"
+        }
+      }
     }
   ]
 }
