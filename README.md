@@ -18,6 +18,7 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 - **JSON Responses (default)**: Structured JSON output with complete or compact modes
 - **Markdown Responses**: Cut token usage by 50% on average and by more than 90% for APIs with complex nested JSON.
 - **Interactive UI (MCP Apps)**: Opt-in `search_table` and `search_dashboard` tools that render results as an interactive UI in supporting hosts
+- **Claude Desktop Extension**: One-click local install from an [MCP Bundle](https://github.com/modelcontextprotocol/mcpb) (`.mcpb`), see below
 
 ## Quick Start
 
@@ -78,6 +79,30 @@ Configure Claude Desktop:
 ```
 
 Get your API key: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
+
+### Claude Desktop Extension (MCP Bundle)
+
+For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) (or build it as below) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. The bundle uses the MCPB `uv` runtime: it ships only the source, `pyproject.toml` and `uv.lock`, and Claude Desktop provisions Python and the locked dependencies with uv at install time, so nothing is vendored and one bundle works on macOS, Windows and Linux.
+
+```bash
+uv run mcpb/build.py   # needs Node.js for the MCPB CLI; writes dist/serpapi-mcp-<version>.mcpb
+```
+
+Everything bundle-related lives in [mcpb/](mcpb/), plus [.mcpbignore](.mcpbignore) at the project root. The build regenerates the engine schemas from the SerpApi Playground (`--no-rebuild-engines` bundles `engines/` from the working tree instead), validates [mcpb/manifest.json](mcpb/manifest.json), packs the git-tracked files minus [.mcpbignore](.mcpbignore) with the manifest at the bundle root, then installs it into a temp dir and starts it over stdio to make sure it works (`--no-smoke` skips that last step). CI builds the bundle on every PR. Pushing a `v<version>` tag runs the release workflow, which deploys the hosted server, publishes the MCP Registry entry, and builds the bundle and attaches it to the GitHub release.
+
+The same stdio entry point works with any local MCP host that launches servers as a subprocess:
+
+```json
+{
+  "mcpServers": {
+    "serpapi": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/serpapi-mcp", "--frozen", "--no-dev", "src/stdio.py"],
+      "env": { "SERPAPI_API_KEY": "YOUR_SERPAPI_API_KEY" }
+    }
+  }
+}
+```
 
 ## Authentication
 
@@ -151,6 +176,15 @@ uv sync && uv run src/server.py
 
 # Docker
 docker build -t serpapi-mcp . && docker run -p 8000:8000 serpapi-mcp
+
+# Build the Claude Desktop extension (MCP Bundle); rebuilds engines, needs Node.js for the MCPB CLI
+uv run mcpb/build.py
+
+# Release: bump the version in pyproject.toml, server.json and mcpb/manifest.json, then tag it.
+# Nothing ships on a plain push to main. The tag runs the release workflow, which deploys the
+# hosted server, publishes server.json to the MCP Registry, and builds the MCP Bundle and
+# attaches it to the GitHub release.
+git tag v1.0.2 && git push origin v1.0.2
 
 # Regenerate engine resources (Playground scrape)
 python build-engines.py

@@ -225,8 +225,54 @@ async def test_search_without_api_key_returns_graceful_error(monkeypatch):
     # A real starlette Request with empty state: request.state.api_key would raise
     # AttributeError, so the guard must use getattr, not attribute access.
     use_request(monkeypatch, real_request(state={}))
+    monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
     out = await mcp_tools.search(params={"q": "x"})
-    assert out == "Error: Unable to access API key from request context"
+    assert out == (
+        "Error: Unable to access API key from request context "
+        "or SERPAPI_API_KEY environment variable"
+    )
+
+
+def no_http_request():
+    # What fastmcp raises when the server runs over stdio (no HTTP request).
+    raise RuntimeError("No active HTTP request found.")
+
+
+async def test_search_falls_back_to_env_api_key_over_stdio(monkeypatch):
+    captured = {}
+
+    def fake_search(params):
+        captured.update(params)
+        return serp_results({"organic_results": []})
+
+    monkeypatch.setattr(mcp_tools, "get_http_request", no_http_request)
+    monkeypatch.setenv("SERPAPI_API_KEY", "ENVKEY")
+    use_search(monkeypatch, fake_search)
+
+    await mcp_tools.search(params={"q": "x"})
+    assert captured["api_key"] == "ENVKEY"
+
+
+async def test_request_api_key_takes_precedence_over_env(monkeypatch):
+    captured = {}
+
+    def fake_search(params):
+        captured.update(params)
+        return serp_results({"organic_results": []})
+
+    use_request(monkeypatch, real_request(state={"api_key": "REQUEST"}))
+    monkeypatch.setenv("SERPAPI_API_KEY", "ENVKEY")
+    use_search(monkeypatch, fake_search)
+
+    await mcp_tools.search(params={"q": "x"})
+    assert captured["api_key"] == "REQUEST"
+
+
+async def test_search_over_stdio_without_env_key_returns_graceful_error(monkeypatch):
+    monkeypatch.setattr(mcp_tools, "get_http_request", no_http_request)
+    monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
+    out = await mcp_tools.search(params={"q": "x"})
+    assert out.startswith("Error: Unable to access API key")
 
 
 async def test_search_complete_returns_full_payload(monkeypatch):
@@ -600,6 +646,7 @@ async def test_search_dashboard_returns_dashboard_app(monkeypatch):
 
 async def test_search_table_without_api_key_renders_error_app(monkeypatch):
     use_request(monkeypatch, real_request(state={}))
+    monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
     app = await mcp_apps.search_table(params={"q": "x"})
     assert app.title == "Search error"
     assert "Unable to access API key" in ui_json(app)

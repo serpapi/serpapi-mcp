@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Any
 
 import serpapi
@@ -59,7 +60,8 @@ def map_search_error(exception) -> str:
         if "401" in text:
             return (
                 "Error: Invalid SerpApi API key. "
-                "Check your API key in the path or Authorization header."
+                "Check the key in the request path or Authorization header, "
+                "or in SERPAPI_API_KEY for stdio hosts."
             )
         if "403" in text:
             return (
@@ -192,12 +194,30 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
         return map_search_error(e)
 
 
-def fetch_search_response(params: dict[str, Any] | None) -> SerpResults | str:
-    """Run a SerpApi search using the request's API key. Raises on failure."""
-    request = get_http_request()
+def resolve_api_key() -> str | None:
+    """Return the SerpApi key for the current call.
+
+    Over HTTP the key is attached to the request by ``ApiKeyMiddleware`` and
+    always wins. Local stdio hosts (e.g. the Claude Desktop MCP Bundle) have no
+    HTTP request at all, so fall back to the ``SERPAPI_API_KEY`` environment
+    variable.
+    """
+    try:
+        request = get_http_request()
+    except RuntimeError:  # no HTTP request: running over stdio
+        request = None
     api_key = getattr(getattr(request, "state", None), "api_key", None)
+    return api_key or os.getenv("SERPAPI_API_KEY") or None
+
+
+def fetch_search_response(params: dict[str, Any] | None) -> SerpResults | str:
+    """Run a SerpApi search using the caller's API key. Raises on failure."""
+    api_key = resolve_api_key()
     if not api_key:
-        raise RuntimeError("Error: Unable to access API key from request context")
+        raise RuntimeError(
+            "Error: Unable to access API key from request context "
+            "or SERPAPI_API_KEY environment variable"
+        )
 
     # api_key set last so caller params can never override the trusted key.
     search_params = {

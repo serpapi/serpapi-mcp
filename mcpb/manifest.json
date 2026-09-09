@@ -1,0 +1,89 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "serpapi-mcp",
+  "display_name": "SerpApi",
+  "version": "1.0.2",
+  "description": "Official SerpApi MCP server for Google, Bing, and other search engines.",
+  "long_description": "Live, structured search results from SerpApi inside your MCP host: web, news, images, shopping, jobs, local businesses, flights, hotels, videos, scholar, app stores and more, across Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, Amazon and other engines.\n\nEvery engine's parameters are exposed as MCP resources (`serpapi://engines`), results come back as JSON or token-efficient Markdown, and hosts that support MCP Apps get interactive table and dashboard views.\n\nRequires a SerpApi API key: https://serpapi.com/manage-api-key",
+  "author": {
+    "name": "SerpApi",
+    "url": "https://serpapi.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/serpapi/serpapi-mcp"
+  },
+  "homepage": "https://serpapi.com/",
+  "documentation": "https://github.com/serpapi/serpapi-mcp#readme",
+  "support": "https://github.com/serpapi/serpapi-mcp/issues",
+  "server": {
+    "type": "uv",
+    "entry_point": "src/stdio.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${__dirname}",
+        "--frozen",
+        "--no-dev",
+        "src/stdio.py"
+      ],
+      "env": {
+        "SERPAPI_API_KEY": "${user_config.serpapi_api_key}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "search",
+      "description": "Search any SerpApi engine (Google, Bing, YouTube, Amazon, eBay and more) and return results as JSON or Markdown."
+    },
+    {
+      "name": "search_table",
+      "description": "Render organic results as an interactive, sortable table (hosts with MCP Apps support)."
+    },
+    {
+      "name": "search_dashboard",
+      "description": "Render results as an interactive dashboard with metrics, a source chart and result details (hosts with MCP Apps support)."
+    }
+  ],
+  "keywords": [
+    "serpapi",
+    "search",
+    "web-search",
+    "serp",
+    "google",
+    "bing",
+    "duckduckgo",
+    "youtube",
+    "amazon",
+    "ebay",
+    "news",
+    "shopping"
+  ],
+  "license": "MIT",
+  "privacy_policies": [
+    "https://serpapi.com/legal#privacy-policy"
+  ],
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "python": ">=3.12"
+    }
+  },
+  "user_config": {
+    "serpapi_api_key": {
+      "type": "string",
+      "title": "SerpApi API Key",
+      "description": "Your SerpApi API key. Get one at https://serpapi.com/manage-api-key",
+      "sensitive": true,
+      "required": true
+    }
+  }
+}

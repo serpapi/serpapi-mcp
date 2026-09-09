@@ -1,0 +1,200 @@
+name: Release
+
+# Everything that ships a version runs from here, and only when a release tag
+# is pushed:
+#
+#   git tag v1.0.2 && git push origin v1.0.2
+#
+# Publishing a GitHub release with a new tag pushes the tag too, so that works
+# as well. The tag must match the version in pyproject.toml, server.json and
+# mcpb/manifest.json (`verify` checks this before anything else runs).
+#
+# Jobs after `verify` are independent of each other, so a failed one can be
+# re-run on its own from the Actions tab without repeating the rest:
+#   bundle    builds the MCP Bundle and attaches it to the GitHub release,
+#             creating the release if it does not exist yet
+#   deploy    deploys the hosted server (mcp.serpapi.com) with AWS Copilot
+#   registry  publishes server.json to the MCP Registry
+#
+# Manual runs (workflow_dispatch) must select a release tag as the ref. Note
+# that `registry` refuses to run twice for the same version: registry versions
+# are immutable.
+
+on:
+  push:
+    tags: [ "v*" ]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify tag and versions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Check the tag matches the project version everywhere
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" != "tag" ]]; then
+            echo "::error title=Not a tag::Run this workflow on a release tag (got ${GITHUB_REF_TYPE} ${GITHUB_REF_NAME})."
+            exit 1
+          fi
+          PROJECT_VERSION="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          REGISTRY_VERSION="$(jq -r '.version' server.json)"
+          MANIFEST_VERSION="$(jq -r '.version' mcpb/manifest.json)"
+          if [[ "${GITHUB_REF_NAME}" != "v${PROJECT_VERSION}" ]]; then
+            echo "::error title=Tag/version mismatch::Tag ${GITHUB_REF_NAME} does not match pyproject.toml version ${PROJECT_VERSION} (expected v${PROJECT_VERSION})."
+            exit 1
+          fi
+          if [[ "${PROJECT_VERSION}" != "${REGISTRY_VERSION}" ]]; then
+            echo "::error title=Version mismatch::pyproject.toml is ${PROJECT_VERSION}, but server.json is ${REGISTRY_VERSION}. Keep all three versions aligned."
+            exit 1
+          fi
+          if [[ "${PROJECT_VERSION}" != "${MANIFEST_VERSION}" ]]; then
+            echo "::error title=Version mismatch::pyproject.toml is ${PROJECT_VERSION}, but mcpb/manifest.json is ${MANIFEST_VERSION}. Keep all three versions aligned."
+            exit 1
+          fi
+          echo "Releasing ${PROJECT_VERSION} from tag ${GITHUB_REF_NAME}."
+
+  bundle:
+    name: MCP Bundle
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.8"
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install Node.js (MCPB CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Regenerates the engine schemas from the SerpApi Playground so the
+      # released bundle carries the current engine list, packs the bundle and
+      # smoke-tests it over stdio.
+      - name: Build and smoke-test the bundle
+        run: uv run --no-project mcpb/build.py
+
+      - name: Create the GitHub release if it does not exist yet
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            echo "Release ${GITHUB_REF_NAME} already exists; attaching the bundle to it."
+          else
+            gh release create "${GITHUB_REF_NAME}" --verify-tag --title "${GITHUB_REF_NAME}" --generate-notes
+          fi
+
+      - name: Attach the bundle to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${GITHUB_REF_NAME}" dist/*.mcpb --clobber
+
+      - name: Upload bundle as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: serpapi-mcp-mcpb
+          path: dist/*.mcpb
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy hosted server
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install AWS Copilot CLI
+        run: |
+          curl -Lo copilot-cli https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux
+          chmod +x copilot-cli
+          sudo mv copilot-cli /usr/local/bin/copilot
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy service
+        run: copilot svc deploy --name mcp-server-api
+
+  registry:
+    name: Publish to MCP Registry
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Registry versions are immutable. Every server.json metadata update must
+      # use a version that has not previously been published.
+      - name: Check registry version is unpublished
+        run: |
+          SERVER_NAME="$(jq -r '.name' server.json)"
+          SERVER_VERSION="$(jq -r '.version' server.json)"
+          ENCODED_NAME="$(jq -rn --arg value "${SERVER_NAME}" '$value | @uri')"
+          ENCODED_VERSION="$(jq -rn --arg value "${SERVER_VERSION}" '$value | @uri')"
+          REGISTRY_URL="https://registry.modelcontextprotocol.io/v0.1/servers/${ENCODED_NAME}/versions/${ENCODED_VERSION}"
+          HTTP_STATUS="$(curl --silent --show-error --location \
+            --output registry-version.json \
+            --write-out '%{http_code}' \
+            "${REGISTRY_URL}")"
+
+          case "${HTTP_STATUS}" in
+            404)
+              ;;
+            200)
+              echo "::error title=Registry version already exists::${SERVER_NAME} ${SERVER_VERSION} is already published. Bump the version in pyproject.toml, server.json and mcpb/manifest.json and tag a new release."
+              exit 1
+              ;;
+            *)
+              echo "::error title=Registry lookup failed::The registry returned HTTP ${HTTP_STATUS} while checking ${SERVER_NAME} ${SERVER_VERSION}."
+              cat registry-version.json
+              exit 1
+              ;;
+          esac
+
+      - name: Install MCP publisher
+        env:
+          MCP_PUBLISHER_VERSION: v1.8.1
+          MCP_PUBLISHER_SHA256: a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc
+        run: |
+          curl --fail --location --silent --show-error \
+            --output mcp-publisher.tar.gz \
+            "https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz"
+          echo "${MCP_PUBLISHER_SHA256}  mcp-publisher.tar.gz" | sha256sum --check -
+          tar -xzf mcp-publisher.tar.gz mcp-publisher
+          chmod +x mcp-publisher
+
+      - name: Authenticate to MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish server metadata
+        run: ./mcp-publisher publish server.json
