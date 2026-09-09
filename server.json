@@ -12,15 +12,24 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://mcp.serpapi.com/{SERPAPI_API_KEY}/mcp",
-      "variables": {
-        "SERPAPI_API_KEY": {
-          "description": "Your SerpApi API key. Get one at https://serpapi.com/manage-api-key",
+      "url": "https://mcp.serpapi.com/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token authentication using your SerpApi API key.",
           "isRequired": true,
           "isSecret": true,
-          "placeholder": "your-serpapi-api-key"
+          "value": "Bearer {SERPAPI_API_KEY}",
+          "variables": {
+            "SERPAPI_API_KEY": {
+              "description": "Your SerpApi API key. Get one at https://serpapi.com/manage-api-key",
+              "isRequired": true,
+              "isSecret": true,
+              "placeholder": "your-serpapi-api-key"
+            }
+          }
         }
-      }
+      ]
     }
   ]
 }

@@ -132,7 +132,6 @@ async def healthcheck_handler(request):
 
 middleware = [
     Middleware(RequestMetricsMiddleware),
-    Middleware(ApiKeyMiddleware),
     Middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -140,6 +139,7 @@ middleware = [
         allow_methods=["*"],
         allow_headers=["*"],
     ),
+    Middleware(ApiKeyMiddleware),
 ]
 starlette_app = mcp.http_app(
     middleware=middleware, stateless_http=True, json_response=True
