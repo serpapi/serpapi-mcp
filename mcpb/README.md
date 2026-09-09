@@ -40,4 +40,4 @@ Bump the version in `pyproject.toml`, `server.json` and `mcpb/manifest.json` (CI
 git tag v1.0.2 && git push origin v1.0.2
 ```
 
-The [release workflow](../.github/workflows/release.yml) builds the bundle, creates the GitHub release if it does not exist yet and attaches the `.mcpb` to it; the same workflow also deploys the hosted server and publishes `server.json` to the MCP Registry, so a tag is the only thing that ships anything. The [MCP Bundle workflow](../.github/workflows/mcpb.yml) runs the same build on every pull request as a check.
+The [release workflow](../.github/workflows/release.yml) runs the test suite, then builds the bundle, creates the GitHub release if it does not exist yet and attaches the `.mcpb` to it; the same workflow also deploys the hosted server and publishes `server.json` to the MCP Registry, so a tag is the only thing that ships or builds anything. Pull requests only run the manifest and stdio entry point tests in [`tests/test_mcpb.py`](../tests/test_mcpb.py); build locally with `uv run mcpb/build.py` to check a bundle before tagging.

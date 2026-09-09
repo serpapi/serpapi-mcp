@@ -88,7 +88,7 @@ For a local, one-click install, download the `.mcpb` bundle from the [latest rel
 uv run mcpb/build.py   # needs Node.js for the MCPB CLI; writes dist/serpapi-mcp-<version>.mcpb
 ```
 
-Everything bundle-related lives in [mcpb/](mcpb/), plus [.mcpbignore](.mcpbignore) at the project root. The build regenerates the engine schemas from the SerpApi Playground (`--no-rebuild-engines` bundles `engines/` from the working tree instead), validates [mcpb/manifest.json](mcpb/manifest.json), packs the git-tracked files minus [.mcpbignore](.mcpbignore) with the manifest at the bundle root, then installs it into a temp dir and starts it over stdio to make sure it works (`--no-smoke` skips that last step). CI builds the bundle on every PR. Pushing a `v<version>` tag runs the release workflow, which deploys the hosted server, publishes the MCP Registry entry, and builds the bundle and attaches it to the GitHub release.
+Everything bundle-related lives in [mcpb/](mcpb/), plus [.mcpbignore](.mcpbignore) at the project root. The build regenerates the engine schemas from the SerpApi Playground (`--no-rebuild-engines` bundles `engines/` from the working tree instead), validates [mcpb/manifest.json](mcpb/manifest.json), packs the git-tracked files minus [.mcpbignore](.mcpbignore) with the manifest at the bundle root, then installs it into a temp dir and starts it over stdio to make sure it works (`--no-smoke` skips that last step). The bundle is only built at release time: pushing a `v<version>` tag runs the release workflow, which runs the test suite and then deploys the hosted server, publishes the MCP Registry entry, and builds the bundle and attaches it to the GitHub release. Pull requests run the manifest and stdio entry point tests in `tests/test_mcpb.py` but do not pack a bundle.
 
 The same stdio entry point works with any local MCP host that launches servers as a subprocess:
 
@@ -181,9 +181,9 @@ docker build -t serpapi-mcp . && docker run -p 8000:8000 serpapi-mcp
 uv run mcpb/build.py
 
 # Release: bump the version in pyproject.toml, server.json and mcpb/manifest.json, then tag it.
-# Nothing ships on a plain push to main. The tag runs the release workflow, which deploys the
-# hosted server, publishes server.json to the MCP Registry, and builds the MCP Bundle and
-# attaches it to the GitHub release.
+# Nothing ships on a plain push to main. The tag runs the release workflow, which runs the test
+# suite and then deploys the hosted server, publishes server.json to the MCP Registry, and builds
+# the MCP Bundle and attaches it to the GitHub release.
 git tag v1.0.2 && git push origin v1.0.2
 
 # Regenerate engine resources (Playground scrape)

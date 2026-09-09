@@ -7,23 +7,44 @@ name: Release
 #
 # Publishing a GitHub release with a new tag pushes the tag too, so that works
 # as well. The tag must match the version in pyproject.toml, server.json and
-# mcpb/manifest.json (`verify` checks this before anything else runs).
+# mcpb/manifest.json.
 #
-# Jobs after `verify` are independent of each other, so a failed one can be
-# re-run on its own from the Actions tab without repeating the rest:
+# Job graph:
+#
+#   verify  (tag matches the versions)  -+
+#                                        +--> bundle, deploy, registry
+#   test    (full pytest suite)         -+
+#
+# Nothing ships unless both gates pass. The three shipping jobs are independent
+# of each other, so a failed one can be re-run on its own ("Re-run failed jobs")
+# without repeating the rest:
 #   bundle    builds the MCP Bundle and attaches it to the GitHub release,
 #             creating the release if it does not exist yet
 #   deploy    deploys the hosted server (mcp.serpapi.com) with AWS Copilot
 #   registry  publishes server.json to the MCP Registry
 #
-# Manual runs (workflow_dispatch) must select a release tag as the ref. Note
-# that `registry` refuses to run twice for the same version: registry versions
-# are immutable.
+# Manual runs (workflow_dispatch) must select a release tag as the ref, and
+# the checkboxes choose which of the three shipping jobs to execute. Untick
+# `registry` when re-running a version that is already published: registry
+# versions are immutable, so that job refuses to run twice.
 
 on:
   push:
     tags: [ "v*" ]
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy the hosted server with AWS Copilot
+        type: boolean
+        default: true
+      bundle:
+        description: Build the MCP Bundle and attach it to the GitHub release
+        type: boolean
+        default: true
+      registry:
+        description: Publish server.json to the MCP Registry
+        type: boolean
+        default: true
 
 concurrency:
   group: release-${{ github.ref }}
@@ -63,9 +84,33 @@ jobs:
           fi
           echo "Releasing ${PROJECT_VERSION} from tag ${GITHUB_REF_NAME}."
 
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.8"
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --group dev --frozen
+
+      - name: Run tests
+        run: uv run pytest -q
+
   bundle:
     name: MCP Bundle
-    needs: verify
+    needs: [verify, test]
+    if: github.event_name == 'push' || inputs.bundle
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -116,7 +161,8 @@ jobs:
 
   deploy:
     name: Deploy hosted server
-    needs: verify
+    needs: [verify, test]
+    if: github.event_name == 'push' || inputs.deploy
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -143,7 +189,8 @@ jobs:
 
   registry:
     name: Publish to MCP Registry
-    needs: verify
+    needs: [verify, test]
+    if: github.event_name == 'push' || inputs.registry
     runs-on: ubuntu-latest
     permissions:
       contents: read
