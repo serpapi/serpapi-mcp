@@ -355,7 +355,9 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
             if history:
                 AreaChart(
                     data=history,
-                    series=[ChartSeries(data_key="price", label=f"Price ({symbol.strip()})")],
+                    series=[
+                        ChartSeries(data_key="price", label=f"Price ({symbol.strip()})")
+                    ],
                     x_axis="date",
                     height=280,
                     curve="smooth",
@@ -367,7 +369,10 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
                 columns=[
                     *_FLIGHTS_COLUMNS,
                     DataTableColumn(
-                        key="price", header="Price", sortable=True, format=f"currency:{currency}"
+                        key="price",
+                        header="Price",
+                        sortable=True,
+                        format=f"currency:{currency}",
                     ),
                 ],
                 rows=rows,
