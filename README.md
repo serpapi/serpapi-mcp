@@ -119,6 +119,8 @@ curl "https://mcp.serpapi.com/your_key/mcp" -d '...'
 curl "https://mcp.serpapi.com/mcp" -H "Authorization: Bearer your_key" -d '...'
 ```
 
+No key is needed to connect, list tools or read resources. `search` and the App tools need one and return an error without it.
+
 ## Search Tool
 
 The MCP server has one main Search Tool that supports all SerpApi engines and result types. You can find all available parameters on the [SerpApi API reference](https://serpapi.com/search-api).

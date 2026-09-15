@@ -63,9 +63,18 @@ def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
 
 
 class ApiKeyMiddleware(BaseHTTPMiddleware):
+    """Attach the caller's SerpApi key to the request.
+
+    The key comes from ``Authorization: Bearer {API_KEY}`` or the
+    ``/{API_KEY}/mcp`` path form, which is rewritten to ``/mcp``. A request
+    without a key passes through: the handshake needs none, and tools check
+    for it themselves.
+    """
+
     async def dispatch(self, request: Request, call_next):
-        # Skip authentication for healthcheck endpoint
-        if request.url.path == "/healthcheck":
+        path = request.url.path
+        # /.well-known/mcp/server-card.json would otherwise match /{API_KEY}/mcp.
+        if path == "/healthcheck" or path.startswith("/.well-known/"):
             return await call_next(request)
 
         api_key = None
@@ -84,17 +93,7 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
             request.scope["path"] = new_path
             request.scope["raw_path"] = new_path.encode("utf-8")
 
-        # 3. Validate API key exists
-        if not api_key:
-            return JSONResponse(
-                {
-                    "error": "Missing API key. Use path format /{API_KEY}/mcp or Authorization: Bearer {API_KEY} header"
-                },
-                status_code=401,
-            )
-
-        # Store API key in request state for tools to access
-        request.state.api_key = api_key
+        request.state.api_key = api_key or None
         return await call_next(request)
 
 
