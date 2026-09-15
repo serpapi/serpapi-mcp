@@ -4,8 +4,8 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Install in VS Code](https://img.shields.io/badge/Install%20in-VS%20Code-blue?logo=visualstudiocode)](https://insiders.vscode.dev/redirect/mcp/install?name=serpapi-mcp&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.serpapi.com%2FYOUR_SERPAPI_API_KEY%2Fmcp%22%7D)
-[![Install in Cursor](https://img.shields.io/badge/Install%20in-Cursor-blue?logo=cursor)](https://cursor.com/en-US/install-mcp?name=serpapi-mcp&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLnNlcnBhcGkuY29tL1lPVVJfU0VSUEFQSV9BUElfS0VZL21jcCJ9)
+[![Install in VS Code](https://img.shields.io/badge/Install%20in-VS%20Code-blue?logo=visualstudiocode)](https://insiders.vscode.dev/redirect/mcp/install?name=serpapi-mcp&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.serpapi.com%2Fmcp%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20YOUR_SERPAPI_API_KEY%22%7D%7D)
+[![Install in Cursor](https://img.shields.io/badge/Install%20in-Cursor-blue?logo=cursor)](https://cursor.com/en-US/install-mcp?name=serpapi-mcp&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLnNlcnBhcGkuY29tL21jcCIsImhlYWRlcnMiOnsiQXV0aG9yaXphdGlvbiI6IkJlYXJlciBZT1VSX1NFUlBBUElfQVBJX0tFWSJ9fQ==)
 
 ## Features
 
@@ -46,7 +46,7 @@ openclaw mcp add serpapi --url https://mcp.serpapi.com/YOUR_SERPAPI_API_KEY/mcp 
 
 **Claude Code**
 ```bash
-claude mcp add --transport http serpapi https://mcp.serpapi.com/YOUR_SERPAPI_API_KEY/mcp
+claude mcp add --transport http serpapi https://mcp.serpapi.com/mcp --header "Authorization: Bearer YOUR_SERPAPI_API_KEY"
 ```
 
 **Hermes**
@@ -54,9 +54,9 @@ claude mcp add --transport http serpapi https://mcp.serpapi.com/YOUR_SERPAPI_API
 hermes mcp add serpapi --url https://mcp.serpapi.com/YOUR_SERPAPI_API_KEY/mcp
 ```
 
-**Codex**
+**Codex** (reads the key from `SERPAPI_API_KEY` in your shell)
 ```bash
-codex mcp add serpapi --url https://mcp.serpapi.com/YOUR_SERPAPI_API_KEY/mcp
+codex mcp add serpapi --url https://mcp.serpapi.com/mcp --bearer-token-env-var SERPAPI_API_KEY
 ```
 
 ### Self-Hosting
@@ -107,16 +107,16 @@ The same stdio entry point works with any local MCP host that launches servers a
 ## Authentication
 
 Two methods are supported:
-- **Path-based**: `/YOUR_API_KEY/mcp` (recommended)
-- **Header-based**: `Authorization: Bearer YOUR_API_KEY`
+- **Header-based**: `Authorization: Bearer YOUR_API_KEY` (recommended: the key stays out of URLs and logs)
+- **Path-based**: `/YOUR_API_KEY/mcp`, for clients that cannot set headers
 
 **Examples:**
 ```bash
+# Header-based
+curl "https://mcp.serpapi.com/mcp" -H "Authorization: Bearer your_key" -d '...'
+
 # Path-based
 curl "https://mcp.serpapi.com/your_key/mcp" -d '...'
-
-# Header-based  
-curl "https://mcp.serpapi.com/mcp" -H "Authorization: Bearer your_key" -d '...'
 ```
 
 No key is needed to connect, list tools or read resources. `search` and the App tools need one and return an error without it.
