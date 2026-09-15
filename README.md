@@ -203,6 +203,14 @@ npx @modelcontextprotocol/inspector
 - **"Rate limit exceeded"**: Wait or upgrade your SerpApi plan
 - **"No results"**: Try different query or engine
 
+## Privacy Policy
+
+- **Sent**: only the parameters the MCP host passes to a tool call. The server never sees the rest of the conversation, or files, memory or history on the host.
+- **Forwarded**: each search goes to `serpapi.com` with your API key; results come back unchanged. See the [SerpApi Privacy Policy](https://serpapi.com/legal#privacy-policy) for how SerpApi handles searches and accounts.
+- **Kept**: `mcp.serpapi.com` records request metrics (method, status code, duration) and stores no queries or results. A key in the URL path can appear in request logs, so prefer the header.
+- **Local bundle**: the Claude Desktop extension runs on your machine, keeps the key in Claude Desktop's settings and calls `serpapi.com` directly. Nothing passes through `mcp.serpapi.com`.
+- **Contact**: [privacy@serpapi.com](mailto:privacy@serpapi.com), or open an [issue](https://github.com/serpapi/serpapi-mcp/issues).
+
 ## Contributing
 
 1. Fork the repository
