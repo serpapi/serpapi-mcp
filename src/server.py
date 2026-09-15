@@ -78,10 +78,9 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         api_key = None
-
-        auth = request.headers.get("Authorization")
-        if auth and auth.startswith("Bearer "):
-            api_key = auth.split(" ", 1)[1].strip()
+        scheme, _, token = request.headers.get("Authorization", "").partition(" ")
+        if scheme.lower() == "bearer":  # auth schemes are case-insensitive (RFC 7235)
+            api_key = token.strip()
 
         original_path = request.scope.get("path", "")
         path_parts = original_path.strip("/").split("/") if original_path else []

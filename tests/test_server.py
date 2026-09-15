@@ -557,9 +557,10 @@ async def test_middleware_skips_public_paths(path):
     assert request.scope["path"] == path
 
 
-async def test_middleware_extracts_bearer_token():
+@pytest.mark.parametrize("scheme", ["Bearer", "bearer", "BEARER"])
+async def test_middleware_extracts_bearer_token(scheme):
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
-    request = real_request(path="/mcp", headers={"Authorization": "Bearer ABC123"})
+    request = real_request(path="/mcp", headers={"Authorization": f"{scheme} ABC123"})
     assert await mw.dispatch(request, passthrough) == "OK"
     assert request.state.api_key == "ABC123"
 
