@@ -25,9 +25,7 @@ from src.version import __version__
 def make_serpapi_http_error(
     status, body, reason="Error", url="https://serpapi.com/search?q=x"
 ):
-    """Build the exception the way the serpapi client does: a requests HTTPError
-    from raise_for_status(), wrapped in serpapi's HTTPError. The wrapper's own
-    .response is None; the body lives on args[0].response."""
+    """Wrap a real requests HTTPError as the SerpApi client does."""
     resp = requests.Response()
     resp.status_code = status
     resp.reason = reason
@@ -96,13 +94,15 @@ def test_engines_dir_resolves_to_repo_engines_directory():
     assert (mcp_resources.ENGINES_DIR / "google_light.json").exists()
 
 
-async def test_protocol_server_identity_uses_application_metadata():
-    async with Client(server.mcp) as client:
-        result = client.initialize_result
+@pytest.mark.parametrize("mode", ["auto", "legacy"])
+async def test_protocol_server_identity_uses_application_metadata(mode):
+    async with Client(server.mcp, mode=mode) as client:
+        info = client.server_info
+        instructions = client.instructions
 
-    assert result.serverInfo.version == __version__
-    assert str(result.serverInfo.websiteUrl) == "https://github.com/serpapi/mcp-server"
-    assert "serpapi://engines" in result.instructions
+    assert info.version == __version__
+    assert str(info.website_url) == "https://github.com/serpapi/mcp-server"
+    assert "serpapi://engines" in instructions
 
 
 async def test_engines_index_resource_reads_engine_files():
@@ -122,8 +122,7 @@ def raiser(exc):
 
 
 class _Wrap(Exception):
-    """An exception whose single arg is its inner cause — mirrors how serpapi
-    wraps a requests error in args[0]. extract_error_response walks this chain."""
+    """Keep the inner exception in args[0] to test nested error extraction."""
 
 
 class _Resp:
@@ -150,11 +149,8 @@ def nest(depth, leaf):
     return cur
 
 
-def test_extract_error_response_reads_json_body_from_wrapped_request_error():
+def test_extract_error_response_reads_json_body_from_serpapi_http_error():
     err = make_serpapi_http_error(400, {"error": "Invalid API key."})
-    assert (
-        err.response is None
-    )  # the wrapper has no response; the body is one level down
     assert json.loads(mcp_tools.extract_error_response(err)) == {
         "error": "Invalid API key."
     }
@@ -205,7 +201,8 @@ def test_extract_error_response_stops_one_past_the_depth_cap():
 
 async def test_search_rejects_invalid_mode():
     out = await mcp_tools.search(params={"q": "x"}, mode="bogus")
-    assert out == "Error: Invalid mode. Must be 'complete' or 'compact'"
+    assert out.is_error
+    assert out.content[0].text == "Error: Invalid mode. Must be 'complete' or 'compact'"
 
 
 async def test_search_rejects_unsupported_output_before_search(monkeypatch):
@@ -216,7 +213,8 @@ async def test_search_rejects_unsupported_output_before_search(monkeypatch):
 
     out = await mcp_tools.search(params={"q": "x", "output": "html"})
 
-    assert out == (
+    assert out.is_error
+    assert out.content[0].text == (
         "Error: Invalid output. Use either 'md' or 'json' for the output parameter."
     )
 
@@ -227,7 +225,8 @@ async def test_search_without_api_key_returns_graceful_error(monkeypatch):
     use_request(monkeypatch, real_request(state={}))
     monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
     out = await mcp_tools.search(params={"q": "x"})
-    assert out == (
+    assert out.is_error
+    assert out.content[0].text == (
         "Error: Unable to access API key from request context "
         "or SERPAPI_API_KEY environment variable"
     )
@@ -272,14 +271,17 @@ async def test_search_over_stdio_without_env_key_returns_graceful_error(monkeypa
     monkeypatch.setattr(mcp_tools, "get_http_request", no_http_request)
     monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
     out = await mcp_tools.search(params={"q": "x"})
-    assert out.startswith("Error: Unable to access API key")
+    assert out.is_error
+    assert out.content[0].text.startswith("Error: Unable to access API key")
 
 
 async def test_search_complete_returns_full_payload(monkeypatch):
     payload = {"search_metadata": {"id": "1"}, "organic_results": [{"title": "hit"}]}
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(payload))
-    assert json.loads(await mcp_tools.search(params={"q": "x"})) == payload
+    result = await mcp_tools.search(params={"q": "x"})
+    assert result.structured_content == {"result": result.content[0].text}
+    assert json.loads(result.content[0].text) == payload
 
 
 async def test_search_returns_markdown_response_unchanged(monkeypatch):
@@ -295,7 +297,9 @@ async def test_search_returns_markdown_response_unchanged(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, capture)
 
-    assert await mcp_tools.search(params={"q": "x", "output": "md"}) == markdown
+    result = await mcp_tools.search(params={"q": "x", "output": "md"})
+    assert result.content[0].text == markdown
+    assert result.structured_content == {"result": markdown}
     assert captured["output"] == "md"
 
 
@@ -310,10 +314,9 @@ async def test_search_explicit_json_output_returns_json(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, capture)
 
-    assert (
-        json.loads(await mcp_tools.search(params={"q": "x", "output": "json"}))
-        == payload
-    )
+    result = await mcp_tools.search(params={"q": "x", "output": "json"})
+    assert result.structured_content == {"result": result.content[0].text}
+    assert json.loads(result.content[0].text) == payload
     assert captured["output"] == "json"
 
 
@@ -323,8 +326,12 @@ async def test_search_json_request_rejects_unexpected_text_response(monkeypatch)
 
     out = await mcp_tools.search(params={"q": "x", "output": "json"})
 
-    assert out == "Error: SerpApi returned text when JSON output was requested."
-    assert "<html>" not in out
+    assert out.is_error
+    assert (
+        out.content[0].text
+        == "Error: SerpApi returned text when JSON output was requested."
+    )
+    assert "<html>" not in out.content[0].text
 
 
 async def test_search_compact_strips_serpapi_metadata(monkeypatch):
@@ -338,8 +345,11 @@ async def test_search_compact_strips_serpapi_metadata(monkeypatch):
     }
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(payload))
-    out = json.loads(await mcp_tools.search(params={"q": "x"}, mode="compact"))
-    assert out == {"organic_results": [{"title": "hit"}]}
+    out = await mcp_tools.search(params={"q": "x"}, mode="compact")
+    assert out.structured_content == {"result": out.content[0].text}
+    assert json.loads(out.structured_content["result"]) == {
+        "organic_results": [{"title": "hit"}]
+    }
 
 
 async def test_search_compact_returns_markdown_unchanged(monkeypatch):
@@ -347,10 +357,9 @@ async def test_search_compact_returns_markdown_unchanged(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: markdown)
 
-    assert (
-        await mcp_tools.search(params={"q": "x", "output": "md"}, mode="compact")
-        == markdown
-    )
+    result = await mcp_tools.search(params={"q": "x", "output": "md"}, mode="compact")
+    assert result.content[0].text == markdown
+    assert result.structured_content == {"result": markdown}
 
 
 async def test_search_compact_does_not_mutate_the_live_result(monkeypatch):
@@ -446,8 +455,9 @@ async def test_search_maps_real_http_errors(monkeypatch, status, fragment):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, raiser(make_serpapi_http_error(status, {"error": "x"})))
     out = await mcp_tools.search(params={"q": "x"})
-    assert out.startswith("Error:")
-    assert fragment in out
+    assert out.is_error
+    assert out.content[0].text.startswith("Error:")
+    assert fragment in out.content[0].text
 
 
 async def test_search_unmapped_http_error_returns_json_body(monkeypatch):
@@ -456,14 +466,17 @@ async def test_search_unmapped_http_error_returns_json_body(monkeypatch):
         monkeypatch, raiser(make_serpapi_http_error(500, {"error": "server boom"}))
     )
     out = await mcp_tools.search(params={"q": "x"})
-    assert out.startswith("Error:")
-    assert "server boom" in out
+    assert out.is_error
+    assert out.content[0].text.startswith("Error:")
+    assert "server boom" in out.content[0].text
 
 
 async def test_search_generic_exception_uses_extractor(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, raiser(ValueError("weird failure")))
-    assert await mcp_tools.search(params={"q": "x"}) == "Error: weird failure"
+    result = await mcp_tools.search(params={"q": "x"})
+    assert result.is_error
+    assert result.content[0].text == "Error: weird failure"
 
 
 async def passthrough(request):
@@ -936,12 +949,14 @@ def test_build_flights_app_generic_title_without_route():
     assert app.title == "Flights dashboard"
 
 
-def test_flights_currency_inr():
-    """Flights with currency=INR should use ₹ not $."""
+@pytest.mark.parametrize(
+    "currency,symbol",
+    [("GBP", "£"), ("EUR", "€"), ("INR", "₹"), ("JPY", "¥"), (None, "$")],
+)
+def test_flights_currency_is_consistent_across_dashboard(currency, symbol):
     data = {
         "search_parameters": {
             "engine": "google_flights",
-            "currency": "INR",
             "departure_id": "COK",
             "arrival_id": "DXB",
         },
@@ -963,18 +978,20 @@ def test_flights_currency_inr():
             "lowest_price": 35758,
             "typical_price_range": [20500, 44000],
             "price_level": "typical",
+            "price_history": [[1726358400, 35758]],
         },
     }
+    if currency is not None:
+        data["search_parameters"]["currency"] = currency
     rows = mcp_apps.flights_rows(data)
-    assert rows[0]["price_fmt"] == "₹35,906"
+    assert rows[0]["price"] == 35906
+    assert rows[0]["price_fmt"] == f"{symbol}35,906"
     app = mcp_apps.build_flights_app(data)
     body = ui_json(app)
-    assert "₹35,758" in body
-    assert "₹20,500" in body
-    # No dollar-prefixed prices ($ appears in $prefab/$event but not before digits)
-    import re
-
-    assert not re.search(r"\$\d", body)
+    assert f"{symbol}35,758" in body
+    assert f"{symbol}20,500" in body
+    assert f"Price ({symbol})" in body
+    assert f'"format": "currency:{currency or "USD"}"' in body
 
 
 async def test_search_dashboard_dispatches_to_flights(monkeypatch):

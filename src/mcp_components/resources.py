@@ -3,9 +3,16 @@ import logging
 import re
 from pathlib import Path
 
-from fastmcp.exceptions import NotFoundError
 from fastmcp.resources import ResourceContent, ResourceResult, resource
-from mcp.types import Annotations
+from mcp import MCPError
+from mcp.types import (
+    INVALID_PARAMS,
+    Annotations,
+    CompletionArgument,
+    CompletionContext,
+    PromptReference,
+    ResourceTemplateReference,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +27,26 @@ def _get_engine_files() -> list[Path]:
     return sorted(ENGINES_DIR.glob("*.json"))
 
 
+def complete_engine_name(
+    ref: PromptReference | ResourceTemplateReference,
+    argument: CompletionArgument,
+    context: CompletionContext | None,
+) -> list[str] | None:
+    """Suggest engine identifiers for the engine resource template."""
+    if (
+        isinstance(ref, ResourceTemplateReference)
+        and ref.uri == "serpapi://engines/{engine_name}"
+        and argument.name == "engine_name"
+    ):
+        return [
+            path.stem
+            for path in _get_engine_files()
+            if path.stem.startswith(argument.value)
+        ]
+    return None
+
+
+# Omit optional priority hints: Codex can reject otherwise valid resource lists.
 @resource(
     "serpapi://engines",
     name="serpapi-engines-index",
@@ -27,7 +54,6 @@ def _get_engine_files() -> list[Path]:
     mime_type="application/json",
     annotations=Annotations(
         audience=["assistant"],
-        priority=0.3,
     ),
 )
 def engines_index() -> ResourceResult:
@@ -62,18 +88,19 @@ def engines_index() -> ResourceResult:
     mime_type="application/json",
     annotations=Annotations(
         audience=["assistant"],
-        priority=0.3,
     ),
 )
 def get_engine_schema(engine_name: str) -> ResourceResult:
     if not re.fullmatch(r"[a-z0-9_]+", engine_name):
-        raise NotFoundError(
-            f"Invalid engine name: {engine_name!r}. Expected [a-z0-9_]+."
+        raise MCPError(
+            code=INVALID_PARAMS,
+            message=f"Invalid engine name: {engine_name!r}. Expected [a-z0-9_]+.",
         )
     engine_path = ENGINES_DIR / f"{engine_name}.json"
     if not engine_path.exists():
-        raise NotFoundError(
-            f"Unknown engine: {engine_name!r}. See serpapi://engines for the full list."
+        raise MCPError(
+            code=INVALID_PARAMS,
+            message=f"Unknown engine: {engine_name!r}. See serpapi://engines for the full list.",
         )
     engine_schema = json.loads(engine_path.read_text())
     engine_schema.get("common_params", {}).pop("api_key", None)

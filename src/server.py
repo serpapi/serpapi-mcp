@@ -16,6 +16,7 @@ from starlette.responses import JSONResponse
 from fastmcp import FastMCP
 from fastmcp.server.providers import FileSystemProvider
 
+from src.mcp_components.resources import complete_engine_name
 from src.version import __version__
 
 COMPONENTS_DIR = Path(__file__).parent / "mcp_components"
@@ -33,6 +34,7 @@ mcp = FastMCP(
     ),
     providers=[FileSystemProvider(COMPONENTS_DIR)],
 )
+mcp.completion(complete_engine_name)
 
 load_dotenv()
 
