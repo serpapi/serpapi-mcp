@@ -102,7 +102,8 @@ async def test_protocol_server_identity_uses_application_metadata():
         result = client.initialize_result
 
     assert result.serverInfo.version == __version__
-    assert str(result.serverInfo.websiteUrl) == "https://github.com/serpapi/mcp-server"
+    assert str(result.serverInfo.websiteUrl) == "https://serpapi.com/integrations/mcp"
+    assert result.serverInfo.icons[0].mimeType == "image/png"
     assert "serpapi://engines" in result.instructions
 
 

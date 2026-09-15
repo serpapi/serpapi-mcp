@@ -73,6 +73,9 @@ def map_search_error(exception) -> str:
 
 search_tool_description = """Universal search tool supporting all SerpApi engines and result types.
 
+    Runs a query against the SerpApi Search API (https://serpapi.com/search-api):
+    `params` is forwarded as the request parameters, and the response is returned as-is.
+
     When to use:
         - Any query needing live, structured SERP data: web results, news, product listings, job postings, local businesses, flight/hotel prices, video results, images, stock/weather cards, knowledge graph entities.
     
