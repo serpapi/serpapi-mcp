@@ -213,7 +213,9 @@ async def search(
             )
 
         data = response.as_dict()
-        if data.get("error"):
+        # Successful searches with no results can also contain an error message.
+        status = data.get("search_metadata", {}).get("status")
+        if data.get("error") and status != "Success":
             return _text_result(content=f"Error: {data['error']}", is_error=True)
 
         # Apply mode-specific filtering

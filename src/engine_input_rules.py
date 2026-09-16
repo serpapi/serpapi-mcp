@@ -50,8 +50,8 @@ def _flight_fields(params: Params) -> RequiredFields:
 def _maps_fields(params: Params) -> RequiredFields:
     if any(not is_missing(params.get(name)) for name in ("place_id", "data_cid")):
         return ()
-    if params.get("type") == "search":
-        return ("type", "q")
+    if params.get("type", "search") == "search":
+        return ("q",)
     if params.get("type") == "place":
         return ("type", "data")
     return ("type",)

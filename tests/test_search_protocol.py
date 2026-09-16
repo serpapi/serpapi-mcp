@@ -140,8 +140,33 @@ async def test_markdown_and_compact_json_preserve_the_string_wrapper(
 
 
 @pytest.mark.parametrize("mode", ["auto", "legacy"])
+@pytest.mark.parametrize("response_mode", ["complete", "compact"])
+async def test_successful_empty_search_is_a_normal_result(
+    monkeypatch, upstream, mode, response_mode
+):
+    message = "Google Light hasn't returned any results for this query."
+    payload = {
+        "search_metadata": {"status": "Success"},
+        "search_information": {"organic_results_state": "Fully empty"},
+        "error": message,
+    }
+    monkeypatch.setattr(
+        tools.serpapi, "search", lambda params: SerpResults(payload, client=None)
+    )
+    async with Client(mcp, mode=mode) as client:
+        result = await client.call_tool(
+            "search", {"params": {"q": "no matching results"}, "mode": response_mode}
+        )
+    assert not result.is_error
+    assert result.structured_content == {"result": result.content[0].text}
+    expected = payload if response_mode == "complete" else {"error": message}
+    assert json.loads(result.data) == expected
+
+
+@pytest.mark.parametrize("mode", ["auto", "legacy"])
+@pytest.mark.parametrize("metadata", [{}, {"search_metadata": {"status": "Error"}}])
 async def test_validation_and_api_errors_set_the_tool_error_flag(
-    monkeypatch, upstream, mode
+    monkeypatch, upstream, mode, metadata
 ):
     async with Client(mcp, mode=mode) as client:
         invalid = await client.call_tool_mcp("search", {"mode": "bogus"})
@@ -153,9 +178,13 @@ async def test_validation_and_api_errors_set_the_tool_error_flag(
         monkeypatch.setattr(
             tools.serpapi,
             "search",
-            lambda params: SerpResults({"error": "Search failed"}, client=None),
+            lambda params: SerpResults(
+                {**metadata, "error": "Search failed"}, client=None
+            ),
         )
         failed = await client.call_tool_mcp("search", {"params": {"q": "x"}})
+        with pytest.raises(ToolError, match="Search failed"):
+            await client.call_tool("search", {"params": {"q": "x"}})
     assert failed.is_error
     assert failed.content[0].text == "Error: Search failed"
     assert failed.structured_content == {"result": "Error: Search failed"}
@@ -254,6 +283,7 @@ async def test_invalid_flight_answers_never_search(upstream, answer_data, fragme
         (FLIGHT_PARAMS, "departure_id"),
         (HOTEL_PARAMS, "check_in_date"),
         ({"engine": "youtube", "search_query": "coffee"}, "search_query"),
+        ({"engine": "google_maps", "q": "coffee"}, "q"),
     ],
 )
 async def test_clients_without_guided_input_receive_actionable_errors(
@@ -311,6 +341,7 @@ async def test_clients_without_guided_input_receive_actionable_errors(
         {"engine": "google_lens", "image_id": "image"},
         {"engine": "google_play_product", "product_id": "com.example.app"},
         {"engine": "google_trends_trending_now"},
+        {"engine": "google_maps", "q": "coffee"},
         {"engine": "google_maps", "place_id": "place"},
         {"engine": "google_maps", "data_cid": "123"},
         {"engine": "bing_maps", "place_id": "place"},
@@ -383,6 +414,7 @@ async def test_invalid_supplied_flight_fields_never_search(upstream, params, fra
         ({"engine": "amazon"}, {"k": "coffee"}),
         ({"engine": "yelp", "find_desc": "coffee"}, {"find_loc": "Austin, TX"}),
         ({"engine": "google_sports", "kgmid": "/m/123"}, {"sp": "ft", "type": "team"}),
+        ({"engine": "google_maps"}, {"q": "coffee"}),
         ({"engine": "google_maps", "type": "search"}, {"q": "coffee"}),
         ({"engine": "google_maps", "type": "place"}, {"data": "place data"}),
         ({}, {"q": "coffee"}),
@@ -460,7 +492,7 @@ async def test_newly_required_fields_are_checked_after_answer(upstream):
 
     async with Client(mcp, elicitation_handler=answer) as client:
         result = await client.call_tool_mcp(
-            "search", {"params": {"engine": "google_maps"}}
+            "search", {"params": {"engine": "google_maps", "type": ""}}
         )
     assert result.is_error
     assert "parameters: data" in result.content[0].text
