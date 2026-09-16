@@ -16,7 +16,7 @@ Usage (from the project root):
 
 What goes in (manifest.json has to sit at the bundle root, so it is copied
 out of this folder):
-  * mcpb/manifest.json, copied to the bundle root;
+  * mcpb/manifest.json and mcpb/icon.png, copied to the bundle root;
   * every git-tracked file (with its working-tree contents), so `git add`
     anything new that must ship; the project-root .mcpbignore then drops what
     the server does not need at runtime (tests, CI, deployment files, this
@@ -42,6 +42,7 @@ from pathlib import Path
 MCPB_DIR = Path(__file__).resolve().parent
 ROOT = MCPB_DIR.parent
 MANIFEST = MCPB_DIR / "manifest.json"
+ICON = MCPB_DIR / "icon.png"
 MCPBIGNORE = ROOT / ".mcpbignore"
 DIST_DIR = ROOT / "dist"
 ENGINES_DIR = "engines"
@@ -51,6 +52,7 @@ SMOKE_TIMEOUT_SECONDS = 600  # first run may download a Python and all wheels
 # Files the bundle cannot work without, and prefixes that must never ship.
 REQUIRED_ENTRIES = {
     "manifest.json",
+    "icon.png",
     "pyproject.toml",
     "uv.lock",
     ".python-version",
@@ -125,7 +127,7 @@ def tracked_files() -> list[Path]:
 
 
 def stage_sources(staging: Path) -> int:
-    """Stage every git-tracked file, plus manifest.json at the root."""
+    """Stage every git-tracked file, plus manifest.json and the icon at the root."""
     staging.mkdir(parents=True)
     count = 0
     for relative in tracked_files():
@@ -138,11 +140,12 @@ def stage_sources(staging: Path) -> int:
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
         count += 1
-    # The MCPB CLI expects both at the root of the directory it packs.
+    # The MCPB CLI expects these at the root of the directory it packs.
     # .mcpbignore is git-tracked at the project root, so the loop above already
     # staged it; copying it again makes the build fail loudly if it ever goes
     # missing instead of silently packing the whole tree.
     shutil.copy2(MANIFEST, staging / "manifest.json")
+    shutil.copy2(ICON, staging / ICON.name)
     shutil.copy2(MCPBIGNORE, staging / ".mcpbignore")
     return count
 

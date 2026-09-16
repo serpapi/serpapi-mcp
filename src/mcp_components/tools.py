@@ -73,6 +73,9 @@ def map_search_error(exception) -> str:
 
 search_tool_description = """Universal search tool supporting all SerpApi engines and result types.
 
+    Runs a query against the SerpApi Search API (https://serpapi.com/search-api):
+    `params` is forwarded as the request parameters, and the response is returned as-is.
+
     When to use:
         - Any query needing live, structured SERP data: web results, news, product listings, job postings, local businesses, flight/hotel prices, video results, images, stock/weather cards, knowledge graph entities.
     
@@ -194,30 +197,31 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
         return map_search_error(e)
 
 
-def resolve_api_key() -> str | None:
-    """Return the SerpApi key for the current call.
+def resolve_api_key() -> str:
+    """Return the caller's SerpApi key, or raise naming the fix.
 
-    Over HTTP the key is attached to the request by ``ApiKeyMiddleware`` and
-    always wins. Local stdio hosts (e.g. the Claude Desktop MCP Bundle) have no
-    HTTP request at all, so fall back to the ``SERPAPI_API_KEY`` environment
-    variable.
+    Over HTTP the key is the one ``ApiKeyMiddleware`` attached to the request.
+    Stdio hosts (the Claude Desktop bundle) have no request and use
+    ``SERPAPI_API_KEY`` instead; the hosted server never does.
     """
     try:
         request = get_http_request()
     except RuntimeError:  # no HTTP request: running over stdio
-        request = None
-    api_key = getattr(getattr(request, "state", None), "api_key", None)
-    return api_key or os.getenv("SERPAPI_API_KEY") or None
+        api_key = os.getenv("SERPAPI_API_KEY")
+        hint = "Set the SERPAPI_API_KEY environment variable."
+    else:
+        api_key = getattr(getattr(request, "state", None), "api_key", None)
+        hint = (
+            "Use path format /{API_KEY}/mcp or Authorization: Bearer {API_KEY} header."
+        )
+    if not api_key:
+        raise RuntimeError(f"Error: Missing API key. {hint}")
+    return api_key
 
 
 def fetch_search_response(params: dict[str, Any] | None) -> SerpResults | str:
     """Run a SerpApi search using the caller's API key. Raises on failure."""
     api_key = resolve_api_key()
-    if not api_key:
-        raise RuntimeError(
-            "Error: Unable to access API key from request context "
-            "or SERPAPI_API_KEY environment variable"
-        )
 
     # api_key set last so caller params can never override the trusted key.
     search_params = {

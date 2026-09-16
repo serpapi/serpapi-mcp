@@ -34,7 +34,6 @@ server/venv/
 copilot/
 tests/
 Dockerfile
-smithery.yaml
 server.json
 build-engines.py
 mcpb/

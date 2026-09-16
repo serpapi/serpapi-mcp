@@ -14,6 +14,7 @@ import serpapi
 from fastmcp import Client
 from serpapi.models import SerpResults
 from starlette.requests import Request
+from starlette.testclient import TestClient
 
 import src.mcp_components.apps as mcp_apps
 import src.mcp_components.resources as mcp_resources
@@ -101,8 +102,86 @@ async def test_protocol_server_identity_uses_application_metadata():
         result = client.initialize_result
 
     assert result.serverInfo.version == __version__
-    assert str(result.serverInfo.websiteUrl) == "https://github.com/serpapi/mcp-server"
+    assert str(result.serverInfo.websiteUrl) == "https://serpapi.com/integrations/mcp"
+    assert result.serverInfo.icons[0].mimeType == "image/png"
     assert "serpapi://engines" in result.instructions
+
+
+# --- ApiKeyMiddleware, through the real Starlette app ---------------------
+
+INITIALIZE = {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+        "protocolVersion": "2025-06-18",
+        "capabilities": {},
+        "clientInfo": {"name": "test", "version": "0"},
+    },
+}
+MCP_HEADERS = {"Accept": "application/json, text/event-stream"}
+
+
+def rpc(method, params=None, id=1):
+    return {"jsonrpc": "2.0", "id": id, "method": method, "params": params or {}}
+
+
+@pytest.fixture
+def http():
+    with TestClient(server.starlette_app) as client:
+        yield client
+
+
+def test_well_known_paths_are_served_without_a_key(http):
+    # Nothing is mounted there yet, but reviewers and clients must reach the
+    # path (OAuth discovery, OpenAI's challenge, Smithery's server card).
+    assert http.get("/.well-known/mcp/server-card.json").status_code == 404
+
+
+def test_initialize_and_tools_list_work_anonymously(http):
+    init = http.post("/mcp", json=INITIALIZE, headers=MCP_HEADERS)
+    assert init.status_code == 200
+    assert init.json()["result"]["serverInfo"]["name"] == "SerpApi MCP Server"
+
+    tools = http.post("/mcp", json=rpc("tools/list"), headers=MCP_HEADERS)
+    assert {t["name"] for t in tools.json()["result"]["tools"]} >= {"search"}
+
+
+def test_anonymous_tools_call_returns_missing_key_error(http, monkeypatch):
+    monkeypatch.setenv("SERPAPI_API_KEY", "SERVERKEY")  # must not be used
+    use_search(monkeypatch, raiser(AssertionError("must not search")))
+
+    call = http.post(
+        "/mcp",
+        json=rpc("tools/call", {"name": "search", "arguments": {"params": {"q": "x"}}}),
+        headers=MCP_HEADERS,
+    )
+    assert call.status_code == 200
+    assert call.json()["result"]["content"][0]["text"].startswith(
+        "Error: Missing API key. Use path format"
+    )
+
+
+@pytest.mark.parametrize(
+    "path, headers",
+    [("/KEY/mcp", {}), ("/mcp", {"Authorization": "Bearer KEY"})],
+    ids=["path", "header"],
+)
+def test_tools_call_forwards_the_callers_key(http, monkeypatch, path, headers):
+    captured = {}
+
+    def capture(params):
+        captured.update(params)
+        return serp_results({"organic_results": []})
+
+    use_search(monkeypatch, capture)
+    call = http.post(
+        path,
+        json=rpc("tools/call", {"name": "search", "arguments": {"params": {"q": "x"}}}),
+        headers={**MCP_HEADERS, **headers},
+    )
+    assert call.status_code == 200
+    assert captured["api_key"] == "KEY"
 
 
 async def test_engines_index_resource_reads_engine_files():
@@ -228,8 +307,8 @@ async def test_search_without_api_key_returns_graceful_error(monkeypatch):
     monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
     out = await mcp_tools.search(params={"q": "x"})
     assert out == (
-        "Error: Unable to access API key from request context "
-        "or SERPAPI_API_KEY environment variable"
+        "Error: Missing API key. Use path format /{API_KEY}/mcp or "
+        "Authorization: Bearer {API_KEY} header."
     )
 
 
@@ -253,26 +332,24 @@ async def test_search_falls_back_to_env_api_key_over_stdio(monkeypatch):
     assert captured["api_key"] == "ENVKEY"
 
 
-async def test_request_api_key_takes_precedence_over_env(monkeypatch):
-    captured = {}
-
-    def fake_search(params):
-        captured.update(params)
-        return serp_results({"organic_results": []})
-
-    use_request(monkeypatch, real_request(state={"api_key": "REQUEST"}))
+async def test_http_request_never_falls_back_to_env_api_key(monkeypatch):
+    # The hosted server must not spend a key of its own on an anonymous caller,
+    # whatever the container environment happens to contain.
+    use_request(monkeypatch, real_request(state={"api_key": None}))
     monkeypatch.setenv("SERPAPI_API_KEY", "ENVKEY")
-    use_search(monkeypatch, fake_search)
+    use_search(monkeypatch, raiser(AssertionError("must not search")))
 
-    await mcp_tools.search(params={"q": "x"})
-    assert captured["api_key"] == "REQUEST"
+    out = await mcp_tools.search(params={"q": "x"})
+    assert out.startswith("Error: Missing API key. Use path format")
 
 
 async def test_search_over_stdio_without_env_key_returns_graceful_error(monkeypatch):
     monkeypatch.setattr(mcp_tools, "get_http_request", no_http_request)
     monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
     out = await mcp_tools.search(params={"q": "x"})
-    assert out.startswith("Error: Unable to access API key")
+    assert (
+        out == "Error: Missing API key. Set the SERPAPI_API_KEY environment variable."
+    )
 
 
 async def test_search_complete_returns_full_payload(monkeypatch):
@@ -470,14 +547,21 @@ async def passthrough(request):
     return "OK"
 
 
-async def test_middleware_skips_healthcheck():
+@pytest.mark.parametrize("path", ["/healthcheck", "/.well-known/mcp/server-card.json"])
+async def test_middleware_skips_public_paths(path):
+    # The server-card path has "mcp" as its second segment and would otherwise
+    # be read as /{API_KEY}/mcp with ".well-known" as the key.
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
-    assert await mw.dispatch(real_request(path="/healthcheck"), passthrough) == "OK"
+    request = real_request(path=path)
+    assert await mw.dispatch(request, passthrough) == "OK"
+    assert not hasattr(request.state, "api_key")
+    assert request.scope["path"] == path
 
 
-async def test_middleware_extracts_bearer_token():
+@pytest.mark.parametrize("scheme", ["Bearer", "bearer", "BEARER"])
+async def test_middleware_extracts_bearer_token(scheme):
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
-    request = real_request(path="/mcp", headers={"Authorization": "Bearer ABC123"})
+    request = real_request(path="/mcp", headers={"Authorization": f"{scheme} ABC123"})
     assert await mw.dispatch(request, passthrough) == "OK"
     assert request.state.api_key == "ABC123"
 
@@ -490,18 +574,22 @@ async def test_middleware_extracts_path_key_and_rewrites_path():
     assert request.scope["path"] == "/mcp"
 
 
-async def test_middleware_returns_401_without_key():
+async def test_middleware_passes_keyless_request_through_with_no_key():
+    # The handshake must work anonymously; tools/call reports the missing key.
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
-    response = await mw.dispatch(real_request(path="/mcp"), passthrough)
-    assert response.status_code == 401
+    request = real_request(path="/mcp")
+    assert await mw.dispatch(request, passthrough) == "OK"
+    assert request.state.api_key is None
 
 
 async def test_middleware_ignores_non_mcp_two_segment_path():
     # /foo/bar has two segments but the second isn't "mcp", so the first segment
     # must NOT be treated as an API key — the guard requires path_parts[1] == "mcp".
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
-    response = await mw.dispatch(real_request(path="/foo/bar"), passthrough)
-    assert response.status_code == 401
+    request = real_request(path="/foo/bar")
+    assert await mw.dispatch(request, passthrough) == "OK"
+    assert request.state.api_key is None
+    assert request.scope["path"] == "/foo/bar"
 
 
 async def test_healthcheck_returns_healthy_with_utc_timestamp():
@@ -649,7 +737,7 @@ async def test_search_table_without_api_key_renders_error_app(monkeypatch):
     monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
     app = await mcp_apps.search_table(params={"q": "x"})
     assert app.title == "Search error"
-    assert "Unable to access API key" in ui_json(app)
+    assert "Missing API key" in ui_json(app)
 
 
 async def test_search_dashboard_maps_http_error_to_error_app(monkeypatch):

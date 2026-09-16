@@ -48,6 +48,12 @@ def test_manifest_uses_uv_runtime_and_launches_existing_entry_point():
     assert args[-1] == entry_point
 
 
+def test_manifest_icon_is_staged_next_to_it():
+    # build.py copies mcpb/icon.png to the bundle root, where the manifest points.
+    assert MANIFEST["icon"] == "icon.png"
+    assert (ROOT / "mcpb" / "icon.png").is_file()
+
+
 def test_manifest_wires_api_key_from_user_config_into_env():
     env = MANIFEST["server"]["mcp_config"]["env"]
     assert env == {"SERPAPI_API_KEY": "${user_config.serpapi_api_key}"}
