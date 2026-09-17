@@ -14,9 +14,9 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 - **Real-time Weather Data**: Location-based weather with forecasts via search queries
 - **Stock Market Data**: Company financials and market data through search integration
 - **Dynamic Result Processing**: Automatically detects and formats different result types
-- **Flexible Response Modes**: Complete or compact JSON responses
-- **JSON Responses (default)**: Structured JSON output with complete or compact modes
-- **Markdown Responses**: Cut token usage by 50% on average and by more than 90% for APIs with complex nested JSON.
+- **Flexible Response Modes**: Complete responses by default; compact filtering for JSON responses
+- **Markdown Responses (default)**: Cut token usage by 50% on average and by more than 90% for APIs with complex nested JSON
+- **JSON Responses**: Structured, machine-readable output when explicitly requested
 - **Interactive UI (MCP Apps)**: Opt-in `search_table` and `search_dashboard` tools that render results as an interactive UI in supporting hosts
 - **Claude Desktop Extension**: One-click local install from an [MCP Bundle](https://github.com/modelcontextprotocol/mcpb) (`.mcpb`), see below
 
@@ -130,7 +130,7 @@ The parameters you can provide are specific for each API engine. Some sample par
 - `params.q` (required): Search query
 - `params.engine`: Search engine (default: "google_light") 
 - `params.location`: Geographic filter
-- `params.output`: Response format; omit for JSON (default), or set to `"md"` for Markdown
+- `params.output`: Response format; omit for Markdown (default), set to `"md"` for Markdown, or set to `"json"` for JSON
 - `mode`: Response mode; `"compact"` removes metadata from JSON, while Markdown is returned unchanged
 - ...see other parameters on the [SerpApi API reference](https://serpapi.com/search-api)
 
@@ -140,8 +140,9 @@ The parameters you can provide are specific for each API engine. Some sample par
 {"name": "search", "arguments": {"params": {"q": "coffee shops", "location": "Austin, TX"}}}
 {"name": "search", "arguments": {"params": {"q": "weather in London"}}}
 {"name": "search", "arguments": {"params": {"q": "AAPL stock"}}}
-{"name": "search", "arguments": {"params": {"q": "news"}, "mode": "compact"}}
+{"name": "search", "arguments": {"params": {"q": "news", "output": "json"}, "mode": "compact"}}
 {"name": "search", "arguments": {"params": {"q": "detailed search"}, "mode": "complete"}}
+{"name": "search", "arguments": {"params": {"q": "structured results", "output": "json"}}}
 {"name": "search", "arguments": {"params": {"q": "news", "output": "md"}}}
 {"name": "search", "arguments": {"params": {"engine": "amazon", "k": "mechanical keyboards", "amazon_domain": "amazon.com", "output": "md"}}}
 {"name": "search", "arguments": {"params": {"engine": "google_scholar", "q": "retrieval augmented generation"}}}
@@ -154,7 +155,7 @@ The parameters you can provide are specific for each API engine. Some sample par
 
 **Result Types:** Answer boxes, organic results, news, images, shopping - automatically detected and formatted.
 
-Search responses preserve the existing MCP `structuredContent.result` string and include the same string in text content. For JSON output, `result` contains serialized JSON; existing clients can continue parsing it with `JSON.parse(response.structuredContent.result)`. For Markdown output, it contains the unchanged Markdown. Errors and cancellations use the same wrapper. Search execution failures set `isError: true`; clients using FastMCP's high-level `call_tool()` should handle `ToolError`, or use `call_tool_mcp()` to inspect the result flag. See [MCP tool results](https://modelcontextprotocol.io/specification/2025-06-18/server/tools).
+Search responses preserve the existing MCP `structuredContent.result` string and include the same string in text content. By default, `result` contains unchanged Markdown. When `params.output` is `"json"`, it contains serialized JSON that clients can parse with `JSON.parse(response.structuredContent.result)`. Errors and cancellations use the same wrapper. Search execution failures set `isError: true`; clients using FastMCP's high-level `call_tool()` should handle `ToolError`, or use `call_tool_mcp()` to inspect the result flag. See [MCP tool results](https://modelcontextprotocol.io/specification/2025-06-18/server/tools).
 
 `search` uses the engine catalog and engine-specific rules to identify missing parameters. Supporting MCP 2026-07-28 clients receive a form before any search runs. Accepted answers are validated; decline or cancellation runs no search. Legacy clients and clients without form elicitation receive an error listing the missing parameters so the agent can ask in conversation. See [MCP input requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr).
 
@@ -169,7 +170,7 @@ To extend guided search, add required fields, descriptions, types, and options t
 
 ## Interactive UI (MCP Apps)
 
-The `search` tool returns JSON by default. For hosts that support the [MCP Apps extension](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) (SEP-1865), two opt-in tools render results as an interactive UI directly in the conversation, so the bulk SERP JSON never enters the model's context window:
+The `search` tool returns Markdown by default; callers can request structured JSON with `params.output="json"`. The MCP App tools always request JSON internally. For hosts that support the [MCP Apps extension](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) (SEP-1865), two opt-in tools render results as an interactive UI directly in the conversation, so the bulk SERP JSON never enters the model's context window:
 
 - `search_table`: organic results as a sortable, searchable table.
 - `search_dashboard`: summary metrics, a source-breakdown chart, and a results table with a click-to-expand detail panel.

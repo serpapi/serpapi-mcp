@@ -62,7 +62,7 @@ async def test_json_results_preserve_the_string_wrapper_and_text(
     )
     async with Client(mcp, mode=mode) as client:
         result = await client.call_tool_mcp(
-            "search", {"params": {"engine": engine, "q": "x"}}
+            "search", {"params": {"engine": engine, "q": "x", "output": "json"}}
         )
     assert not result.is_error
     assert result.structured_content == {"result": result.content[0].text}
@@ -109,7 +109,7 @@ async def test_search_matches_original_string_tool_contract(
 
 
 @pytest.mark.parametrize("mode", ["auto", "legacy"])
-async def test_markdown_and_compact_json_preserve_the_string_wrapper(
+async def test_default_markdown_and_compact_json_preserve_the_string_wrapper(
     monkeypatch, upstream, mode
 ):
     markdown = "## Results\n\n- Coffee\n"
@@ -125,10 +125,11 @@ async def test_markdown_and_compact_json_preserve_the_string_wrapper(
     monkeypatch.setattr(tools.serpapi, "search", search)
     async with Client(mcp, mode=mode) as client:
         text = await client.call_tool_mcp(
-            "search", {"params": {"q": "x", "output": "md"}, "mode": "compact"}
+            "search", {"params": {"q": "x"}, "mode": "compact"}
         )
         data = await client.call_tool_mcp(
-            "search", {"params": {"q": "x"}, "mode": "compact"}
+            "search",
+            {"params": {"q": "x", "output": "json"}, "mode": "compact"},
         )
     assert not text.is_error and not data.is_error
     assert text.content[0].text == markdown
@@ -155,7 +156,11 @@ async def test_successful_empty_search_is_a_normal_result(
     )
     async with Client(mcp, mode=mode) as client:
         result = await client.call_tool(
-            "search", {"params": {"q": "no matching results"}, "mode": response_mode}
+            "search",
+            {
+                "params": {"q": "no matching results", "output": "json"},
+                "mode": response_mode,
+            },
         )
     assert not result.is_error
     assert result.structured_content == {"result": result.content[0].text}
@@ -233,7 +238,7 @@ async def test_guided_flights_only_collect_missing_fields(upstream, flight_type)
     assert upstream[0]["api_key"] == "TEST_KEY"
     assert upstream[0]["currency"] == "GBP"
     assert ("return_date" in upstream[0]) == (flight_type == 1)
-    assert "output" not in upstream[0]
+    assert upstream[0]["output"] == "md"
     assert "departure_id" not in original
 
 
@@ -448,7 +453,13 @@ async def test_guided_search_uses_engine_requirements_and_preserves_arguments(
     assert len(prompts) == 1
     assert original == original_copy
     assert upstream == [
-        {"engine": "google_light", **original, **answers, "api_key": "TEST_KEY"}
+        {
+            "engine": "google_light",
+            "output": "md",
+            **original,
+            **answers,
+            "api_key": "TEST_KEY",
+        }
     ]
 
 
@@ -534,7 +545,13 @@ async def test_new_catalog_engine_needs_no_mcp_handler_changes(
         )
     assert not result.is_error
     assert upstream == [
-        {"engine": "example", "query": "x", **responses, "api_key": "TEST_KEY"}
+        {
+            "engine": "example",
+            "output": "md",
+            "query": "x",
+            **responses,
+            "api_key": "TEST_KEY",
+        }
     ]
 
 
