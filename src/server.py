@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -6,6 +7,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
+import serpapi
 import uvicorn
 from dotenv import load_dotenv
 from starlette.middleware import Middleware
@@ -113,12 +115,35 @@ async def introspect_token(token: str) -> str | None:
             )
         response.raise_for_status()
         body = response.json()
-    except (httpx.HTTPError, ValueError):
+    except (httpx.HTTPError, ValueError) as exc:
+        logger.warning("OAuth introspection failed (%s)", type(exc).__name__)
         return None
 
-    if not body.get("active"):
+    if not isinstance(body, dict):
+        logger.warning("OAuth introspection returned an invalid response")
         return None
-    return body.get("api_key")
+    if body.get("active") is not True:
+        return None
+    api_key = body.get("api_key")
+    if not isinstance(api_key, str) or not api_key.strip():
+        logger.warning("OAuth introspection returned no valid API key")
+        return None
+    return api_key
+
+
+async def is_valid_api_key(api_key: str) -> bool:
+    """Verify a legacy bearer key without consuming search credits."""
+    try:
+        account = await asyncio.to_thread(serpapi.account, api_key=api_key, timeout=5.0)
+    except (serpapi.exceptions.SerpApiError, ValueError) as exc:
+        # Exception messages can contain the request URL, including the API key.
+        logger.warning("SerpApi API-key validation failed (%s)", type(exc).__name__)
+        return False
+
+    if not isinstance(account, dict) or account.get("api_key") != api_key:
+        logger.warning("SerpApi Account API did not confirm the API key")
+        return False
+    return True
 
 
 class ApiKeyMiddleware(BaseHTTPMiddleware):
@@ -132,8 +157,10 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
         auth = request.headers.get("Authorization")
         if auth and auth.startswith("Bearer "):
             bearer_value = auth.split(" ", 1)[1].strip()
-            if OAUTH_INTROSPECTION_ENABLED:
+            if bearer_value and OAUTH_INTROSPECTION_ENABLED:
                 api_key = await introspect_token(bearer_value)
+                if not api_key and await is_valid_api_key(bearer_value):
+                    api_key = bearer_value
             else:
                 api_key = bearer_value
 

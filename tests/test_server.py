@@ -726,6 +726,11 @@ async def fut(value):
 async def test_middleware_uses_introspection_when_enabled(monkeypatch):
     monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
     monkeypatch.setattr(server, "introspect_token", lambda token: fut("USER_KEY"))
+
+    def unexpected_account_call(**kwargs):
+        pytest.fail("OAuth tokens must not trigger Account API validation")
+
+    monkeypatch.setattr(serpapi, "account", unexpected_account_call)
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
     request = real_request(path="/mcp", headers={"Authorization": "Bearer oauth-token"})
     assert await mw.dispatch(request, passthrough) == "OK"
@@ -735,10 +740,143 @@ async def test_middleware_uses_introspection_when_enabled(monkeypatch):
 async def test_middleware_rejects_bearer_when_introspection_fails(monkeypatch):
     monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
     monkeypatch.setattr(server, "introspect_token", lambda token: fut(None))
+    monkeypatch.setattr(server, "is_valid_api_key", lambda key: fut(False))
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
     request = real_request(path="/mcp", headers={"Authorization": "Bearer bad-token"})
     response = await mw.dispatch(request, passthrough)
     assert response.status_code == 401
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+@pytest.mark.parametrize("auth", ["bearer", "path"])
+async def test_legacy_keys_work_with_or_without_oauth(monkeypatch, enabled, auth):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", enabled)
+    introspected = []
+    validated = []
+
+    async def introspect(token):
+        introspected.append(token)
+        return None
+
+    def account(*, api_key, timeout):
+        validated.append(api_key)
+        assert timeout == 5.0
+        return {"api_key": api_key}
+
+    monkeypatch.setattr(server, "introspect_token", introspect)
+    monkeypatch.setattr(serpapi, "account", account)
+    request = real_request(
+        path="/RAW_KEY/mcp" if auth == "path" else "/mcp",
+        headers={"Authorization": "Bearer RAW_KEY"} if auth == "bearer" else {},
+    )
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    assert await mw.dispatch(request, passthrough) == "OK"
+    assert request.state.api_key == "RAW_KEY"
+    assert request.scope["path"] == "/mcp"
+    expected = ["RAW_KEY"] if enabled and auth == "bearer" else []
+    assert introspected == validated == expected
+
+
+@pytest.mark.parametrize("introspection_down", [False, True])
+@pytest.mark.parametrize("valid_key", [False, True])
+async def test_bearer_fallback_only_accepts_verified_keys(
+    monkeypatch, introspection_down, valid_key
+):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kw: FakeAsyncClient(
+            response=FakeIntrospectionResponse({"active": False}),
+            exc=httpx.ConnectError("down") if introspection_down else None,
+        ),
+    )
+
+    def account(*, api_key, timeout):
+        assert api_key == "CREDENTIAL"
+        if not valid_key:
+            raise make_serpapi_http_error(401, {"error": "Invalid API key."})
+        return {"api_key": api_key}
+
+    monkeypatch.setattr(serpapi, "account", account)
+    request = real_request(headers={"Authorization": "Bearer CREDENTIAL"})
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    response = await mw.dispatch(request, passthrough)
+    if valid_key:
+        assert response == "OK"
+        assert request.state.api_key == "CREDENTIAL"
+    else:
+        assert response.status_code == 401
+        assert not hasattr(request.state, "api_key")
+
+
+async def test_empty_bearer_does_not_call_authentication_services(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+
+    async def unexpected_lookup(value):
+        pytest.fail("Empty credentials must not trigger upstream requests")
+
+    monkeypatch.setattr(server, "introspect_token", unexpected_lookup)
+    monkeypatch.setattr(server, "is_valid_api_key", unexpected_lookup)
+    request = real_request(headers={"Authorization": "Bearer   "})
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    response = await mw.dispatch(request, passthrough)
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize(
+    "account",
+    [None, [], {}, {"error": "Invalid key"}, {"api_key": "OTHER_KEY"}],
+)
+async def test_api_key_validation_requires_matching_account_key(monkeypatch, account):
+    monkeypatch.setattr(serpapi, "account", lambda **kwargs: account)
+    assert not await server.is_valid_api_key("RAW_KEY")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        make_serpapi_http_error(401, {"error": "Invalid API key."}),
+        make_serpapi_http_error(403, {"error": "Forbidden"}),
+        make_serpapi_http_error(429, {"error": "Too many requests"}),
+        make_serpapi_http_error(500, {"error": "Server error"}),
+        serpapi.exceptions.HTTPConnectionError(
+            requests.exceptions.ConnectionError("secret-key-in-url")
+        ),
+        serpapi.exceptions.TimeoutError("secret-key-in-url"),
+        ValueError("secret-key-in-url"),
+    ],
+)
+async def test_api_key_validation_fails_closed_without_logging_keys(
+    monkeypatch, caplog, error
+):
+    def account(**kwargs):
+        raise error
+
+    monkeypatch.setattr(serpapi, "account", account)
+    assert not await server.is_valid_api_key("secret-key-in-url")
+    assert "API-key validation failed" in caplog.text
+    assert "secret-key-in-url" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        None,
+        [],
+        {"active": "false", "api_key": "KEY"},
+        {"active": True},
+        {"active": True, "api_key": []},
+        {"active": True, "api_key": " "},
+    ],
+)
+async def test_introspection_rejects_malformed_responses(monkeypatch, body):
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kw: FakeAsyncClient(response=FakeIntrospectionResponse(body)),
+    )
+    assert await server.introspect_token("some-token") is None
 
 
 # --- MCP Apps: shared error mapping ----------------------------------------
