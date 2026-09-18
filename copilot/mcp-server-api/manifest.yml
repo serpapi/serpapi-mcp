@@ -26,6 +26,7 @@ storage:
 
 variables:
   PYTHONDONTWRITEBYTECODE: "1"
+  MCP_PUBLIC_ORIGIN: "https://mcp.serpapi.com"
 
 # Allow writes to /tmp
 taskdef_overrides:

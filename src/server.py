@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import os
@@ -5,6 +6,8 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+import httpx
+import serpapi
 import uvicorn
 from dotenv import load_dotenv
 from starlette.middleware import Middleware
@@ -21,6 +24,22 @@ from src.version import __version__
 
 COMPONENTS_DIR = Path(__file__).parent / "mcp_components"
 
+load_dotenv()
+
+PUBLIC_ORIGIN = os.getenv("MCP_PUBLIC_ORIGIN", "").rstrip("/")
+
+# Authorization server for RFC 9728 discovery (serpapi/SerpApi#10015).
+OAUTH_AUTHORIZATION_SERVER = os.getenv(
+    "MCP_OAUTH_AUTHORIZATION_SERVER", "https://serpapi.com"
+)
+OAUTH_PROTECTED_RESOURCE_PATH = "/.well-known/oauth-protected-resource"
+OAUTH_INTROSPECTION_URL = os.getenv(
+    "MCP_OAUTH_INTROSPECTION_URL", f"{OAUTH_AUTHORIZATION_SERVER}/oauth/introspect"
+)
+OAUTH_CLIENT_ID = os.getenv("MCP_OAUTH_CLIENT_ID")
+OAUTH_CLIENT_SECRET = os.getenv("MCP_OAUTH_CLIENT_SECRET")
+OAUTH_INTROSPECTION_ENABLED = bool(OAUTH_CLIENT_ID and OAUTH_CLIENT_SECRET)
+
 
 mcp = FastMCP(
     "SerpApi MCP Server",
@@ -35,8 +54,6 @@ mcp = FastMCP(
     providers=[FileSystemProvider(COMPONENTS_DIR)],
 )
 mcp.completion(complete_engine_name)
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -64,17 +81,88 @@ def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
     logger.info(json.dumps(emf_event))
 
 
+def public_origin(request: Request) -> str:
+    return PUBLIC_ORIGIN or f"{request.url.scheme}://{request.url.netloc}"
+
+
+def resource_metadata_url(request: Request) -> str:
+    return f"{public_origin(request)}{OAUTH_PROTECTED_RESOURCE_PATH}"
+
+
+async def oauth_protected_resource_handler(request: Request):
+    return JSONResponse(
+        {
+            "resource": f"{public_origin(request)}/mcp",
+            "authorization_servers": [OAUTH_AUTHORIZATION_SERVER],
+            "bearer_methods_supported": ["header"],
+            "scopes_supported": ["search"],
+        }
+    )
+
+
+async def introspect_token(token: str) -> str | None:
+    """Resolve an OAuth access token to the resource owner's SerpApi api_key.
+
+    Returns None if the token is inactive or the authorization server is
+    unreachable. Caller is responsible for checking OAUTH_INTROSPECTION_ENABLED.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.post(
+                OAUTH_INTROSPECTION_URL,
+                data={"token": token},
+                auth=(OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET),
+            )
+        response.raise_for_status()
+        body = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        logger.warning("OAuth introspection failed (%s)", type(exc).__name__)
+        return None
+
+    if not isinstance(body, dict):
+        logger.warning("OAuth introspection returned an invalid response")
+        return None
+    if body.get("active") is not True:
+        return None
+    api_key = body.get("api_key")
+    if not isinstance(api_key, str) or not api_key.strip():
+        logger.warning("OAuth introspection returned no valid API key")
+        return None
+    return api_key
+
+
+async def is_valid_api_key(api_key: str) -> bool:
+    """Verify a legacy bearer key without consuming search credits."""
+    try:
+        account = await asyncio.to_thread(serpapi.account, api_key=api_key, timeout=5.0)
+    except (serpapi.exceptions.SerpApiError, ValueError) as exc:
+        # Exception messages can contain the request URL, including the API key.
+        logger.warning("SerpApi API-key validation failed (%s)", type(exc).__name__)
+        return False
+
+    if not isinstance(account, dict) or account.get("api_key") != api_key:
+        logger.warning("SerpApi Account API did not confirm the API key")
+        return False
+    return True
+
+
 class ApiKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Skip authentication for healthcheck endpoint
-        if request.url.path == "/healthcheck":
+        # Skip authentication for healthcheck and OAuth discovery endpoints
+        if request.url.path in ("/healthcheck", OAUTH_PROTECTED_RESOURCE_PATH):
             return await call_next(request)
 
         api_key = None
 
         auth = request.headers.get("Authorization")
         if auth and auth.startswith("Bearer "):
-            api_key = auth.split(" ", 1)[1].strip()
+            bearer_value = auth.split(" ", 1)[1].strip()
+            if bearer_value and OAUTH_INTROSPECTION_ENABLED:
+                api_key = await introspect_token(bearer_value)
+                if not api_key and await is_valid_api_key(bearer_value):
+                    api_key = bearer_value
+            else:
+                api_key = bearer_value
 
         original_path = request.scope.get("path", "")
         path_parts = original_path.strip("/").split("/") if original_path else []
@@ -93,6 +181,11 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
                     "error": "Missing API key. Use path format /{API_KEY}/mcp or Authorization: Bearer {API_KEY} header"
                 },
                 status_code=401,
+                headers={
+                    "WWW-Authenticate": (
+                        f'Bearer resource_metadata="{resource_metadata_url(request)}"'
+                    )
+                },
             )
 
         # Store API key in request state for tools to access
@@ -148,6 +241,9 @@ starlette_app = mcp.http_app(
 )
 
 starlette_app.add_route("/healthcheck", healthcheck_handler, methods=["GET"])
+starlette_app.add_route(
+    OAUTH_PROTECTED_RESOURCE_PATH, oauth_protected_resource_handler, methods=["GET"]
+)
 
 if __name__ == "__main__":
     host = os.getenv("MCP_HOST", "0.0.0.0")

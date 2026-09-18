@@ -80,6 +80,14 @@ Configure Claude Desktop:
 
 Get your API key: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
 
+For deployments behind a TLS-terminating proxy, set `MCP_PUBLIC_ORIGIN` to the
+external origin (for example, `https://mcp.example.com`, without a path).
+OAuth discovery and the authentication challenge use this origin rather than the
+internal HTTP connection. The hosted deployment sets `https://mcp.serpapi.com`.
+Without it, direct connections use the request's scheme and host.
+Configuration can be supplied through environment variables or `.env`; environment
+variables take precedence. See [`.env.example`](.env.example) for the OAuth settings.
+
 ### Claude Desktop Extension (MCP Bundle)
 
 For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) (or build it as below) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. The bundle uses the MCPB `uv` runtime: it ships only the source, `pyproject.toml` and `uv.lock`, and Claude Desktop provisions Python and the locked dependencies with uv at install time, so nothing is vendored and one bundle works on macOS, Windows and Linux.
@@ -118,6 +126,21 @@ curl "https://mcp.serpapi.com/your_key/mcp" -d '...'
 # Header-based  
 curl "https://mcp.serpapi.com/mcp" -H "Authorization: Bearer your_key" -d '...'
 ```
+
+### OAuth and existing API keys
+
+Set `MCP_OAUTH_CLIENT_ID` and `MCP_OAUTH_CLIENT_SECRET` to enable OAuth bearer
+tokens. The server introspects them at `MCP_OAUTH_INTROSPECTION_URL`, which
+defaults to `${MCP_OAUTH_AUTHORIZATION_SERVER}/oauth/introspect`
+(`MCP_OAUTH_AUTHORIZATION_SERVER` defaults to `https://serpapi.com`).
+
+Existing bearer API keys continue to work: if introspection does not resolve a
+bearer value, the server verifies it using the [SerpApi Account API](https://serpapi.com/account-api)
+before accepting it as a raw key. This adds an Account API request for each
+raw-key bearer request while OAuth is enabled, but consumes no search credits.
+Unverified values are rejected with `401`; failed OAuth tokens are never blindly
+forwarded to search as API keys. Path-based keys and deployments without OAuth
+credentials retain their existing behavior.
 
 ## Search Tool
 
