@@ -80,6 +80,14 @@ Configure Claude Desktop:
 
 Get your API key: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
 
+For deployments behind a TLS-terminating proxy, set `MCP_PUBLIC_ORIGIN` to the
+external origin (for example, `https://mcp.example.com`, without a path).
+OAuth discovery and the authentication challenge use this origin rather than the
+internal HTTP connection. The hosted deployment sets `https://mcp.serpapi.com`.
+Without it, direct connections use the request's scheme and host.
+Configuration can be supplied through environment variables or `.env`; environment
+variables take precedence. See [`.env.example`](.env.example) for the OAuth settings.
+
 ### Claude Desktop Extension (MCP Bundle)
 
 For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) (or build it as below) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. The bundle uses the MCPB `uv` runtime: it ships only the source, `pyproject.toml` and `uv.lock`, and Claude Desktop provisions Python and the locked dependencies with uv at install time, so nothing is vendored and one bundle works on macOS, Windows and Linux.

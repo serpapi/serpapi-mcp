@@ -22,6 +22,10 @@ from src.version import __version__
 
 COMPONENTS_DIR = Path(__file__).parent / "mcp_components"
 
+load_dotenv()
+
+PUBLIC_ORIGIN = os.getenv("MCP_PUBLIC_ORIGIN", "").rstrip("/")
+
 # Authorization server for RFC 9728 discovery (serpapi/SerpApi#10015).
 OAUTH_AUTHORIZATION_SERVER = os.getenv(
     "MCP_OAUTH_AUTHORIZATION_SERVER", "https://serpapi.com"
@@ -49,8 +53,6 @@ mcp = FastMCP(
 )
 mcp.completion(complete_engine_name)
 
-load_dotenv()
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -77,14 +79,18 @@ def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
     logger.info(json.dumps(emf_event))
 
 
+def public_origin(request: Request) -> str:
+    return PUBLIC_ORIGIN or f"{request.url.scheme}://{request.url.netloc}"
+
+
 def resource_metadata_url(request: Request) -> str:
-    return f"{request.url.scheme}://{request.url.netloc}{OAUTH_PROTECTED_RESOURCE_PATH}"
+    return f"{public_origin(request)}{OAUTH_PROTECTED_RESOURCE_PATH}"
 
 
 async def oauth_protected_resource_handler(request: Request):
     return JSONResponse(
         {
-            "resource": f"{request.url.scheme}://{request.url.netloc}/mcp",
+            "resource": f"{public_origin(request)}/mcp",
             "authorization_servers": [OAUTH_AUTHORIZATION_SERVER],
             "bearer_methods_supported": ["header"],
             "scopes_supported": ["search"],

@@ -7,6 +7,10 @@ or an API key.
 """
 
 import json
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 import httpx
 import pytest
@@ -537,7 +541,8 @@ async def test_middleware_skips_oauth_protected_resource():
     assert await mw.dispatch(request, passthrough) == "OK"
 
 
-async def test_middleware_401_challenges_with_resource_metadata_url():
+async def test_middleware_401_challenges_with_resource_metadata_url(monkeypatch):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "")
     mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
     response = await mw.dispatch(real_request(path="/mcp"), passthrough)
     assert response.status_code == 401
@@ -549,15 +554,20 @@ async def test_middleware_401_challenges_with_resource_metadata_url():
     )
 
 
-def test_resource_metadata_url_is_absolute_and_scheme_aware():
+@pytest.mark.parametrize("scheme", ["http", "https"])
+def test_resource_metadata_url_is_absolute_and_scheme_aware(monkeypatch, scheme):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "")
     request = real_request(path="/mcp")
+    request.scope["scheme"] = scheme
+    request.scope["server"] = ("testserver", 443 if scheme == "https" else 80)
     assert (
         server.resource_metadata_url(request)
-        == f"http://testserver{server.OAUTH_PROTECTED_RESOURCE_PATH}"
+        == f"{scheme}://testserver{server.OAUTH_PROTECTED_RESOURCE_PATH}"
     )
 
 
-async def test_oauth_protected_resource_handler_returns_metadata():
+async def test_oauth_protected_resource_handler_returns_metadata(monkeypatch):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "")
     request = real_request(path=server.OAUTH_PROTECTED_RESOURCE_PATH)
     resp = await server.oauth_protected_resource_handler(request)
     assert resp.status_code == 200
@@ -566,6 +576,87 @@ async def test_oauth_protected_resource_handler_returns_metadata():
     assert body["authorization_servers"] == [server.OAUTH_AUTHORIZATION_SERVER]
     assert body["bearer_methods_supported"] == ["header"]
     assert body["scopes_supported"] == ["search"]
+
+
+async def test_discovery_uses_public_origin_behind_tls_proxy(monkeypatch):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "https://mcp.example.com")
+    transport = httpx.ASGITransport(
+        app=server.starlette_app, client=("10.0.1.23", 12345)
+    )
+    async with httpx.AsyncClient(
+        transport=transport,
+        base_url="http://internal:8000",
+        headers={"X-Forwarded-Proto": "https"},
+    ) as client:
+        metadata = await client.get(server.OAUTH_PROTECTED_RESOURCE_PATH)
+        challenge = await client.post("/mcp")
+
+    assert metadata.status_code == 200
+    assert metadata.json()["resource"] == "https://mcp.example.com/mcp"
+    assert challenge.status_code == 401
+    assert (
+        'resource_metadata="https://mcp.example.com/.well-known/oauth-protected-resource"'
+        in challenge.headers["WWW-Authenticate"]
+    )
+
+
+@pytest.mark.parametrize("override", [False, True])
+def test_oauth_settings_load_from_dotenv_before_initialization(tmp_path, override):
+    dotenv_file = tmp_path / ".env"
+    dotenv_file.write_text(
+        "MCP_PUBLIC_ORIGIN=https://mcp.example.com/\n"
+        "MCP_OAUTH_AUTHORIZATION_SERVER=https://auth.example.com\n"
+        "MCP_OAUTH_CLIENT_ID=test-client\n"
+        "MCP_OAUTH_CLIENT_SECRET=test-secret\n"
+    )
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if not key.startswith("MCP_OAUTH_")
+        and key not in {"MCP_PUBLIC_ORIGIN", "PYTHON_DOTENV_DISABLED"}
+    }
+    if override:
+        env["MCP_OAUTH_INTROSPECTION_URL"] = "https://auth.example.com/custom"
+        env["MCP_OAUTH_CLIENT_ID"] = "environment-client"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            """
+import json
+import sys
+from unittest.mock import patch
+
+with patch("dotenv.main.find_dotenv", return_value=sys.argv[1]):
+    from src import server
+print(json.dumps([
+    server.PUBLIC_ORIGIN,
+    server.OAUTH_AUTHORIZATION_SERVER,
+    server.OAUTH_INTROSPECTION_URL,
+    server.OAUTH_CLIENT_ID,
+    server.OAUTH_CLIENT_SECRET,
+    server.OAUTH_INTROSPECTION_ENABLED,
+]))
+""",
+            str(dotenv_file),
+        ],
+        cwd=Path(__file__).resolve().parents[1],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=30,
+    )
+    assert json.loads(result.stdout) == [
+        "https://mcp.example.com",
+        "https://auth.example.com",
+        "https://auth.example.com/custom"
+        if override
+        else "https://auth.example.com/oauth/introspect",
+        "environment-client" if override else "test-client",
+        "test-secret",
+        True,
+    ]
 
 
 # --- OAuth token introspection ---------------------------------------------
