@@ -527,6 +527,46 @@ async def test_healthcheck_returns_healthy_with_utc_timestamp():
     assert body["timestamp"].endswith("Z")
 
 
+# --- OAuth 2.0 Protected Resource Metadata (RFC 9728) ----------------------
+
+
+async def test_middleware_skips_oauth_protected_resource():
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    request = real_request(path=server.OAUTH_PROTECTED_RESOURCE_PATH)
+    assert await mw.dispatch(request, passthrough) == "OK"
+
+
+async def test_middleware_401_challenges_with_resource_metadata_url():
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    response = await mw.dispatch(real_request(path="/mcp"), passthrough)
+    assert response.status_code == 401
+    challenge = response.headers["WWW-Authenticate"]
+    assert challenge.startswith("Bearer ")
+    assert (
+        f'resource_metadata="http://testserver{server.OAUTH_PROTECTED_RESOURCE_PATH}"'
+        in challenge
+    )
+
+
+def test_resource_metadata_url_is_absolute_and_scheme_aware():
+    request = real_request(path="/mcp")
+    assert (
+        server.resource_metadata_url(request)
+        == f"http://testserver{server.OAUTH_PROTECTED_RESOURCE_PATH}"
+    )
+
+
+async def test_oauth_protected_resource_handler_returns_metadata():
+    request = real_request(path=server.OAUTH_PROTECTED_RESOURCE_PATH)
+    resp = await server.oauth_protected_resource_handler(request)
+    assert resp.status_code == 200
+    body = json.loads(resp.body)
+    assert body["resource"] == "http://testserver/mcp"
+    assert body["authorization_servers"] == [server.OAUTH_AUTHORIZATION_SERVER]
+    assert body["bearer_methods_supported"] == ["header"]
+    assert body["scopes_supported"] == ["search"]
+
+
 # --- MCP Apps: shared error mapping ----------------------------------------
 
 

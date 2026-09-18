@@ -21,6 +21,12 @@ from src.version import __version__
 
 COMPONENTS_DIR = Path(__file__).parent / "mcp_components"
 
+# Authorization server for RFC 9728 discovery (serpapi/SerpApi#10015).
+OAUTH_AUTHORIZATION_SERVER = os.getenv(
+    "MCP_OAUTH_AUTHORIZATION_SERVER", "https://serpapi.com"
+)
+OAUTH_PROTECTED_RESOURCE_PATH = "/.well-known/oauth-protected-resource"
+
 
 mcp = FastMCP(
     "SerpApi MCP Server",
@@ -64,10 +70,25 @@ def emit_metric(namespace: str, metrics: dict, dimensions: dict = {}):
     logger.info(json.dumps(emf_event))
 
 
+def resource_metadata_url(request: Request) -> str:
+    return f"{request.url.scheme}://{request.url.netloc}{OAUTH_PROTECTED_RESOURCE_PATH}"
+
+
+async def oauth_protected_resource_handler(request: Request):
+    return JSONResponse(
+        {
+            "resource": f"{request.url.scheme}://{request.url.netloc}/mcp",
+            "authorization_servers": [OAUTH_AUTHORIZATION_SERVER],
+            "bearer_methods_supported": ["header"],
+            "scopes_supported": ["search"],
+        }
+    )
+
+
 class ApiKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Skip authentication for healthcheck endpoint
-        if request.url.path == "/healthcheck":
+        # Skip authentication for healthcheck and OAuth discovery endpoints
+        if request.url.path in ("/healthcheck", OAUTH_PROTECTED_RESOURCE_PATH):
             return await call_next(request)
 
         api_key = None
@@ -93,6 +114,11 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
                     "error": "Missing API key. Use path format /{API_KEY}/mcp or Authorization: Bearer {API_KEY} header"
                 },
                 status_code=401,
+                headers={
+                    "WWW-Authenticate": (
+                        f'Bearer resource_metadata="{resource_metadata_url(request)}"'
+                    )
+                },
             )
 
         # Store API key in request state for tools to access
@@ -148,6 +174,9 @@ starlette_app = mcp.http_app(
 )
 
 starlette_app.add_route("/healthcheck", healthcheck_handler, methods=["GET"])
+starlette_app.add_route(
+    OAUTH_PROTECTED_RESOURCE_PATH, oauth_protected_resource_handler, methods=["GET"]
+)
 
 if __name__ == "__main__":
     host = os.getenv("MCP_HOST", "0.0.0.0")
