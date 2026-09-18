@@ -8,6 +8,7 @@ or an API key.
 
 import json
 
+import httpx
 import pytest
 import requests
 import serpapi
@@ -565,6 +566,88 @@ async def test_oauth_protected_resource_handler_returns_metadata():
     assert body["authorization_servers"] == [server.OAUTH_AUTHORIZATION_SERVER]
     assert body["bearer_methods_supported"] == ["header"]
     assert body["scopes_supported"] == ["search"]
+
+
+# --- OAuth token introspection ---------------------------------------------
+
+
+class FakeIntrospectionResponse:
+    def __init__(self, json_body, status_code=200):
+        self._json_body = json_body
+        self.status_code = status_code
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise httpx.HTTPStatusError("error", request=None, response=self)
+
+    def json(self):
+        return self._json_body
+
+
+class FakeAsyncClient:
+    def __init__(self, response=None, exc=None, **kwargs):
+        self._response = response
+        self._exc = exc
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        return False
+
+    async def post(self, url, data=None, auth=None):
+        if self._exc:
+            raise self._exc
+        return self._response
+
+
+async def test_introspect_token_returns_api_key_for_active_token(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_CLIENT_ID", "mcp-client")
+    monkeypatch.setattr(server, "OAUTH_CLIENT_SECRET", "mcp-secret")
+    response = FakeIntrospectionResponse({"active": True, "api_key": "USER_KEY"})
+    monkeypatch.setattr(
+        httpx, "AsyncClient", lambda **kw: FakeAsyncClient(response=response)
+    )
+    assert await server.introspect_token("some-token") == "USER_KEY"
+
+
+async def test_introspect_token_returns_none_for_inactive_token(monkeypatch):
+    response = FakeIntrospectionResponse({"active": False})
+    monkeypatch.setattr(
+        httpx, "AsyncClient", lambda **kw: FakeAsyncClient(response=response)
+    )
+    assert await server.introspect_token("revoked-token") is None
+
+
+async def test_introspect_token_returns_none_on_http_error(monkeypatch):
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kw: FakeAsyncClient(exc=httpx.ConnectError("down")),
+    )
+    assert await server.introspect_token("some-token") is None
+
+
+async def fut(value):
+    return value
+
+
+async def test_middleware_uses_introspection_when_enabled(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+    monkeypatch.setattr(server, "introspect_token", lambda token: fut("USER_KEY"))
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    request = real_request(path="/mcp", headers={"Authorization": "Bearer oauth-token"})
+    assert await mw.dispatch(request, passthrough) == "OK"
+    assert request.state.api_key == "USER_KEY"
+
+
+async def test_middleware_rejects_bearer_when_introspection_fails(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+    monkeypatch.setattr(server, "introspect_token", lambda token: fut(None))
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    request = real_request(path="/mcp", headers={"Authorization": "Bearer bad-token"})
+    response = await mw.dispatch(request, passthrough)
+    assert response.status_code == 401
 
 
 # --- MCP Apps: shared error mapping ----------------------------------------

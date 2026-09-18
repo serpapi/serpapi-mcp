@@ -5,6 +5,7 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
+import httpx
 import uvicorn
 from dotenv import load_dotenv
 from starlette.middleware import Middleware
@@ -26,6 +27,12 @@ OAUTH_AUTHORIZATION_SERVER = os.getenv(
     "MCP_OAUTH_AUTHORIZATION_SERVER", "https://serpapi.com"
 )
 OAUTH_PROTECTED_RESOURCE_PATH = "/.well-known/oauth-protected-resource"
+OAUTH_INTROSPECTION_URL = os.getenv(
+    "MCP_OAUTH_INTROSPECTION_URL", f"{OAUTH_AUTHORIZATION_SERVER}/oauth/introspect"
+)
+OAUTH_CLIENT_ID = os.getenv("MCP_OAUTH_CLIENT_ID")
+OAUTH_CLIENT_SECRET = os.getenv("MCP_OAUTH_CLIENT_SECRET")
+OAUTH_INTROSPECTION_ENABLED = bool(OAUTH_CLIENT_ID and OAUTH_CLIENT_SECRET)
 
 
 mcp = FastMCP(
@@ -85,6 +92,29 @@ async def oauth_protected_resource_handler(request: Request):
     )
 
 
+async def introspect_token(token: str) -> str | None:
+    """Resolve an OAuth access token to the resource owner's SerpApi api_key.
+
+    Returns None if the token is inactive or the authorization server is
+    unreachable. Caller is responsible for checking OAUTH_INTROSPECTION_ENABLED.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.post(
+                OAUTH_INTROSPECTION_URL,
+                data={"token": token},
+                auth=(OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET),
+            )
+        response.raise_for_status()
+        body = response.json()
+    except (httpx.HTTPError, ValueError):
+        return None
+
+    if not body.get("active"):
+        return None
+    return body.get("api_key")
+
+
 class ApiKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Skip authentication for healthcheck and OAuth discovery endpoints
@@ -95,7 +125,11 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
 
         auth = request.headers.get("Authorization")
         if auth and auth.startswith("Bearer "):
-            api_key = auth.split(" ", 1)[1].strip()
+            bearer_value = auth.split(" ", 1)[1].strip()
+            if OAUTH_INTROSPECTION_ENABLED:
+                api_key = await introspect_token(bearer_value)
+            else:
+                api_key = bearer_value
 
         original_path = request.scope.get("path", "")
         path_parts = original_path.strip("/").split("/") if original_path else []
