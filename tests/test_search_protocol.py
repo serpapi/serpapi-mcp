@@ -15,6 +15,7 @@ from starlette.middleware import Middleware
 import src.mcp_components.resources as resources
 import src.mcp_components.tools as tools
 import src.engine_input_rules as input_rules
+import src.server as server
 from src.server import ApiKeyMiddleware, mcp
 
 
@@ -565,7 +566,16 @@ async def test_engine_completion_matches_catalog_and_handles_unknown_references(
             assert result.values == []
 
 
-@pytest.mark.parametrize("auth", ["bearer", "path"])
+@pytest.mark.parametrize(
+    "auth,oauth_enabled",
+    [
+        ("bearer", False),
+        ("path", False),
+        ("bearer", True),
+        ("path", True),
+        ("oauth", True),
+    ],
+)
 @pytest.mark.parametrize(
     "complete_params,missing_name",
     [
@@ -582,8 +592,17 @@ async def test_engine_completion_matches_catalog_and_handles_unknown_references(
     ],
 )
 async def test_search_continuation_runs_on_another_http_replica(
-    upstream, auth, complete_params, missing_name
+    monkeypatch, upstream, auth, oauth_enabled, complete_params, missing_name
 ):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", oauth_enabled)
+
+    async def introspect(token):
+        return "HTTP_KEY" if token == "OAUTH_TOKEN" else None
+
+    monkeypatch.setattr(server, "introspect_token", introspect)
+    monkeypatch.setattr(
+        server.serpapi, "account", lambda **kwargs: {"api_key": "HTTP_KEY"}
+    )
     replicas = [FastMCP("Search replica"), FastMCP("Search replica")]
     headers = {
         "Accept": "application/json, text/event-stream",
@@ -594,6 +613,8 @@ async def test_search_continuation_runs_on_another_http_replica(
     path = "/HTTP_KEY/mcp" if auth == "path" else "/mcp"
     if auth == "bearer":
         headers["Authorization"] = "Bearer HTTP_KEY"
+    elif auth == "oauth":
+        headers["Authorization"] = "Bearer OAUTH_TOKEN"
     params = {
         "name": "search",
         "arguments": {

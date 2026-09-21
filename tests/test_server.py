@@ -7,7 +7,12 @@ or an API key.
 """
 
 import json
+import os
+import subprocess
+import sys
+from pathlib import Path
 
+import httpx
 import pytest
 import requests
 import serpapi
@@ -58,6 +63,13 @@ def real_request(path="/mcp", headers=None, state=None):
 
 def serp_results(payload):
     return SerpResults(payload, client=None)
+
+
+@pytest.fixture(autouse=True)
+def clear_bearer_auth_cache():
+    # Module-level cache is shared process-wide; keep tests isolated from it.
+    server.bearer_auth_cache.clear()
+    yield
 
 
 def use_request(monkeypatch, request):
@@ -525,6 +537,380 @@ async def test_healthcheck_returns_healthy_with_utc_timestamp():
     assert body["service"] == "SerpApi MCP Server"
     # timezone-aware UTC, Z-suffixed (utcnow() was deprecated on 3.12+).
     assert body["timestamp"].endswith("Z")
+
+
+# --- OAuth 2.0 Protected Resource Metadata (RFC 9728) ----------------------
+
+
+async def test_middleware_skips_oauth_protected_resource():
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    request = real_request(path=server.OAUTH_PROTECTED_RESOURCE_PATH)
+    assert await mw.dispatch(request, passthrough) == "OK"
+
+
+async def test_middleware_401_challenges_with_resource_metadata_url(monkeypatch):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "")
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    response = await mw.dispatch(real_request(path="/mcp"), passthrough)
+    assert response.status_code == 401
+    challenge = response.headers["WWW-Authenticate"]
+    assert challenge.startswith("Bearer ")
+    assert (
+        f'resource_metadata="http://testserver{server.OAUTH_PROTECTED_RESOURCE_PATH}"'
+        in challenge
+    )
+
+
+@pytest.mark.parametrize("scheme", ["http", "https"])
+def test_resource_metadata_url_is_absolute_and_scheme_aware(monkeypatch, scheme):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "")
+    request = real_request(path="/mcp")
+    request.scope["scheme"] = scheme
+    request.scope["server"] = ("testserver", 443 if scheme == "https" else 80)
+    assert (
+        server.resource_metadata_url(request)
+        == f"{scheme}://testserver{server.OAUTH_PROTECTED_RESOURCE_PATH}"
+    )
+
+
+async def test_oauth_protected_resource_handler_returns_metadata(monkeypatch):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "")
+    request = real_request(path=server.OAUTH_PROTECTED_RESOURCE_PATH)
+    resp = await server.oauth_protected_resource_handler(request)
+    assert resp.status_code == 200
+    body = json.loads(resp.body)
+    assert body["resource"] == "http://testserver/mcp"
+    assert body["authorization_servers"] == [server.OAUTH_AUTHORIZATION_SERVER]
+    assert body["bearer_methods_supported"] == ["header"]
+    assert body["scopes_supported"] == ["search"]
+
+
+async def test_discovery_uses_public_origin_behind_tls_proxy(monkeypatch):
+    monkeypatch.setattr(server, "PUBLIC_ORIGIN", "https://mcp.example.com")
+    transport = httpx.ASGITransport(
+        app=server.starlette_app, client=("10.0.1.23", 12345)
+    )
+    async with httpx.AsyncClient(
+        transport=transport,
+        base_url="http://internal:8000",
+        headers={"X-Forwarded-Proto": "https"},
+    ) as client:
+        metadata = await client.get(server.OAUTH_PROTECTED_RESOURCE_PATH)
+        challenge = await client.post("/mcp")
+
+    assert metadata.status_code == 200
+    assert metadata.json()["resource"] == "https://mcp.example.com/mcp"
+    assert challenge.status_code == 401
+    assert (
+        'resource_metadata="https://mcp.example.com/.well-known/oauth-protected-resource"'
+        in challenge.headers["WWW-Authenticate"]
+    )
+
+
+@pytest.mark.parametrize("override", [False, True])
+def test_oauth_settings_load_from_dotenv_before_initialization(tmp_path, override):
+    dotenv_file = tmp_path / ".env"
+    dotenv_file.write_text(
+        "MCP_PUBLIC_ORIGIN=https://mcp.example.com/\n"
+        "MCP_OAUTH_AUTHORIZATION_SERVER=https://auth.example.com\n"
+        "MCP_OAUTH_CLIENT_ID=test-client\n"
+        "MCP_OAUTH_CLIENT_SECRET=test-secret\n"
+    )
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if not key.startswith("MCP_OAUTH_")
+        and key not in {"MCP_PUBLIC_ORIGIN", "PYTHON_DOTENV_DISABLED"}
+    }
+    if override:
+        env["MCP_OAUTH_INTROSPECTION_URL"] = "https://auth.example.com/custom"
+        env["MCP_OAUTH_CLIENT_ID"] = "environment-client"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            """
+import json
+import sys
+from unittest.mock import patch
+
+with patch("dotenv.main.find_dotenv", return_value=sys.argv[1]):
+    from src import server
+print(json.dumps([
+    server.PUBLIC_ORIGIN,
+    server.OAUTH_AUTHORIZATION_SERVER,
+    server.OAUTH_INTROSPECTION_URL,
+    server.OAUTH_CLIENT_ID,
+    server.OAUTH_CLIENT_SECRET,
+    server.OAUTH_INTROSPECTION_ENABLED,
+]))
+""",
+            str(dotenv_file),
+        ],
+        cwd=Path(__file__).resolve().parents[1],
+        env=env,
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=30,
+    )
+    assert json.loads(result.stdout) == [
+        "https://mcp.example.com",
+        "https://auth.example.com",
+        "https://auth.example.com/custom"
+        if override
+        else "https://auth.example.com/oauth/introspect",
+        "environment-client" if override else "test-client",
+        "test-secret",
+        True,
+    ]
+
+
+# --- OAuth token introspection ---------------------------------------------
+
+
+class FakeIntrospectionResponse:
+    def __init__(self, json_body, status_code=200):
+        self._json_body = json_body
+        self.status_code = status_code
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise httpx.HTTPStatusError("error", request=None, response=self)
+
+    def json(self):
+        return self._json_body
+
+
+class FakeAsyncClient:
+    def __init__(self, response=None, exc=None, **kwargs):
+        self._response = response
+        self._exc = exc
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        return False
+
+    async def post(self, url, data=None, auth=None):
+        if self._exc:
+            raise self._exc
+        return self._response
+
+
+async def test_introspect_token_returns_api_key_for_active_token(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_CLIENT_ID", "mcp-client")
+    monkeypatch.setattr(server, "OAUTH_CLIENT_SECRET", "mcp-secret")
+    response = FakeIntrospectionResponse({"active": True, "api_key": "USER_KEY"})
+    monkeypatch.setattr(
+        httpx, "AsyncClient", lambda **kw: FakeAsyncClient(response=response)
+    )
+    assert await server.introspect_token("some-token") == "USER_KEY"
+
+
+async def test_introspect_token_returns_none_for_inactive_token(monkeypatch):
+    response = FakeIntrospectionResponse({"active": False})
+    monkeypatch.setattr(
+        httpx, "AsyncClient", lambda **kw: FakeAsyncClient(response=response)
+    )
+    assert await server.introspect_token("revoked-token") is None
+
+
+async def test_introspect_token_returns_none_on_http_error(monkeypatch):
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kw: FakeAsyncClient(exc=httpx.ConnectError("down")),
+    )
+    assert await server.introspect_token("some-token") is None
+
+
+async def fut(value):
+    return value
+
+
+async def test_middleware_uses_introspection_when_enabled(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+    monkeypatch.setattr(server, "introspect_token", lambda token: fut("USER_KEY"))
+
+    def unexpected_account_call(**kwargs):
+        pytest.fail("OAuth tokens must not trigger Account API validation")
+
+    monkeypatch.setattr(serpapi, "account", unexpected_account_call)
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    request = real_request(path="/mcp", headers={"Authorization": "Bearer oauth-token"})
+    assert await mw.dispatch(request, passthrough) == "OK"
+    assert request.state.api_key == "USER_KEY"
+
+
+async def test_middleware_rejects_bearer_when_introspection_fails(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+    monkeypatch.setattr(server, "introspect_token", lambda token: fut(None))
+    monkeypatch.setattr(server, "is_valid_api_key", lambda key: fut(False))
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    request = real_request(path="/mcp", headers={"Authorization": "Bearer bad-token"})
+    response = await mw.dispatch(request, passthrough)
+    assert response.status_code == 401
+
+
+async def test_resolve_bearer_api_key_caches_successful_resolution(monkeypatch):
+    calls = []
+
+    async def introspect(token):
+        calls.append(token)
+        return "USER_KEY"
+
+    monkeypatch.setattr(server, "introspect_token", introspect)
+    assert await server.resolve_bearer_api_key("some-token") == "USER_KEY"
+    assert await server.resolve_bearer_api_key("some-token") == "USER_KEY"
+    assert calls == ["some-token"]
+
+
+async def test_resolve_bearer_api_key_does_not_cache_rejections(monkeypatch):
+    calls = []
+
+    async def introspect(token):
+        calls.append(token)
+        return None
+
+    monkeypatch.setattr(server, "introspect_token", introspect)
+    monkeypatch.setattr(server, "is_valid_api_key", lambda key: fut(False))
+    assert await server.resolve_bearer_api_key("bad-token") is None
+    assert await server.resolve_bearer_api_key("bad-token") is None
+    assert calls == ["bad-token", "bad-token"]
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+@pytest.mark.parametrize("auth", ["bearer", "path"])
+async def test_legacy_keys_work_with_or_without_oauth(monkeypatch, enabled, auth):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", enabled)
+    introspected = []
+    validated = []
+
+    async def introspect(token):
+        introspected.append(token)
+        return None
+
+    def account(*, api_key, timeout):
+        validated.append(api_key)
+        assert timeout == 5.0
+        return {"api_key": api_key}
+
+    monkeypatch.setattr(server, "introspect_token", introspect)
+    monkeypatch.setattr(serpapi, "account", account)
+    request = real_request(
+        path="/RAW_KEY/mcp" if auth == "path" else "/mcp",
+        headers={"Authorization": "Bearer RAW_KEY"} if auth == "bearer" else {},
+    )
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    assert await mw.dispatch(request, passthrough) == "OK"
+    assert request.state.api_key == "RAW_KEY"
+    assert request.scope["path"] == "/mcp"
+    expected = ["RAW_KEY"] if enabled and auth == "bearer" else []
+    assert introspected == validated == expected
+
+
+@pytest.mark.parametrize("introspection_down", [False, True])
+@pytest.mark.parametrize("valid_key", [False, True])
+async def test_bearer_fallback_only_accepts_verified_keys(
+    monkeypatch, introspection_down, valid_key
+):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kw: FakeAsyncClient(
+            response=FakeIntrospectionResponse({"active": False}),
+            exc=httpx.ConnectError("down") if introspection_down else None,
+        ),
+    )
+
+    def account(*, api_key, timeout):
+        assert api_key == "CREDENTIAL"
+        if not valid_key:
+            raise make_serpapi_http_error(401, {"error": "Invalid API key."})
+        return {"api_key": api_key}
+
+    monkeypatch.setattr(serpapi, "account", account)
+    request = real_request(headers={"Authorization": "Bearer CREDENTIAL"})
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    response = await mw.dispatch(request, passthrough)
+    if valid_key:
+        assert response == "OK"
+        assert request.state.api_key == "CREDENTIAL"
+    else:
+        assert response.status_code == 401
+        assert not hasattr(request.state, "api_key")
+
+
+async def test_empty_bearer_does_not_call_authentication_services(monkeypatch):
+    monkeypatch.setattr(server, "OAUTH_INTROSPECTION_ENABLED", True)
+
+    async def unexpected_lookup(value):
+        pytest.fail("Empty credentials must not trigger upstream requests")
+
+    monkeypatch.setattr(server, "introspect_token", unexpected_lookup)
+    monkeypatch.setattr(server, "is_valid_api_key", unexpected_lookup)
+    request = real_request(headers={"Authorization": "Bearer   "})
+    mw = server.ApiKeyMiddleware(app=lambda *a, **k: None)
+    response = await mw.dispatch(request, passthrough)
+    assert response.status_code == 401
+
+
+@pytest.mark.parametrize(
+    "account",
+    [None, [], {}, {"error": "Invalid key"}, {"api_key": "OTHER_KEY"}],
+)
+async def test_api_key_validation_requires_matching_account_key(monkeypatch, account):
+    monkeypatch.setattr(serpapi, "account", lambda **kwargs: account)
+    assert not await server.is_valid_api_key("RAW_KEY")
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        make_serpapi_http_error(401, {"error": "Invalid API key."}),
+        make_serpapi_http_error(403, {"error": "Forbidden"}),
+        make_serpapi_http_error(429, {"error": "Too many requests"}),
+        make_serpapi_http_error(500, {"error": "Server error"}),
+        serpapi.exceptions.HTTPConnectionError(
+            requests.exceptions.ConnectionError("secret-key-in-url")
+        ),
+        serpapi.exceptions.TimeoutError("secret-key-in-url"),
+        ValueError("secret-key-in-url"),
+    ],
+)
+async def test_api_key_validation_fails_closed_without_logging_keys(
+    monkeypatch, caplog, error
+):
+    def account(**kwargs):
+        raise error
+
+    monkeypatch.setattr(serpapi, "account", account)
+    assert not await server.is_valid_api_key("secret-key-in-url")
+    assert "API-key validation failed" in caplog.text
+    assert "secret-key-in-url" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        None,
+        [],
+        {"active": "false", "api_key": "KEY"},
+        {"active": True},
+        {"active": True, "api_key": []},
+        {"active": True, "api_key": " "},
+    ],
+)
+async def test_introspection_rejects_malformed_responses(monkeypatch, body):
+    monkeypatch.setattr(
+        httpx,
+        "AsyncClient",
+        lambda **kw: FakeAsyncClient(response=FakeIntrospectionResponse(body)),
+    )
+    assert await server.introspect_token("some-token") is None
 
 
 # --- MCP Apps: shared error mapping ----------------------------------------
