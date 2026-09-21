@@ -301,7 +301,6 @@ _FLIGHTS_COLUMNS = [
     DataTableColumn(key="arrival", header="Arrives", sortable=True),
     DataTableColumn(key="duration", header="Duration", sortable=True),
     DataTableColumn(key="stops", header="Stops", sortable=True),
-    DataTableColumn(key="price", header="Price", sortable=True, format="currency"),
 ]
 
 
@@ -319,6 +318,7 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
 
     title = "Flights dashboard"
     params = data.get("search_parameters") or {}
+    currency = params.get("currency", "USD")
     dep = params.get("departure_id", "")
     arr = params.get("arrival_id", "")
     if dep and arr:
@@ -355,7 +355,9 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
             if history:
                 AreaChart(
                     data=history,
-                    series=[ChartSeries(data_key="price", label="Price ($)")],
+                    series=[
+                        ChartSeries(data_key="price", label=f"Price ({symbol.strip()})")
+                    ],
                     x_axis="date",
                     height=280,
                     curve="smooth",
@@ -364,7 +366,15 @@ def build_flights_app(data: dict[str, Any]) -> PrefabApp:
 
             # Flights table
             DataTable(
-                columns=_FLIGHTS_COLUMNS,
+                columns=[
+                    *_FLIGHTS_COLUMNS,
+                    DataTableColumn(
+                        key="price",
+                        header="Price",
+                        sortable=True,
+                        format=f"currency:{currency}",
+                    ),
+                ],
                 rows=rows,
                 search=True,
                 paginated=True,

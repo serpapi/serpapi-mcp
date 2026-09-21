@@ -125,6 +125,7 @@ No key is needed to connect, list tools or read resources. `search` and the App 
 
 The MCP server has one main Search Tool that supports all SerpApi engines and result types. You can find all available parameters on the [SerpApi API reference](https://serpapi.com/search-api).
 Engine parameter schemas are also exposed as MCP resources: `serpapi://engines` (index) and `serpapi://engines/<engine>`.
+Clients that support [argument completion](https://gofastmcp.com/servers/completions) can request engine-name suggestions for `serpapi://engines/{engine_name}`. For example, the prefix `google_f` suggests matching engine identifiers. This completes the resource URI parameter, not arbitrary search queries.
 
 The parameters you can provide are specific for each API engine. Some sample parameters are provided below:
 
@@ -155,9 +156,22 @@ The parameters you can provide are specific for each API engine. Some sample par
 
 **Result Types:** Answer boxes, organic results, news, images, shopping - automatically detected and formatted.
 
+Search responses preserve the existing MCP `structuredContent.result` string and include the same string in text content. For JSON output, `result` contains serialized JSON; existing clients can continue parsing it with `JSON.parse(response.structuredContent.result)`. For Markdown output, it contains the unchanged Markdown. Errors and cancellations use the same wrapper. Search execution failures set `isError: true`; clients using FastMCP's high-level `call_tool()` should handle `ToolError`, or use `call_tool_mcp()` to inspect the result flag. See [MCP tool results](https://modelcontextprotocol.io/specification/2025-06-18/server/tools).
+
+`search` uses the engine catalog and engine-specific rules to identify missing parameters. Supporting MCP 2026-07-28 clients receive a form before any search runs. Accepted answers are validated; decline or cancellation runs no search. Legacy clients and clients without form elicitation receive an error listing the missing parameters so the agent can ask in conversation. See [MCP input requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr).
+
+- [Google Flights](https://serpapi.com/google-flights-api): departure and arrival identifiers, departure date, and a return date for round trips. Dates and airport identifiers are checked. Token-based searches, multi-city itineraries, and `selected_flights_json` retain their existing behavior.
+- [Google Hotels](https://serpapi.com/google-hotels-api): destination or hotel query, check-in date, and check-out date. Check-out must follow check-in. Guest counts and other optional filters keep the caller's values or the API defaults.
+- [Google Maps Directions](https://serpapi.com/google-maps-directions-api): missing start and destination addresses. Coordinates or place data IDs already supplied satisfy the corresponding endpoint.
+- Other catalog engines use their required fields, such as YouTube's `search_query`, Yelp's `find_loc`, and Amazon's `k`. Engine rules account for known defaults and alternatives, including Amazon category nodes, eBay categories, and Google Scholar citation searches.
+
+The form is derived from the original arguments on each request. It uses no `requestState` or process-local continuation storage, so a retry can run on another replica without a shared state-protection key. Authentication is applied on every HTTP request, and only answers for requested fields are used. If an answer introduces another requirement, the tool lists the remaining fields for the agent to supply in a new call.
+
+To extend guided search, add required fields, descriptions, types, and options to the engine's `engines/<engine>.json` file. Add an `EngineInputRules` entry in [`src/engine_input_rules.py`](src/engine_input_rules.py) when requirements depend on other parameters, defaults, or alternatives. The shared MCP handler in [`src/search_input.py`](src/search_input.py) needs no engine-specific branches. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
+
 ## Interactive UI (MCP Apps)
 
-The default `search` tool returns JSON and is unchanged. For hosts that support the [MCP Apps extension](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) (SEP-1865), two opt-in tools render results as an interactive UI directly in the conversation, so the bulk SERP JSON never enters the model's context window:
+The `search` tool returns JSON by default. For hosts that support the [MCP Apps extension](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) (SEP-1865), two opt-in tools render results as an interactive UI directly in the conversation, so the bulk SERP JSON never enters the model's context window:
 
 - `search_table`: organic results as a sortable, searchable table.
 - `search_dashboard`: summary metrics, a source-breakdown chart, and a results table with a click-to-expand detail panel.

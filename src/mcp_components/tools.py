@@ -3,10 +3,13 @@ import os
 from typing import Any
 
 import serpapi
+from fastmcp import Context
 from fastmcp.server.dependencies import get_http_request
-from fastmcp.tools import tool
-from mcp.types import ToolAnnotations
+from fastmcp.tools import ToolResult, tool
+from mcp.types import InputRequiredResult, ToolAnnotations
 from serpapi.models import SerpResults
+
+from src.search_input import prepare_search_input
 
 
 def extract_error_response(exception) -> str:
@@ -71,6 +74,15 @@ def map_search_error(exception) -> str:
     return f"Error: {extract_error_response(exception)}"
 
 
+def _text_result(content: str, *, is_error: bool = False) -> ToolResult:
+    """Preserve the response wrapper produced by the original string-returning tool."""
+    return ToolResult(
+        content=content,
+        structured_content={"result": content},
+        is_error=is_error,
+    )
+
+
 search_tool_description = """Universal search tool supporting all SerpApi engines and result types.
 
     Runs a query against the SerpApi Search API (https://serpapi.com/search-api):
@@ -101,7 +113,13 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
             - "compact": Remove metadata fields from JSON responses. Markdown is returned unchanged.
     
     Output schema:
-        Markdown when params.output is "md"; otherwise a JSON string or an error message.
+        structuredContent.result contains the response string: serialized JSON or unchanged Markdown.
+        The same string is included in text content. Tool failures preserve this wrapper and set isError to true.
+
+    Guided search:
+        Searches can request missing engine parameters from supporting clients using the engine catalog and engine-specific rules.
+        Flights collect airports and dates, hotels collect the destination and stay dates, and directions collect missing endpoints.
+        Other clients receive a missing-parameter error. Cancellation does not run a search.
 
     Examples:
         Weather: {"params": {"q": "weather in London", "engine": "google"}, "mode": "complete"}
@@ -131,6 +149,12 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
 
 @tool(
     description=search_tool_description,
+    output_schema={
+        "type": "object",
+        "properties": {"result": {"type": "string"}},
+        "required": ["result"],
+        "x-fastmcp-wrap-result": True,
+    },
     annotations=ToolAnnotations(
         title="SerpApi search",
         readOnlyHint=True,  # search is read-only; no state mutation
@@ -139,7 +163,11 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
         openWorldHint=True,  # talks to external search engines
     ),
 )
-async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
+async def search(
+    params: dict[str, Any] | None = None,
+    mode: str = "complete",
+    ctx: Context | None = None,
+) -> ToolResult | InputRequiredResult:
     """Universal search tool supporting all SerpApi engines and result types.
 
     Args:
@@ -154,27 +182,44 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
             - "compact": Removes metadata fields from JSON responses; Markdown is unchanged
 
     Returns:
-        A Markdown or JSON string containing search results, or an error message.
+        A wrapped response string, a wrapped tool error, or a search input request.
     """
 
     # Validate mode parameter
     if mode not in ["complete", "compact"]:
-        return "Error: Invalid mode. Must be 'complete' or 'compact'"
+        return _text_result(
+            content="Error: Invalid mode. Must be 'complete' or 'compact'",
+            is_error=True,
+        )
 
     output = (params or {}).get("output", "json")
-    if output not in {"json", "md"}:
-        return (
-            "Error: Invalid output. Use either 'md' or 'json' for the output parameter."
+    if output not in ("json", "md"):
+        return _text_result(
+            content="Error: Invalid output. Use either 'md' or 'json' for the output parameter.",
+            is_error=True,
         )
 
     try:
+        prepared = prepare_search_input(params or {}, ctx)
+        if isinstance(prepared, InputRequiredResult):
+            return prepared
+        if isinstance(prepared, ToolResult):
+            return _text_result(prepared.content[0].text, is_error=prepared.is_error)
+        params = prepared
         response = fetch_search_response(params)
         if isinstance(response, str):
             if output == "md":
-                return response
-            return "Error: SerpApi returned text when JSON output was requested."
+                return _text_result(content=response)
+            return _text_result(
+                content="Error: SerpApi returned text when JSON output was requested.",
+                is_error=True,
+            )
 
         data = response.as_dict()
+        # Successful searches with no results can also contain an error message.
+        status = data.get("search_metadata", {}).get("status")
+        if data.get("error") and status != "Success":
+            return _text_result(content=f"Error: {data['error']}", is_error=True)
 
         # Apply mode-specific filtering
         if mode == "compact":
@@ -189,12 +234,12 @@ async def search(params: dict[str, Any] = None, mode: str = "complete") -> str:
             for field in fields_to_remove:
                 data.pop(field, None)
 
-        return json.dumps(data, indent=2, ensure_ascii=False)
+        return _text_result(content=json.dumps(data, indent=2, ensure_ascii=False))
 
     except RuntimeError as e:
-        return str(e)
+        return _text_result(content=str(e), is_error=True)
     except Exception as e:
-        return map_search_error(e)
+        return _text_result(content=map_search_error(e), is_error=True)
 
 
 def resolve_api_key() -> str:
