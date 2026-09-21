@@ -1441,6 +1441,7 @@ version = "1.0.3"
 source = { virtual = "." }
 dependencies = [
     { name = "beautifulsoup4" },
+    { name = "cachetools" },
     { name = "fastmcp", extra = ["apps"] },
     { name = "httpx" },
     { name = "markdownify" },
@@ -1465,6 +1466,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.12.0" },
+    { name = "cachetools", specifier = ">=5.0.0" },
     { name = "fastmcp", extras = ["apps"], specifier = ">=4.0.3" },
     { name = "httpx", specifier = ">=0.25.0" },
     { name = "markdownify", specifier = ">=0.14.1" },

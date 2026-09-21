@@ -65,6 +65,13 @@ def serp_results(payload):
     return SerpResults(payload, client=None)
 
 
+@pytest.fixture(autouse=True)
+def clear_bearer_auth_cache():
+    # Module-level cache is shared process-wide; keep tests isolated from it.
+    server.bearer_auth_cache.clear()
+    yield
+
+
 def use_request(monkeypatch, request):
     monkeypatch.setattr(mcp_tools, "get_http_request", lambda: request)
 
@@ -745,6 +752,33 @@ async def test_middleware_rejects_bearer_when_introspection_fails(monkeypatch):
     request = real_request(path="/mcp", headers={"Authorization": "Bearer bad-token"})
     response = await mw.dispatch(request, passthrough)
     assert response.status_code == 401
+
+
+async def test_resolve_bearer_api_key_caches_successful_resolution(monkeypatch):
+    calls = []
+
+    async def introspect(token):
+        calls.append(token)
+        return "USER_KEY"
+
+    monkeypatch.setattr(server, "introspect_token", introspect)
+    assert await server.resolve_bearer_api_key("some-token") == "USER_KEY"
+    assert await server.resolve_bearer_api_key("some-token") == "USER_KEY"
+    assert calls == ["some-token"]
+
+
+async def test_resolve_bearer_api_key_does_not_cache_rejections(monkeypatch):
+    calls = []
+
+    async def introspect(token):
+        calls.append(token)
+        return None
+
+    monkeypatch.setattr(server, "introspect_token", introspect)
+    monkeypatch.setattr(server, "is_valid_api_key", lambda key: fut(False))
+    assert await server.resolve_bearer_api_key("bad-token") is None
+    assert await server.resolve_bearer_api_key("bad-token") is None
+    assert calls == ["bad-token", "bad-token"]
 
 
 @pytest.mark.parametrize("enabled", [False, True])

@@ -136,11 +136,13 @@ defaults to `${MCP_OAUTH_AUTHORIZATION_SERVER}/oauth/introspect`
 
 Existing bearer API keys continue to work: if introspection does not resolve a
 bearer value, the server verifies it using the [SerpApi Account API](https://serpapi.com/account-api)
-before accepting it as a raw key. This adds an Account API request for each
-raw-key bearer request while OAuth is enabled, but consumes no search credits.
-Unverified values are rejected with `401`; failed OAuth tokens are never blindly
-forwarded to search as API keys. Path-based keys and deployments without OAuth
-credentials retain their existing behavior.
+before accepting it as a raw key. Unverified values are rejected with `401`;
+failed OAuth tokens are never blindly forwarded to search as API keys.
+Successful resolutions (OAuth tokens and legacy keys alike) are cached for
+`MCP_BEARER_AUTH_CACHE_TTL` seconds (default: 60) so repeat requests from the
+same client don't re-hit the authorization server or Account API each time;
+rejections are always re-checked. Path-based keys and deployments without
+OAuth credentials retain their existing behavior.
 
 ## Search Tool
 
