@@ -99,7 +99,7 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
                 - q: Search query. Required for most engines.
                 - engine: SerpApi engine name. Defaults to "google_light".
                 - location: Optional geographic location for localized results.
-                - output: Optional response format. Omit for JSON (default), or set to "md" for Markdown.
+                - output: Optional response format. Omit for Markdown (default), set to "md" for Markdown, or set to "json" for JSON.
     
             Engine-specific parameters are available via MCP resources:
                 - serpapi://engines lists all supported engines.
@@ -122,7 +122,7 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
         Weather: {"params": {"q": "weather in London", "engine": "google"}, "mode": "complete"}
         Stock: {"params": {"q": "AAPL stock", "engine": "google"}, "mode": "complete"}
         General: {"params": {"q": "coffee shops", "engine": "google_light", "location": "Austin, TX"}, "mode": "complete"}
-        Compact: {"params": {"q": "news"}, "mode": "compact"}
+        Compact JSON: {"params": {"q": "news", "output": "json"}, "mode": "compact"}
         Markdown: {"params": {"q": "news", "output": "md"}}
 
     Supported engines include (not limited to):
@@ -172,7 +172,8 @@ async def search(
             - q: Search query (required for most engines)
             - engine: Search engine to use (default: "google_light")
             - location: Geographic location filter
-            - output: Response format; omit for JSON or set to "md" for Markdown
+            - output: Response format; omit for Markdown (default), set to "md" for
+              Markdown, or set to "json" for JSON
 
         mode: Response mode (default: "complete")
             - "complete": Returns the full response
@@ -189,7 +190,7 @@ async def search(
             is_error=True,
         )
 
-    output = (params or {}).get("output", "json")
+    output = (params or {}).get("output", "md")
     if output not in ("json", "md"):
         return _text_result(
             content="Error: Invalid output. Use either 'md' or 'json' for the output parameter.",
@@ -268,6 +269,7 @@ def fetch_search_response(params: dict[str, Any] | None) -> SerpResults | str:
     # api_key set last so caller params can never override the trusted key.
     search_params = {
         "engine": "google_light",
+        "output": "md",
         **(params or {}),
         "api_key": api_key,
     }
