@@ -239,6 +239,94 @@ async def search(
         return _text_result(content=map_search_error(e), is_error=True)
 
 
+extract_tool_description = """Extract page content as structured JSON or Markdown.
+
+    When to use:
+        - Read and parse the content of a public web page.
+        - Discover a website's URLs.
+        - Crawl multiple pages on a website.
+
+    Parameters:
+        params: Extract API parameters. See serpapi://engines/extract for all options.
+            - url: Absolute http(s) URL to extract. Required.
+            - mode: "scrape" (default) for one page, "map" for URL discovery, or "crawl" for multiple pages.
+            - max_pages: Crawl page limit, including the starting page. Default 10, maximum 100.
+              Crawl mode consumes one search credit per successfully extracted page on an uncached request.
+            - output: Omit for JSON, or set to "md" for Markdown.
+            - include_markdown: Defaults to true for scrape and crawl. Set to false to omit
+              text_content.markdown. No default is added for map, which only discovers URLs.
+            - json_restrictor: Select the response fields to return.
+        mode: Response mode, "complete" (default) or "compact".
+            For single-page JSON extraction, compact defaults json_restrictor to
+            "text_content.markdown", or "text_content" when include_markdown is false.
+            Explicit parameter values take precedence.
+            For map and crawl, compact removes JSON metadata.
+            Extract's scrape/map/crawl mode goes in params.mode. Markdown is returned unchanged.
+
+    Page content hint:
+        For only a single page's content, use mode="compact" with the default scrape mode,
+        or explicitly set include_markdown=true and json_restrictor="text_content.markdown".
+        This returns the page's Markdown in text_content.markdown and leaves out the other response sections.
+        With include_markdown=false, compact returns the text_content section without Markdown.
+
+    Output:
+        structuredContent.result and text content contain the same serialized JSON or Markdown string.
+        Tool failures set isError to true.
+
+    Guided input:
+        Supporting clients prompt for a missing URL before extraction. Other clients receive
+        an error listing the missing parameter. Cancelling the prompt runs no extraction.
+
+    Examples:
+        Single page: {"params": {"url": "https://example.com"}}
+        Page content only: {"params": {"url": "https://example.com"}, "mode": "compact"}
+        Markdown: {"params": {"url": "https://example.com", "output": "md"}}
+        Discover URLs: {"params": {"url": "https://example.com", "mode": "map"}}
+        Crawl: {"params": {"url": "https://example.com", "mode": "crawl", "max_pages": 2}}
+
+    A convenience wrapper for the SerpApi Extract API, recommended for parsing page contents.
+    """
+
+
+@tool(
+    description=extract_tool_description,
+    output_schema={
+        "type": "object",
+        "properties": {"result": {"type": "string"}},
+        "required": ["result"],
+        "x-fastmcp-wrap-result": True,
+    },
+    annotations=ToolAnnotations(
+        title="SerpApi extract",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=False,
+        openWorldHint=True,
+    ),
+)
+async def extract(
+    params: dict[str, Any] | None = None,
+    mode: str = "complete",
+    ctx: Context | None = None,
+) -> ToolResult | InputRequiredResult:
+    """Extract page content with the SerpApi Extract API."""
+    params = {**(params or {}), "engine": "extract"}
+    if params.get("mode", "scrape") in ("scrape", "crawl"):
+        params.setdefault("include_markdown", True)
+    if (
+        mode == "compact"
+        and params.get("mode", "scrape") == "scrape"
+        and params.get("output", "json") == "json"
+    ):
+        params.setdefault(
+            "json_restrictor",
+            "text_content"
+            if params.get("include_markdown") is False
+            else "text_content.markdown",
+        )
+    return await search(params=params, mode=mode, ctx=ctx)
+
+
 def resolve_api_key() -> str:
     """Return the caller's SerpApi key, or raise naming the fix.
 

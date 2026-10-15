@@ -169,6 +169,34 @@ The form is derived from the original arguments on each request. It uses no `req
 
 To extend guided search, add required fields, descriptions, types, and options to the engine's `engines/<engine>.json` file. Add an `EngineInputRules` entry in [`src/engine_input_rules.py`](src/engine_input_rules.py) when requirements depend on other parameters, defaults, or alternatives. The shared MCP handler in [`src/search_input.py`](src/search_input.py) needs no engine-specific branches. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
 
+## Extract tool
+
+The `extract` tool reads web pages and returns their content as structured JSON or Markdown. You can extract a single page, discover a website's URLs, or crawl multiple pages. Find all available parameters on the [Extract API reference](https://serpapi.com/extract-api) or in the `serpapi://engines/extract` resource.
+
+Some parameters you can provide:
+
+- `params.url` (required): Page or website URL
+- `params.mode`: Extraction mode; `"scrape"` (default) reads one page, `"map"` discovers URLs, and `"crawl"` extracts multiple pages
+- `params.include_markdown`: Include the page's content as Markdown; defaults to `true` for scrape and crawl, or set to `false` to disable it
+- `params.output`: Response format; omit for JSON (default), or set to `"md"` for Markdown
+- `params.max_pages`: Maximum pages to crawl, including the starting page (default: 10, maximum: 100)
+- `params.json_restrictor`: Choose which fields to return, such as `"text_content.markdown"`
+- `mode`: Response mode; `"complete"` (default) returns the full response. For single-page JSON extraction, `"compact"` returns only `text_content.markdown`, or the `text_content` section when `params.include_markdown` is `false`. For map and crawl, it removes JSON metadata. Markdown output is returned unchanged.
+
+**Examples:**
+
+```json
+{"name": "extract", "arguments": {"params": {"url": "https://example.com"}}}
+{"name": "extract", "arguments": {"params": {"url": "https://example.com"}, "mode": "compact"}}
+{"name": "extract", "arguments": {"params": {"url": "https://example.com", "output": "md"}}}
+{"name": "extract", "arguments": {"params": {"url": "https://example.com", "mode": "map"}}}
+{"name": "extract", "arguments": {"params": {"url": "https://example.com", "mode": "crawl", "max_pages": 2}}}
+```
+
+For only a single page's content, use `mode="compact"`, or set `params.include_markdown` to `true` and `params.json_restrictor` to `"text_content.markdown"`. This returns the page's Markdown without the other response sections. With `params.include_markdown=false`, compact returns the `text_content` section without Markdown.
+
+Crawling consumes one search credit per successfully extracted page on an uncached request. Use `params.max_pages` to limit how many pages are extracted.
+
 ## Interactive UI (MCP apps)
 
 The `search` tool returns JSON by default. For hosts that support the [MCP Apps extension](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) (SEP-1865), two opt-in tools render results as an interactive UI directly in the conversation, so the bulk SERP JSON never enters the model's context window:

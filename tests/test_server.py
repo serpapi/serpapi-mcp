@@ -76,7 +76,7 @@ async def test_filesystem_provider_registers_tools_apps_and_resources():
         template.uri_template for template in await server.mcp.list_resource_templates()
     }
 
-    assert {"search", "search_table", "search_dashboard"} <= set(tools)
+    assert {"search", "extract", "search_table", "search_dashboard"} <= set(tools)
     assert tools["search"].meta is None
     assert (
         tools["search_table"].meta["ui"]["resourceUri"].startswith("ui://prefab/tool/")

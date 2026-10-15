@@ -42,6 +42,10 @@
       "description": "Search any SerpApi engine (Google, Bing, YouTube, Amazon, eBay and more) and return results as JSON or Markdown."
     },
     {
+      "name": "extract",
+      "description": "Extract page data as JSON or Markdown. A convenience mirror of search with the Extract API engine set automatically."
+    },
+    {
       "name": "search_table",
       "description": "Render organic results as an interactive, sortable table (hosts with MCP Apps support)."
     },
