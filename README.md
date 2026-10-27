@@ -20,7 +20,7 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 - **Interactive UI (MCP Apps)**: Opt-in `search_table` and `search_dashboard` tools that render results as an interactive UI in supporting hosts
 - **Claude Desktop Extension**: One-click local install from an [MCP Bundle](https://github.com/modelcontextprotocol/mcpb) (`.mcpb`), see below
 
-## Quick Start
+## Quick start
 
 SerpApi MCP Server is available as a hosted service at [mcp.serpapi.com](https://mcp.serpapi.com). In order to connect to it, you need to provide an API key. You can find your API key on your [SerpApi dashboard](https://serpapi.com/dashboard).
 
@@ -59,7 +59,7 @@ hermes mcp add serpapi --url https://mcp.serpapi.com/YOUR_SERPAPI_API_KEY/mcp
 codex mcp add serpapi --url https://mcp.serpapi.com/mcp --bearer-token-env-var SERPAPI_API_KEY
 ```
 
-### Self-Hosting
+### Self-hosting
 ```bash
 git clone https://github.com/serpapi/serpapi-mcp.git
 cd serpapi-mcp
@@ -80,7 +80,7 @@ Configure Claude Desktop:
 
 Get your API key: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
 
-### Claude Desktop Extension (MCP Bundle)
+### Claude Desktop Extension (MCP bundle)
 
 For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) (or build it as below) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. The bundle uses the MCPB `uv` runtime: it ships only the source, `pyproject.toml` and `uv.lock`, and Claude Desktop provisions Python and the locked dependencies with uv at install time, so nothing is vendored and one bundle works on macOS, Windows and Linux.
 
@@ -121,9 +121,9 @@ curl "https://mcp.serpapi.com/your_key/mcp" -d '...'
 
 No key is needed to connect, list tools or read resources. `search` and the App tools need one and return an error without it.
 
-## Search Tool
+## Search tool
 
-The MCP server has one main Search Tool that supports all SerpApi engines and result types. You can find all available parameters on the [SerpApi API reference](https://serpapi.com/search-api).
+The MCP server has one main search tool that supports all SerpApi engines and result types. You can find all available parameters on the [SerpApi API reference](https://serpapi.com/search-api).
 Engine parameter schemas are also exposed as MCP resources: `serpapi://engines` (index) and `serpapi://engines/<engine>`.
 Clients that support [argument completion](https://gofastmcp.com/servers/completions) can request engine-name suggestions for `serpapi://engines/{engine_name}`. For example, the prefix `google_f` suggests matching engine identifiers. This completes the resource URI parameter, not arbitrary search queries.
 
@@ -152,9 +152,9 @@ The parameters you can provide are specific for each API engine. Some sample par
 {"name": "search", "arguments": {"params": {"engine": "ebay", "_nkw": "vintage mechanical keyboard"}}}
 ```
 
-**Supported Engines:** Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and more (see `serpapi://engines`).
+**Supported engines:** Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and more (see `serpapi://engines`).
 
-**Result Types:** Answer boxes, organic results, news, images, shopping - automatically detected and formatted.
+**Result types:** Answer boxes, organic results, news, images, shopping - automatically detected and formatted.
 
 Search responses preserve the existing MCP `structuredContent.result` string and include the same string in text content. For JSON output, `result` contains serialized JSON; existing clients can continue parsing it with `JSON.parse(response.structuredContent.result)`. For Markdown output, it contains the unchanged Markdown. Errors and cancellations use the same wrapper. Search execution failures set `isError: true`; clients using FastMCP's high-level `call_tool()` should handle `ToolError`, or use `call_tool_mcp()` to inspect the result flag. See [MCP tool results](https://modelcontextprotocol.io/specification/2025-06-18/server/tools).
 
@@ -169,7 +169,7 @@ The form is derived from the original arguments on each request. It uses no `req
 
 To extend guided search, add required fields, descriptions, types, and options to the engine's `engines/<engine>.json` file. Add an `EngineInputRules` entry in [`src/engine_input_rules.py`](src/engine_input_rules.py) when requirements depend on other parameters, defaults, or alternatives. The shared MCP handler in [`src/search_input.py`](src/search_input.py) needs no engine-specific branches. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
 
-## Interactive UI (MCP Apps)
+## Interactive UI (MCP apps)
 
 The `search` tool returns JSON by default. For hosts that support the [MCP Apps extension](https://modelcontextprotocol.io/seps/1865-mcp-apps-interactive-user-interfaces-for-mcp) (SEP-1865), two opt-in tools render results as an interactive UI directly in the conversation, so the bulk SERP JSON never enters the model's context window:
 
@@ -219,7 +219,7 @@ npx @modelcontextprotocol/inspector
 - **"Rate limit exceeded"**: Wait or upgrade your SerpApi plan
 - **"No results"**: Try different query or engine
 
-## Privacy Policy
+## Privacy policy
 
 - **Sent**: only the parameters the MCP host passes to a tool call. The server never sees the rest of the conversation, or files, memory or history on the host.
 - **Forwarded**: each search goes to `serpapi.com` with your API key; results come back unchanged. See the [SerpApi Privacy Policy](https://serpapi.com/legal#privacy-policy) for how SerpApi handles searches and accounts.
