@@ -772,7 +772,7 @@ ENGINE_APP_BUILDERS: dict[str, Any] = {
         openWorldHint=True,
     ),
 )
-async def search_table(params: dict[str, Any] = None) -> PrefabApp:
+async def search_table(params: dict[str, Any] | None = None) -> PrefabApp:
     try:
         data = fetch_search_data(params)
     except Exception as exc:
@@ -800,7 +800,7 @@ async def search_table(params: dict[str, Any] = None) -> PrefabApp:
         openWorldHint=True,
     ),
 )
-async def search_dashboard(params: dict[str, Any] = None) -> PrefabApp:
+async def search_dashboard(params: dict[str, Any] | None = None) -> PrefabApp:
     try:
         data = fetch_search_data(params)
     except Exception as exc:
