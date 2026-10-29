@@ -357,12 +357,12 @@ async def test_search_complete_returns_full_payload(monkeypatch):
     payload = {"search_metadata": {"id": "1"}, "organic_results": [{"title": "hit"}]}
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(payload))
-    result = await mcp_tools.search(params={"q": "x"})
+    result = await mcp_tools.search(params={"q": "x", "output": "json"})
     assert result.structured_content == {"result": result.content[0].text}
     assert json.loads(result.content[0].text) == payload
 
 
-async def test_search_returns_markdown_response_unchanged(monkeypatch):
+async def test_search_defaults_to_markdown(monkeypatch):
     markdown = (
         "## Organic Results\n\n| Position | Title |\n| --- | --- |\n| 1 | Hit |\n"
     )
@@ -375,7 +375,7 @@ async def test_search_returns_markdown_response_unchanged(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, capture)
 
-    result = await mcp_tools.search(params={"q": "x", "output": "md"})
+    result = await mcp_tools.search(params={"q": "x"})
     assert result.content[0].text == markdown
     assert result.structured_content == {"result": markdown}
     assert captured["output"] == "md"
@@ -423,7 +423,9 @@ async def test_search_compact_strips_serpapi_metadata(monkeypatch):
     }
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: serp_results(payload))
-    out = await mcp_tools.search(params={"q": "x"}, mode="compact")
+    out = await mcp_tools.search(
+        params={"q": "x", "output": "json"}, mode="compact"
+    )
     assert out.structured_content == {"result": out.content[0].text}
     assert json.loads(out.structured_content["result"]) == {
         "organic_results": [{"title": "hit"}]
@@ -435,7 +437,7 @@ async def test_search_compact_returns_markdown_unchanged(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: markdown)
 
-    result = await mcp_tools.search(params={"q": "x", "output": "md"}, mode="compact")
+    result = await mcp_tools.search(params={"q": "x"}, mode="compact")
     assert result.content[0].text == markdown
     assert result.structured_content == {"result": markdown}
 
@@ -445,7 +447,7 @@ async def test_search_compact_does_not_mutate_the_live_result(monkeypatch):
     results = serp_results(payload)
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, lambda params: results)
-    await mcp_tools.search(params={"q": "x"}, mode="compact")
+    await mcp_tools.search(params={"q": "x", "output": "json"}, mode="compact")
     assert "search_metadata" in results.as_dict()
 
 
@@ -458,11 +460,13 @@ async def test_search_forwards_api_key_and_default_engine(monkeypatch):
 
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
     use_search(monkeypatch, capture)
-    await mcp_tools.search(params={"q": "x"})
+    params = {"q": "x"}
+    await mcp_tools.search(params=params)
     assert captured["api_key"] == "KEY"
     assert captured["engine"] == "google_light"
+    assert captured["output"] == "md"
     assert captured["q"] == "x"
-    assert "output" not in captured
+    assert params == {"q": "x"}
 
 
 async def test_search_caller_overrides_default_engine(monkeypatch):
