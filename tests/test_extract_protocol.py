@@ -13,13 +13,8 @@ from src.server import mcp
 
 
 @pytest.fixture
-def extract_upstream(monkeypatch, tmp_path):
-    # The published catalog is generated at build time. Keep these checks
-    # independent of a developer's generated or untracked engine files.
-    (tmp_path / "extract.json").write_text(
-        json.dumps({"params": {"url": {"required": True}}})
-    )
-    monkeypatch.setattr(input_rules, "ENGINES_DIR", tmp_path)
+def extract_upstream(monkeypatch):
+    # Exercise the shipped catalog, including missing-URL guided input.
     monkeypatch.setenv("SERPAPI_API_KEY", "EXTRACT_TEST_KEY")
     calls = []
 
@@ -27,23 +22,18 @@ def extract_upstream(monkeypatch, tmp_path):
         calls.append(dict(params))
         if params.get("output") == "md":
             return "# Example page\n\nPage content.\n"
-        text_content = {"full": "Page content."}
-        if params.get("include_markdown", False):
-            text_content["markdown"] = "Page content."
         payload = {
             "search_metadata": {"status": "Success"},
             "page_information": {"title": "Example page"},
-            "text_content": text_content,
+            "inline_links": [{"link": "https://example.com/next"}],
         }
+        if str(params.get("include_markdown", True)).lower() != "false":
+            payload["markdown"] = "Page content."
         restrictor = params.get("json_restrictor")
-        if restrictor == "text_content.markdown":
-            payload = (
-                {"text_content": {"markdown": text_content["markdown"]}}
-                if "markdown" in text_content
-                else {}
-            )
-        elif restrictor:
-            payload = {restrictor: payload[restrictor]}
+        if restrictor:
+            payload = {
+                key: payload[key] for key in restrictor.split(",") if key in payload
+            }
         return SerpResults(payload, client=None)
 
     monkeypatch.setattr(tools.serpapi, "search", search)
@@ -56,12 +46,12 @@ def extract_upstream(monkeypatch, tmp_path):
     [
         ({"include_markdown": True}, "complete"),
         (
-            {"include_markdown": True, "json_restrictor": "text_content.markdown"},
+            {"json_restrictor": "markdown,error"},
             "compact",
         ),
         ({"output": "md", "include_markdown": True}, "compact"),
         (
-            {"include_markdown": True, "json_restrictor": "text_content.markdown"},
+            {"json_restrictor": "markdown,error"},
             "complete",
         ),
         ({"mode": "map", "include_sitemap": False}, "complete"),
@@ -84,6 +74,7 @@ async def test_extract_mirrors_search_and_forces_engine(
         "url": "https://example.com",
         "engine": "google_light",
         "api_key": "UNTRUSTED",
+        "output": "json",
         **options,
     }
     async with Client(mcp, mode=protocol) as client:
@@ -118,7 +109,7 @@ async def test_extract_does_not_mutate_callers_params(extract_upstream, response
 @pytest.mark.parametrize("response_mode", ["complete", "compact"])
 @pytest.mark.parametrize("output", ["json", "md"])
 @pytest.mark.parametrize("disable_markdown", [False, True])
-async def test_extract_markdown_defaults_for_content_modes(
+async def test_extract_uses_api_markdown_defaults(
     extract_upstream, extraction_mode, response_mode, output, disable_markdown
 ):
     params = {"url": "https://example.com", "output": output}
@@ -141,10 +132,8 @@ async def test_extract_markdown_defaults_for_content_modes(
     assert params == original
     if disable_markdown:
         assert extract_upstream[0]["include_markdown"] is False
-    elif extraction_mode == "map":
-        assert "include_markdown" not in extract_upstream[0]
     else:
-        assert extract_upstream[0]["include_markdown"] is True
+        assert "include_markdown" not in extract_upstream[0]
     assert extract_upstream[1] == {
         **params,
         "engine": "extract",
@@ -154,24 +143,22 @@ async def test_extract_markdown_defaults_for_content_modes(
 
 @pytest.mark.parametrize("protocol", ["auto", "legacy"])
 @pytest.mark.parametrize(
-    "options,expected_defaults",
+    "options",
     [
-        ({}, {"include_markdown": True, "json_restrictor": "text_content.markdown"}),
-        (
-            {"mode": "scrape", "output": "json"},
-            {"include_markdown": True, "json_restrictor": "text_content.markdown"},
-        ),
-        ({"include_markdown": False}, {"json_restrictor": "text_content"}),
-        ({"json_restrictor": "text_content"}, {"include_markdown": True}),
-        ({"json_restrictor": ""}, {"include_markdown": True}),
-        ({"include_markdown": False, "json_restrictor": "page_information"}, {}),
-        ({"include_markdown": False, "json_restrictor": ""}, {}),
+        {},
+        {"mode": "scrape", "output": "json"},
+        {"include_markdown": False},
+        {"include_markdown": "false"},
+        {"json_restrictor": "page_information"},
+        {"json_restrictor": ""},
+        {"include_markdown": False, "json_restrictor": "page_information"},
+        {"include_markdown": False, "json_restrictor": ""},
     ],
 )
-async def test_extract_compact_defaults_preserve_overrides_and_search(
-    extract_upstream, protocol, options, expected_defaults
+async def test_extract_compact_json_preserves_overrides_and_search(
+    extract_upstream, protocol, options
 ):
-    params = {"url": "https://example.com", **options}
+    params = {"url": "https://example.com", "output": "json", **options}
     async with Client(mcp, mode=protocol) as client:
         extracted = await client.call_tool_mcp(
             "extract", {"params": params, "mode": "compact"}
@@ -180,17 +167,23 @@ async def test_extract_compact_defaults_preserve_overrides_and_search(
             "search", {"params": {**params, "engine": "extract"}, "mode": "compact"}
         )
     authenticated = {**params, "engine": "extract", "api_key": "EXTRACT_TEST_KEY"}
-    assert extract_upstream == [{**authenticated, **expected_defaults}, authenticated]
+    assert extract_upstream == [authenticated, authenticated]
     assert not extracted.is_error
     assert not searched.is_error
     assert extracted.structured_content == {"result": extracted.content[0].text}
     data = json.loads(extracted.content[0].text)
     assert data
     assert "search_metadata" not in data
-    if options.get("include_markdown") is False:
-        assert "markdown" not in data.get("text_content", {})
+    if "json_restrictor" in options:
+        assert extracted.structured_content == searched.structured_content
+    elif str(options.get("include_markdown", True)).lower() != "false":
+        assert data == {"markdown": "Page content."}
+        assert "page_information" in json.loads(searched.content[0].text)
+    if str(options.get("include_markdown", True)).lower() == "false":
+        assert "markdown" not in data
         if "json_restrictor" not in options:
-            assert data == {"text_content": {"full": "Page content."}}
+            assert data["page_information"]["title"] == "Example page"
+            assert data["inline_links"]
 
 
 @pytest.mark.parametrize("protocol", ["auto", "legacy"])
@@ -218,8 +211,9 @@ async def test_extract_rejects_invalid_input_without_searching(
 
 @pytest.mark.parametrize("action", ["accept", "cancel"])
 @pytest.mark.parametrize("response_mode", ["complete", "compact"])
+@pytest.mark.parametrize("output", [None, "json"])
 async def test_extract_guided_url_preserves_engine_and_context(
-    extract_upstream, action, response_mode
+    extract_upstream, action, response_mode, output
 ):
     async def answer(message, response_type, params, context):
         assert params.requested_schema["required"] == ["url"]
@@ -233,19 +227,30 @@ async def test_extract_guided_url_preserves_engine_and_context(
             },
         )
 
+    arguments = {"mode": response_mode}
+    if output is not None:
+        arguments["params"] = {"output": output}
     async with Client(mcp, elicitation_handler=answer) as client:
-        result = await client.call_tool_mcp("extract", {"mode": response_mode})
+        result = await client.call_tool_mcp("extract", arguments)
     assert not result.is_error
     if action == "accept":
         expected = {
             "engine": "extract",
             "url": "https://example.com",
             "api_key": "EXTRACT_TEST_KEY",
-            "include_markdown": True,
         }
-        if response_mode == "compact":
-            expected["json_restrictor"] = "text_content.markdown"
+        if output is not None:
+            expected["output"] = output
+        elif response_mode == "compact":
+            expected["output"] = "md"
         assert extract_upstream == [expected]
+        if response_mode == "compact":
+            if output == "json":
+                assert json.loads(result.content[0].text) == {
+                    "markdown": "Page content."
+                }
+            else:
+                assert result.content[0].text == "# Example page\n\nPage content.\n"
     else:
         assert "cancelled" in result.content[0].text
         assert not extract_upstream
@@ -276,3 +281,89 @@ async def test_extract_preserves_upstream_error_wrapper(extract_upstream, monkey
     assert result.is_error
     assert result.structured_content == {"result": "Error: Extraction failed"}
     assert result.content[0].text == "Error: Extraction failed"
+
+
+async def test_extract_resource_and_guided_input_use_shipped_schema():
+    spec = input_rules.get_search_input_spec({"engine": "extract"})
+    assert spec is not None
+    assert "url" in spec.fields
+    async with Client(mcp) as client:
+        contents = await client.read_resource("serpapi://engines/extract")
+    schema = json.loads(contents[0].text)
+    assert schema["params"]["url"]["required"] is True
+    assert "Default: `true`" in schema["params"]["include_markdown"]["description"]
+    assert "include_inline_assets" not in schema["params"]
+
+
+async def test_extract_compact_keeps_upstream_errors(extract_upstream, monkeypatch):
+    def fail(params):
+        assert "json_restrictor" not in params
+        return SerpResults({"error": "Extraction failed"}, client=None)
+
+    monkeypatch.setattr(tools.serpapi, "search", fail)
+    async with Client(mcp) as client:
+        result = await client.call_tool_mcp(
+            "extract", {"params": {"url": "https://example.com"}, "mode": "compact"}
+        )
+    assert result.is_error
+    assert "Extraction failed" in result.content[0].text
+
+
+@pytest.mark.parametrize("protocol", ["auto", "legacy"])
+async def test_extract_compact_preserves_redirected_engine_results(
+    extract_upstream, monkeypatch, protocol
+):
+    organic_results = [{"title": "Coffee", "link": "https://example.com/coffee"}]
+
+    def redirected_search(params):
+        payload = {
+            "search_metadata": {"status": "Success"},
+            "search_parameters": {"engine": "google"},
+            "organic_results": organic_results,
+        }
+        if restrictor := params.get("json_restrictor"):
+            payload = {
+                key: payload[key] for key in restrictor.split(",") if key in payload
+            }
+        return SerpResults(payload, client=None)
+
+    monkeypatch.setattr(tools.serpapi, "search", redirected_search)
+    async with Client(mcp, mode=protocol) as client:
+        result = await client.call_tool_mcp(
+            "extract",
+            {
+                "params": {
+                    "url": "https://www.google.com/search?q=coffee",
+                    "output": "json",
+                },
+                "mode": "compact",
+            },
+        )
+    assert not result.is_error
+    assert json.loads(result.content[0].text) == {"organic_results": organic_results}
+    assert result.structured_content == {"result": result.content[0].text}
+
+
+@pytest.mark.parametrize("protocol", ["auto", "legacy"])
+@pytest.mark.parametrize("extraction_mode", ["scrape", "map", "crawl"])
+@pytest.mark.parametrize("response_mode", ["complete", "compact"])
+async def test_extract_default_output(
+    extract_upstream, protocol, extraction_mode, response_mode
+):
+    params = {"url": "https://example.com", "mode": extraction_mode}
+    async with Client(mcp, mode=protocol) as client:
+        result = await client.call_tool_mcp(
+            "extract", {"params": params, "mode": response_mode}
+        )
+    assert not result.is_error
+    expected = {**params, "engine": "extract", "api_key": "EXTRACT_TEST_KEY"}
+    if response_mode == "compact":
+        expected["output"] = "md"
+        assert result.content[0].text == "# Example page\n\nPage content.\n"
+    else:
+        assert (
+            json.loads(result.content[0].text)["page_information"]["title"]
+            == "Example page"
+        )
+    assert extract_upstream == [expected]
+    assert result.structured_content == {"result": result.content[0].text}

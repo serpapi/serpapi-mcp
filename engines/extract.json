@@ -1,0 +1,106 @@
+{
+  "engine": "extract",
+  "params": {
+    "url": {
+      "required": true,
+      "description": "Parameter defines the URL of the page to extract. It must be an absolute `http` or `https` URL. Search pages that have a dedicated SerpApi engine, such as Google or Bing, are redirected to that engine.",
+      "group": "search_query"
+    },
+    "mode": {
+      "type": "select",
+      "options": [
+        "scrape",
+        "map",
+        "crawl"
+      ],
+      "description": "Parameter defines the extraction mode. It can be set to: `scrape` (default) - Extract a single page. `map` - List the website's URLs from the page links and sitemaps. `crawl` - Follow links on the same website and extract every page visited. **Crawl mode consumes one search credit per successfully extracted page.**",
+      "group": "mode"
+    },
+    "max_pages": {
+      "type": "number",
+      "description": "Used with `mode=crawl`. Parameter defines the maximum number of pages to extract, including the starting page. Default: `10`. Maximum: `100`. Each successfully extracted page consumes one search credit.",
+      "group": "crawl_settings"
+    },
+    "max_depth": {
+      "type": "number",
+      "description": "Used with `mode=crawl`. Parameter defines how many links deep the crawl follows from the starting page. `0` extracts only the starting page. Default: `2`. Maximum: `3`.",
+      "group": "crawl_settings"
+    },
+    "include_subdomains": {
+      "type": "checkbox",
+      "description": "Used with `mode=map` and `mode=crawl`. Parameter defines whether to include other subdomains of the same website, e.g. `blog.example.com` when starting from `www.example.com`. Default: `false` (same host only).",
+      "group": "crawl_settings"
+    },
+    "include_sitemap": {
+      "type": "checkbox",
+      "description": "Used with `mode=map`. Parameter defines whether to also read the website's sitemaps, from `/sitemap.xml` and `/robots.txt`. Default: `true`.",
+      "group": "crawl_settings"
+    },
+    "prefetch_delay": {
+      "type": "number",
+      "description": "Parameter defines a delay in milliseconds before the first page is fetched (0–10,000). Default: `0`. The Extract API doesn't run JavaScript, so this is not a rendering delay.",
+      "group": "fetch_settings"
+    },
+    "timeout": {
+      "type": "number",
+      "description": "Parameter defines the HTTP request timeout in milliseconds (1,000–120,000). Default: `30,000` (30 seconds).",
+      "group": "fetch_settings"
+    },
+    "include_tags": {
+      "description": "Parameter defines a comma-separated list of CSS selectors to keep, e.g. `article, main, .post-content`. Everything else inside is removed before parsing.",
+      "group": "fetch_settings"
+    },
+    "exclude_tags": {
+      "description": "Parameter defines a comma-separated list of CSS selectors to remove before parsing, e.g. `nav, footer, .ads, #cookie-banner`.",
+      "group": "fetch_settings"
+    },
+    "include_markdown": {
+      "type": "checkbox",
+      "description": "Parameter defines whether to include the page's main content as Markdown in `markdown`. Default: `true`.",
+      "group": "fetch_settings"
+    }
+  },
+  "common_params": {
+    "engine": {
+      "required": true,
+      "description": "Set parameter to `extract` to use the Extract API engine.",
+      "group": "serpapi_parameters"
+    },
+    "device": {
+      "type": "device",
+      "options": [
+        "desktop",
+        "tablet",
+        "mobile"
+      ],
+      "description": "Parameter defines the device to use to get the results. It can be set to `desktop` (default) to use a regular browser, `tablet` to use a tablet browser (currently using iPads), or `mobile` to use a mobile browser.",
+      "group": "serpapi_parameters"
+    },
+    "no_cache": {
+      "type": "checkbox",
+      "description": "Parameter will force SerpApi to fetch the Extract results even if a cached version is already present. A cache is served only if the query and all parameters are exactly the same. Cache expires after 1h. Cached searches are free, and are not counted towards your searches per month. It can be set to `false` (default) to allow results from the cache, or `true` to disallow results from the cache. no\\_cache and async parameters should not be used together.",
+      "group": "serpapi_parameters"
+    },
+    "async": {
+      "description": "Parameter defines the way you want to submit your search to SerpApi. It can be set to `false` (default) to open an HTTP connection and keep it open until you got your search results, or `true` to just submit your search to SerpApi and retrieve them later. In this case, you'll need to use our Searches Archive API to retrieve your results. async and no\\_cache parameters should not be used together. async should not be used on accounts with Ludicrous Speed enabled.",
+      "group": "serpapi_parameters"
+    },
+    "zero_trace": {
+      "description": "Enterprise only. Parameter enables ZeroTrace mode. It can be set to `false` (default) or `true`. Enable this mode to skip storing search parameters, search files, and search metadata on our servers. This may make debugging more difficult.",
+      "group": "serpapi_parameters"
+    },
+    "api_key": {
+      "required": true,
+      "description": "Parameter defines the SerpApi private key to use.",
+      "group": "serpapi_parameters"
+    },
+    "output": {
+      "description": "Parameter defines the format of the result. It can be set to `json` (default) to get a structured JSON of the results, `html` to get the raw HTML retrieved, or `md` to get a markdown-formatted version optimized for LLMs and AI agents.",
+      "group": "serpapi_parameters"
+    },
+    "json_restrictor": {
+      "description": "Parameter defines the fields you want to include in the output, reducing payload size for faster response. See the JSON Restrictor documentation for more details.",
+      "group": "serpapi_parameters"
+    }
+  }
+}

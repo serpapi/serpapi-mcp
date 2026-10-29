@@ -178,10 +178,10 @@ Some parameters you can provide:
 - `params.url` (required): Page or website URL
 - `params.mode`: Extraction mode; `"scrape"` (default) reads one page, `"map"` discovers URLs, and `"crawl"` extracts multiple pages
 - `params.include_markdown`: Include the page's content as Markdown; defaults to `true` for scrape and crawl, or set to `false` to disable it
-- `params.output`: Response format; omit for JSON (default), or set to `"md"` for Markdown
+- `params.output`: Response format; defaults to `"json"` in complete mode and `"md"` in compact mode. Set it explicitly to override the format.
 - `params.max_pages`: Maximum pages to crawl, including the starting page (default: 10, maximum: 100)
-- `params.json_restrictor`: Choose which fields to return, such as `"text_content.markdown"`
-- `mode`: Response mode; `"complete"` (default) returns the full response. For single-page JSON extraction, `"compact"` returns only `text_content.markdown`, or the `text_content` section when `params.include_markdown` is `false`. For map and crawl, it removes JSON metadata. Markdown output is returned unchanged.
+- `params.json_restrictor`: Choose which fields to return, such as `"markdown,error"`
+- `mode`: Response mode; `"complete"` (default) returns the full response. `"compact"` defaults to native Markdown. With an explicit `params.output="json"`, single-page compact extraction keeps the top-level `markdown` field when present and retains API errors. Responses without Markdown, including results redirected to another engine, keep their data with metadata removed. Explicit `params.json_restrictor` values and `params.include_markdown=false` take precedence when using JSON. For map and crawl, compact JSON removes metadata. Markdown output is returned unchanged.
 
 **Examples:**
 
@@ -193,7 +193,7 @@ Some parameters you can provide:
 {"name": "extract", "arguments": {"params": {"url": "https://example.com", "mode": "crawl", "max_pages": 2}}}
 ```
 
-For only a single page's content, use `mode="compact"`, or set `params.include_markdown` to `true` and `params.json_restrictor` to `"text_content.markdown"`. This returns the page's Markdown without the other response sections. With `params.include_markdown=false`, compact returns the `text_content` section without Markdown.
+For a single page's content as native Markdown, use `mode="compact"`. Add `params.output="json"` to receive JSON containing the `markdown` field instead. Complete JSON includes that field by default; crawl JSON includes it in each `pages` entry. Setting `params.output="json"` and `params.include_markdown=false` keeps the remaining structured fields without Markdown.
 
 Crawling consumes one search credit per successfully extracted page on an uncached request. Use `params.max_pages` to limit how many pages are extracted.
 

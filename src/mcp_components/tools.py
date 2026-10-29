@@ -239,53 +239,28 @@ async def search(
         return _text_result(content=map_search_error(e), is_error=True)
 
 
-extract_tool_description = """Extract page content as structured JSON or Markdown.
+extract_tool_description = """Extract content from a public http(s) URL, discover site URLs, or crawl pages.
 
-    When to use:
-        - Read and parse the content of a public web page.
-        - Discover a website's URLs.
-        - Crawl multiple pages on a website.
+API options go in params: url is required; params.mode is scrape (default), map, or crawl. See serpapi://engines/extract for all options.
 
-    Parameters:
-        params: Extract API parameters. See serpapi://engines/extract for all options.
-            - url: Absolute http(s) URL to extract. Required.
-            - mode: "scrape" (default) for one page, "map" for URL discovery, or "crawl" for multiple pages.
-            - max_pages: Crawl page limit, including the starting page. Default 10, maximum 100.
-              Crawl mode consumes one search credit per successfully extracted page on an uncached request.
-            - output: Omit for JSON, or set to "md" for Markdown.
-            - include_markdown: Defaults to true for scrape and crawl. Set to false to omit
-              text_content.markdown. No default is added for map, which only discovers URLs.
-            - json_restrictor: Select the response fields to return.
-        mode: Response mode, "complete" (default) or "compact".
-            For single-page JSON extraction, compact defaults json_restrictor to
-            "text_content.markdown", or "text_content" when include_markdown is false.
-            Explicit parameter values take precedence.
-            For map and crawl, compact removes JSON metadata.
-            Extract's scrape/map/crawl mode goes in params.mode. Markdown is returned unchanged.
+Top-level mode controls the response:
+- complete (default): full JSON.
+- compact: native Markdown by default.
 
-    Page content hint:
-        For only a single page's content, use mode="compact" with the default scrape mode,
-        or explicitly set include_markdown=true and json_restrictor="text_content.markdown".
-        This returns the page's Markdown in text_content.markdown and leaves out the other response sections.
-        With include_markdown=false, compact returns the text_content section without Markdown.
+params.output selects the format and overrides either default:
+- "md": return native Markdown unchanged in either response mode.
+- "json": return JSON, with filtering determined by the response mode.
 
-    Output:
-        structuredContent.result and text content contain the same serialized JSON or Markdown string.
-        Tool failures set isError to true.
+Compact JSON removes metadata. For scrape responses containing markdown, it also keeps only markdown and any error field. include_markdown=false or an explicit json_restrictor skips this extra filtering. Map/crawl and responses without markdown keep their remaining fields. Use complete with output="json" for full JSON.
 
-    Guided input:
-        Supporting clients prompt for a missing URL before extraction. Other clients receive
-        an error listing the missing parameter. Cancelling the prompt runs no extraction.
+Crawl max_pages defaults to 10 (maximum 100). Each successfully extracted, uncached page consumes one credit.
 
-    Examples:
-        Single page: {"params": {"url": "https://example.com"}}
-        Page content only: {"params": {"url": "https://example.com"}, "mode": "compact"}
-        Markdown: {"params": {"url": "https://example.com", "output": "md"}}
-        Discover URLs: {"params": {"url": "https://example.com", "mode": "map"}}
-        Crawl: {"params": {"url": "https://example.com", "mode": "crawl", "max_pages": 2}}
-
-    A convenience wrapper for the SerpApi Extract API, recommended for parsing page contents.
-    """
+Examples:
+Full scrape JSON: {"params":{"url":"https://example.com"},"mode":"complete"}
+Scrape Markdown: {"params":{"url":"https://example.com"},"mode":"compact"}
+Map URLs as JSON: {"params":{"url":"https://example.com","mode":"map"},"mode":"complete"}
+Crawl pages as Markdown: {"params":{"url":"https://example.com","mode":"crawl","max_pages":2},"mode":"compact"}
+"""
 
 
 @tool(
@@ -311,20 +286,32 @@ async def extract(
 ) -> ToolResult | InputRequiredResult:
     """Extract page content with the SerpApi Extract API."""
     params = {**(params or {}), "engine": "extract"}
-    if params.get("mode", "scrape") in ("scrape", "crawl"):
-        params.setdefault("include_markdown", True)
+    if mode == "compact":
+        params.setdefault("output", "md")
+    result = await search(params=params, mode=mode, ctx=ctx)
     if (
         mode == "compact"
         and params.get("mode", "scrape") == "scrape"
         and params.get("output", "json") == "json"
+        and str(params.get("include_markdown", True)).lower() != "false"
+        and "json_restrictor" not in params
+        and isinstance(result, ToolResult)
+        and not result.is_error
     ):
-        params.setdefault(
-            "json_restrictor",
-            "text_content"
-            if params.get("include_markdown") is False
-            else "text_content.markdown",
-        )
-    return await search(params=params, mode=mode, ctx=ctx)
+        try:
+            data = json.loads(result.content[0].text)
+        except json.JSONDecodeError:
+            # Guided input cancellation returns a plain-text message.
+            return result
+        if "markdown" in data:
+            return _text_result(
+                content=json.dumps(
+                    {key: data[key] for key in ("markdown", "error") if key in data},
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+    return result
 
 
 def resolve_api_key() -> str:
