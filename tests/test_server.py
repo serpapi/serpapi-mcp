@@ -746,6 +746,18 @@ async def test_search_dashboard_returns_dashboard_app(monkeypatch):
     assert "coffee" in body  # query surfaced in a metric
 
 
+@pytest.mark.parametrize("name", ["search_table", "search_dashboard"])
+async def test_app_tools_accept_explicit_null_params(monkeypatch, name):
+    monkeypatch.setenv("SERPAPI_API_KEY", "KEY")
+    use_search(monkeypatch, lambda params: serp_results(_SAMPLE_PAYLOAD))
+    async with Client(server.mcp) as client:
+        tools = {tool.name: tool for tool in await client.list_tools()}
+        schema = tools[name].input_schema["properties"]["params"]
+        assert {"type": "null"} in schema["anyOf"]
+        result = await client.call_tool(name, {"params": None})
+    assert not result.is_error
+
+
 async def test_search_table_without_api_key_renders_error_app(monkeypatch):
     use_request(monkeypatch, real_request(state={}))
     monkeypatch.delenv("SERPAPI_API_KEY", raising=False)
