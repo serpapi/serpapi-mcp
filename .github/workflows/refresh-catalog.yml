@@ -48,6 +48,7 @@ jobs:
           fi
 
       - name: Verify the release was deployed successfully
+        id: verify_deployment
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.release.outputs.tag }}

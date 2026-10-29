@@ -13,10 +13,26 @@ from pathlib import Path
 from fastmcp import Client
 from fastmcp.client.transports import PythonStdioTransport
 
+from mcpb import build
 import src.server as server
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "mcpb" / "manifest.json").read_text(encoding="utf-8"))
+
+
+def test_bundle_preserves_generation_date_when_reusing_catalog(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    engines = project / "engines"
+    engines.mkdir(parents=True)
+    (engines / "google.json").write_text('{"engine": "google", "params": {}}')
+    (engines / ".generated-at").write_text("2020-01-01T00:00:00+00:00")
+    monkeypatch.setattr(build, "ROOT", project)
+
+    staging = tmp_path / "bundle"
+    assert build.stage_engines(staging, rebuild=False) == 1
+    assert {
+        file.name: file.read_bytes() for file in (staging / "engines").iterdir()
+    } == {file.name: file.read_bytes() for file in engines.iterdir()}
 
 
 def test_manifest_version_matches_pyproject_and_registry():

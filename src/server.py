@@ -2,8 +2,6 @@ import asyncio
 import json
 import logging
 import os
-import subprocess
-import sys
 import time
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
@@ -21,26 +19,16 @@ from fastmcp import FastMCP
 from fastmcp.server.providers import FileSystemProvider
 from mcp.types import Icon
 
+from src.engine_catalog import ensure_engines
 from src.mcp_components.resources import complete_engine_name
 from src.version import __version__
 
 COMPONENTS_DIR = Path(__file__).parent / "mcp_components"
-PROJECT_DIR = Path(__file__).resolve().parents[1]
 
 
 @asynccontextmanager
 async def lifespan(server: FastMCP):
-    engines_dir = PROJECT_DIR / "engines"
-    if not any(engines_dir.glob("*.json")):
-        await asyncio.to_thread(
-            subprocess.run,
-            [sys.executable, str(PROJECT_DIR / "build-engines.py")],
-            cwd=PROJECT_DIR,
-            check=True,
-            stdout=sys.stderr,  # Keep generator output off the stdio protocol stream.
-        )
-        if not any(engines_dir.glob("*.json")):
-            raise RuntimeError("Engine generation produced no schema files.")
+    await asyncio.to_thread(ensure_engines)
     yield
 
 
