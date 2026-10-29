@@ -99,8 +99,8 @@ def normalize_engine(engine: str, payload: dict[str, object]) -> dict[str, objec
 def main() -> int:
     """Main entry point: fetch playground data and generate engine files."""
     props = fetch_props(PLAYGROUND_URL)
-    if not isinstance(params := props.get("parameters"), dict):
-        raise RuntimeError("Playground props missing 'parameters' map.")
+    if not isinstance(params := props.get("parameters"), dict) or not params:
+        raise RuntimeError("Playground props missing a nonempty 'parameters' map.")
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     engines = []
@@ -115,6 +115,9 @@ def main() -> int:
             encoding="utf-8",
         )
         engines.append(engine)
+
+    if not engines:
+        raise RuntimeError("Playground returned no supported engines.")
 
     print(f"Wrote {len(engines)} engine files to {OUTPUT_DIR}")
     return 0

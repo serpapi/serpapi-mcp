@@ -44,5 +44,8 @@ jobs:
             exit 1
           fi
 
+      - name: Generate engine schemas
+        run: uv run --no-sync python build-engines.py
+
       - name: Run tests
         run: uv run pytest -q

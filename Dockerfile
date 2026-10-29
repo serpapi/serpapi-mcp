@@ -7,7 +7,6 @@ WORKDIR /app
 COPY pyproject.toml /app/
 COPY uv.lock /app/uv.lock
 COPY src /app/src
-COPY engines /app/engines
 COPY build-engines.py /app/build-engines.py
 
 RUN uv sync --locked --no-dev

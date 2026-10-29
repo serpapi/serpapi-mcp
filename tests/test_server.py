@@ -7,6 +7,7 @@ or an API key.
 """
 
 import json
+import subprocess
 
 import pytest
 import requests
@@ -93,6 +94,62 @@ async def test_filesystem_provider_registers_tools_apps_and_resources():
 def test_engines_dir_resolves_to_repo_engines_directory():
     assert mcp_resources.ENGINES_DIR.exists()
     assert (mcp_resources.ENGINES_DIR / "google_light.json").exists()
+
+
+@pytest.mark.parametrize("empty_directory", [False, True])
+def test_startup_generates_missing_engines(
+    monkeypatch, tmp_path, capfd, empty_directory
+):
+    monkeypatch.setattr(server, "PROJECT_DIR", tmp_path)
+    monkeypatch.chdir(tmp_path.parent)
+    engines = tmp_path / "engines"
+    if empty_directory:
+        engines.mkdir()
+    (tmp_path / "build-engines.py").write_text(
+        "from pathlib import Path\n"
+        "Path('engines').mkdir(exist_ok=True)\n"
+        "Path('engines/google.json').write_text('{}')\n"
+        "print('Generated engine schemas')\n"
+    )
+
+    with TestClient(server.starlette_app) as client:
+        assert client.get("/healthcheck").status_code == 200
+        assert (engines / "google.json").read_text() == "{}"
+
+    output = capfd.readouterr()
+    assert "Generated engine schemas" in output.err
+    assert "Generated engine schemas" not in output.out
+
+
+async def test_startup_skips_existing_engines(monkeypatch, tmp_path):
+    monkeypatch.setattr(server, "PROJECT_DIR", tmp_path)
+    engines = tmp_path / "engines"
+    engines.mkdir()
+    schema = engines / "google.json"
+    schema.write_text("{}")
+
+    # There is no generator in this directory, so launching it would fail.
+    async with Client(server.mcp) as client:
+        assert "search" in {tool.name for tool in await client.list_tools()}
+    assert schema.read_text() == "{}"
+
+
+async def test_startup_propagates_generation_failure(monkeypatch, tmp_path):
+    monkeypatch.setattr(server, "PROJECT_DIR", tmp_path)
+    (tmp_path / "build-engines.py").write_text("raise SystemExit(1)\n")
+
+    with pytest.raises(subprocess.CalledProcessError):
+        async with server.lifespan(server.mcp):
+            pytest.fail("Startup must fail when schema generation fails")
+
+
+async def test_startup_rejects_empty_generation(monkeypatch, tmp_path):
+    monkeypatch.setattr(server, "PROJECT_DIR", tmp_path)
+    (tmp_path / "build-engines.py").write_text("")
+
+    with pytest.raises(RuntimeError, match="no schema files"):
+        async with server.lifespan(server.mcp):
+            pytest.fail("Startup must fail when no schemas were generated")
 
 
 @pytest.mark.parametrize("mode", ["auto", "legacy"])
