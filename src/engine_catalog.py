@@ -99,8 +99,14 @@ def normalize_engine(engine: str, payload: dict[str, object]) -> dict[str, objec
     }
 
 
-def generate_engines(output_dir: Path = ENGINES_DIR) -> int:
+def generate_engines(
+    output_dir: Path = ENGINES_DIR, *, only_if_missing: bool = False
+) -> int:
     """Refresh schemas, removing retired engines after the new files are ready."""
+    existing = list(output_dir.glob("*.json"))
+    if only_if_missing and existing:
+        return len(existing)
+
     props = fetch_props(PLAYGROUND_URL)
     if not isinstance(params := props.get("parameters"), dict) or not params:
         raise RuntimeError("Playground props missing a nonempty 'parameters' map.")
@@ -119,19 +125,35 @@ def generate_engines(output_dir: Path = ENGINES_DIR) -> int:
     if not schemas:
         raise RuntimeError("Playground returned no supported engines.")
 
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(dir=output_dir.parent, prefix=".engines-") as temporary:
-        staging = Path(temporary)
+        staging = Path(temporary) / "engines"
+        staging.mkdir()
         for name, content in schemas.items():
             (staging / name).write_text(content, encoding="utf-8")
+        generated_at = staging / ".generated-at"
+        generated_at.write_text(datetime.now(UTC).isoformat(), encoding="utf-8")
+        if not existing:
+            # Publish the first catalog all at once. Remove an empty destination
+            # first because Windows cannot rename a directory onto one.
+            try:
+                try:
+                    output_dir.rmdir()
+                except FileNotFoundError:
+                    pass
+                staging.rename(output_dir)
+            except OSError:
+                # Another starter may have published its complete catalog first.
+                if not any(output_dir.glob("*.json")):
+                    raise
+            return len(list(output_dir.glob("*.json")))
+
         # Replace complete files so readers never see partially written JSON.
         for name in schemas:
             (staging / name).replace(output_dir / name)
         for path in output_dir.glob("*.json"):
             if path.name not in schemas:
                 path.unlink(missing_ok=True)
-        generated_at = staging / ".generated-at"
-        generated_at.write_text(datetime.now(UTC).isoformat(), encoding="utf-8")
         generated_at.replace(output_dir / generated_at.name)
     return len(schemas)
 
@@ -139,7 +161,7 @@ def generate_engines(output_dir: Path = ENGINES_DIR) -> int:
 def ensure_engines() -> None:
     """Generate missing schemas, or warn when an existing catalog needs refreshing."""
     if not any(ENGINES_DIR.glob("*.json")):
-        generate_engines(ENGINES_DIR)
+        generate_engines(ENGINES_DIR, only_if_missing=True)
         return
 
     try:
