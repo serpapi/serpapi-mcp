@@ -81,5 +81,5 @@ async def test_stdio_entry_point_serves_tools_and_resources(tmp_path):
         tools = {tool.name for tool in await client.list_tools()}
         engines = await client.read_resource("serpapi://engines")
 
-    assert {"search", "search_table", "search_dashboard"} <= tools
+    assert {"search", "extract", "search_table", "search_dashboard"} <= tools
     assert json.loads(engines[0].text)["count"] > 0
