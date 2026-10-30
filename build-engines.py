@@ -82,6 +82,13 @@ def normalize_engine(engine: str, payload: dict[str, object]) -> dict[str, objec
                     filtered["options"] = normalize_options(options)
                 if isinstance(html_value := filtered.pop("html", None), str):
                     filtered["description"] = html_to_markdown(html_value)
+                if group_name == "serpapi_parameters" and param_name == "output":
+                    # The upstream API also supports HTML, which the MCP tools reject.
+                    filtered["options"] = ["json", "md"]
+                    filtered["description"] = (
+                        "MCP tools support `json` (default) for structured JSON or `md` for Markdown. "
+                        "Compact mode in the `extract` tool defaults to `md`."
+                    )
                 if filtered:
                     filtered["group"] = group_name
                     if group_name == "serpapi_parameters":

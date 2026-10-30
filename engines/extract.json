@@ -95,7 +95,11 @@
       "group": "serpapi_parameters"
     },
     "output": {
-      "description": "Parameter defines the format of the result. It can be set to `json` (default) to get a structured JSON of the results, `html` to get the raw HTML retrieved, or `md` to get a markdown-formatted version optimized for LLMs and AI agents.",
+      "options": [
+        "json",
+        "md"
+      ],
+      "description": "MCP tools support `json` (default) for structured JSON or `md` for Markdown. Compact mode in the `extract` tool defaults to `md`.",
       "group": "serpapi_parameters"
     },
     "json_restrictor": {
