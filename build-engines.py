@@ -86,8 +86,9 @@ def normalize_engine(engine: str, payload: dict[str, object]) -> dict[str, objec
                     # The upstream API also supports HTML, which the MCP tools reject.
                     filtered["options"] = ["json", "md"]
                     filtered["description"] = (
-                        "MCP tools support `json` (default) for structured JSON or `md` for Markdown. "
-                        "Compact mode in the `extract` tool defaults to `md`."
+                        "Parameter defines the format of the result. It can be set to `json` "
+                        "to get a structured JSON of the results, or `md` to get a markdown-formatted "
+                        "version optimized for LLMs and AI agents."
                     )
                 if filtered:
                     filtered["group"] = group_name
