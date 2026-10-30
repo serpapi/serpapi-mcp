@@ -44,5 +44,12 @@ jobs:
             exit 1
           fi
 
+      - name: Generate engine schemas
+        run: uv run --no-sync python build-engines.py
+
       - name: Run tests
         run: uv run pytest -q
+
+      - name: Smoke-test production Docker image
+        timeout-minutes: 15
+        run: uv run --no-sync python scripts/smoke_test_container.py

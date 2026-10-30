@@ -1,7 +1,9 @@
+import asyncio
 import json
 import logging
 import os
 import time
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -17,10 +19,17 @@ from fastmcp import FastMCP
 from fastmcp.server.providers import FileSystemProvider
 from mcp.types import Icon
 
+from src.engine_catalog import ensure_engines
 from src.mcp_components.resources import complete_engine_name
 from src.version import __version__
 
 COMPONENTS_DIR = Path(__file__).parent / "mcp_components"
+
+
+@asynccontextmanager
+async def lifespan(server: FastMCP):
+    await asyncio.to_thread(ensure_engines)
+    yield
 
 
 mcp = FastMCP(
@@ -41,6 +50,7 @@ mcp = FastMCP(
         "name to inspect its supported parameters."
     ),
     providers=[FileSystemProvider(COMPONENTS_DIR)],
+    lifespan=lifespan,
 )
 mcp.completion(complete_engine_name)
 

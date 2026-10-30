@@ -180,6 +180,9 @@ def stage_engines(staging: Path, rebuild: bool) -> int:
         target.mkdir(parents=True, exist_ok=True)
         for schema in sorted((ROOT / ENGINES_DIR).glob("*.json")):
             shutil.copy2(schema, target / schema.name)
+        generated_at = ROOT / ENGINES_DIR / ".generated-at"
+        if generated_at.is_file():
+            shutil.copy2(generated_at, target / generated_at.name)
 
     count = len(list(target.glob("*.json")))
     if count == 0:

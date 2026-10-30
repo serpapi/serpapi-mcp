@@ -1,0 +1,109 @@
+name: Refresh engine catalog
+
+on:
+  schedule:
+    # Every Monday at 03:30 UTC (09:00 IST).
+    - cron: "30 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+# Hold the release deploy job's lock from version selection through deployment.
+concurrency:
+  group: mcp-server-prod
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  refresh:
+    name: Test and redeploy latest release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Find latest published release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE_TAG="$(gh api "repos/${GITHUB_REPOSITORY}/releases/latest" --jq '.tag_name')"
+          echo "tag=${RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
+
+      - name: Check out release
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ steps.release.outputs.tag }}
+
+      - name: Refuse refresh while a newer release tag is unpublished
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          LATEST_TAG="$(git -c versionsort.suffix=- ls-remote --tags --refs --sort=-version:refname origin 'v*' \
+            | awk 'NR == 1 { sub("refs/tags/", "", $2); print $2 }')"
+          if [[ "${LATEST_TAG}" != "${RELEASE_TAG}" ]]; then
+            echo "::error::Latest published release ${RELEASE_TAG} differs from newest release tag ${LATEST_TAG}. Resolve the newer release before refreshing to avoid rolling production back."
+            exit 1
+          fi
+
+      - name: Verify the release was deployed successfully
+        id: verify_deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          RELEASE_SHA="$(git rev-parse HEAD)"
+          RUN_ID="$(gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/workflows/release.yml/runs" \
+            -f branch="${RELEASE_TAG}" -f head_sha="${RELEASE_SHA}" -F per_page=1 \
+            --jq '.workflow_runs[0].id // empty')"
+          if [[ -z "${RUN_ID}" ]]; then
+            echo "::error::No release workflow run found for ${RELEASE_TAG} at ${RELEASE_SHA}. Deploy this release before refreshing its catalog."
+            exit 1
+          fi
+          DEPLOY_RESULT="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?filter=latest&per_page=100" \
+            --jq '.jobs[] | select(.name == "Deploy hosted server") | .conclusion')"
+          if [[ "${DEPLOY_RESULT}" != "success" ]]; then
+            echo "::error::The latest release run for ${RELEASE_TAG} has no successful Deploy hosted server job. Resolve its deployment before refreshing."
+            exit 1
+          fi
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.8"
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --group dev --frozen
+
+      - name: Regenerate engine catalog
+        run: uv run --no-sync python build-engines.py
+
+      - name: Run tests
+        run: uv run --no-sync pytest -q
+
+      - name: Install AWS Copilot CLI
+        run: |
+          curl --fail --location --silent --show-error \
+            --output copilot-cli \
+            https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux
+          chmod +x copilot-cli
+          sudo mv copilot-cli /usr/local/bin/copilot
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # A fresh runner rebuilds the Dockerfile, including build-engines.py.
+      # A unique image tag updates the service even when the release is unchanged.
+      - name: Rebuild and deploy service
+        run: |
+          copilot svc deploy \
+            --env prod \
+            --name mcp-server-api \
+            --tag "catalog-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"

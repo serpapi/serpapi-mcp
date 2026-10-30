@@ -104,6 +104,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev --frozen
 
+      - name: Generate engine schemas
+        run: uv run --no-sync python build-engines.py
+
       - name: Run tests
         run: uv run pytest -q
 
@@ -163,6 +166,10 @@ jobs:
     name: Deploy hosted server
     needs: [verify, test]
     if: github.event_name == 'push' || inputs.deploy
+    concurrency:
+      group: mcp-server-prod
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     permissions:
       contents: read

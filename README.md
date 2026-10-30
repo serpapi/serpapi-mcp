@@ -167,7 +167,7 @@ Search responses preserve the existing MCP `structuredContent.result` string and
 
 The form is derived from the original arguments on each request. It uses no `requestState` or process-local continuation storage, so a retry can run on another replica without a shared state-protection key. Authentication is applied on every HTTP request, and only answers for requested fields are used. If an answer introduces another requirement, the tool lists the remaining fields for the agent to supply in a new call.
 
-To extend guided search, add required fields, descriptions, types, and options to the engine's `engines/<engine>.json` file. Add an `EngineInputRules` entry in [`src/engine_input_rules.py`](src/engine_input_rules.py) when requirements depend on other parameters, defaults, or alternatives. The shared MCP handler in [`src/search_input.py`](src/search_input.py) needs no engine-specific branches. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
+Engine parameter metadata comes from the SerpApi Playground and is generated into `engines/<engine>.json`. Add an `EngineInputRules` entry in [`src/engine_input_rules.py`](src/engine_input_rules.py) when requirements depend on other parameters, defaults, or alternatives. The shared MCP handler in [`src/search_input.py`](src/search_input.py) needs no engine-specific branches. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
 
 ## Interactive UI (MCP apps)
 
@@ -185,6 +185,10 @@ uv run fastmcp dev apps src/server.py
 ```
 
 ## Development
+
+The generated `engines/` folder is ignored by Git. HTTP and stdio startup call `ensure_engines()` to generate it from the SerpApi Playground if it is missing or empty, so the first local run needs network access. The complete catalog is published together so overlapping startups cannot read a partial catalog. If the folder contains only leftover non-JSON files, remove it before generating again. Docker and MCP Bundle builds generate the schemas ahead of time; startup skips generation when they are present. To refresh an existing local catalog, run `uv run python build-engines.py` from the project root. This updates current schemas and removes retired engines. If fetching or parsing fails, the existing catalog is kept. There is no automatic refresh during local startup.
+
+Successful generation records its UTC timestamp in `engines/.generated-at`. Startup logs a warning to stderr when the catalog is more than 14 days old or its generation date is unknown, including the refresh command above. The warning does not block startup or change any files. Docker images and MCP Bundles keep this timestamp, so rebuild and redeploy the image or reinstall the rebuilt bundle to refresh them. The age check runs only at startup.
 
 ```bash
 # Local development
@@ -204,13 +208,17 @@ uv run --no-sync scripts/bump_version.py 2.0.0
 # the MCP Bundle and attaches it to the GitHub release.
 git tag v2.0.0 && git push origin v2.0.0
 
-# Regenerate engine resources (Playground scrape)
-python build-engines.py
+# Refresh the local catalog now, even if engines/ already exists
+uv run python build-engines.py
 
 # Testing with MCP Inspector
 npx @modelcontextprotocol/inspector
 # Configure: URL mcp.serpapi.com/YOUR_KEY/mcp, Transport "Streamable HTTP transport"
 ```
+
+The `Refresh engine catalog` workflow rebuilds and redeploys the hosted server every Monday at 09:00 IST (03:30 UTC), or through **Run workflow** in GitHub Actions. It checks out the latest published release, requires it to match the newest `v*` tag, and checks that the latest release run for that exact commit has a successful `Deploy hosted server` job. A missing, skipped, failed, or unfinished deployment blocks the refresh. It runs tests, then uses a fresh GitHub-hosted runner to build a Docker image with current schemas and deploy it to `prod` with a unique image tag. Docker generates the catalog again during its build, so the tested and deployed catalogs can differ if the Playground changes between those steps.
+
+The refresh and release deployment jobs share a concurrency group. Before enabling the refresh workflow on `main`, deploy a release containing these changes and the shared lock, then test a manual refresh. If the workflow reaches `main` first, disable it in GitHub Actions until that release succeeds. Pause refreshes during an intentional production rollback; GitHub release history does not track deployments made outside this workflow. Avoid rerunning deployments from older tags that predate the shared lock.
 
 ## Troubleshooting
 
