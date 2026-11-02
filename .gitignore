@@ -4,6 +4,8 @@ scratch/
 
 # Generated engine schemas
 /engines/
+/.engines-*/
+/.engines.lock
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

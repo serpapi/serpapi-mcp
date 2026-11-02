@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import logging
+import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.request import Request, urlopen
-
-from bs4 import BeautifulSoup
-from markdownify import markdownify
 
 PLAYGROUND_URL = "https://serpapi.com/playground"
 EXCLUDED_ENGINES = {
@@ -21,6 +20,10 @@ EXCLUDED_ENGINES = {
 }
 PARAM_KEEP_KEYS = {"html", "type", "options", "required"}
 ENGINES_DIR = Path(__file__).resolve().parents[1] / "engines"
+CATALOG_MANIFEST = ".catalog"
+# The Playground exposes over 140 engines. Also protect clean builds with no baseline.
+MIN_ENGINES = 100
+REQUIRED_ENGINES = {"google", "google_light"}
 TIMEOUT_SECONDS = 30
 USER_AGENT = "Mozilla/5.0"
 logger = logging.getLogger(__name__)
@@ -28,6 +31,8 @@ logger = logging.getLogger(__name__)
 
 def html_to_markdown(value: str) -> str:
     """Convert HTML to markdown, normalizing whitespace."""
+    from markdownify import markdownify
+
     md = markdownify(html.unescape(value), strip=["a"])
     return " ".join(md.split())
 
@@ -57,6 +62,8 @@ def normalize_options(options: list[object]) -> list[object]:
 
 def fetch_props(url: str) -> dict[str, object]:
     """Fetch playground HTML and extract React props."""
+    from bs4 import BeautifulSoup
+
     req = Request(url, headers={"User-Agent": USER_AGENT})
     with urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
         page_html = resp.read().decode("utf-8", errors="ignore")
@@ -99,85 +106,116 @@ def normalize_engine(engine: str, payload: dict[str, object]) -> dict[str, objec
     }
 
 
-def generate_engines(
-    output_dir: Path = ENGINES_DIR, *, only_if_missing: bool = False
-) -> int:
-    """Refresh schemas, removing retired engines after the new files are ready."""
-    existing = list(output_dir.glob("*.json"))
-    if only_if_missing and existing:
-        return len(existing)
+def catalog_generated_at(directory: Path) -> datetime | None:
+    """Return the generation date only when every schema matches the manifest."""
+    try:
+        manifest = json.loads((directory / CATALOG_MANIFEST).read_bytes())
+        expected = manifest["files"]
+        files = list(directory.glob("*.json"))
+        if not isinstance(expected, dict) or not expected:
+            return None
+        if {path.name for path in files} != set(expected):
+            return None
+        for path in files:
+            if hashlib.sha256(path.read_bytes()).hexdigest() != expected[path.name]:
+                return None
+        generated_at = datetime.fromisoformat(manifest["generated_at"])
+        if generated_at.tzinfo is None:
+            return None
+        return generated_at
+    except (OSError, ValueError, TypeError, KeyError):
+        return None
 
-    props = fetch_props(PLAYGROUND_URL)
+
+def build_schemas(props: dict) -> dict[str, bytes]:
+    """Reject incomplete upstream data before changing any existing schemas."""
     if not isinstance(params := props.get("parameters"), dict) or not params:
         raise RuntimeError("Playground props missing a nonempty 'parameters' map.")
 
     schemas = {}
 
-    for engine, payload in sorted(params.items()):
-        if not isinstance(engine, str) or engine in EXCLUDED_ENGINES:
+    for engine, payload in params.items():
+        if engine in EXCLUDED_ENGINES:
             continue
-        if not isinstance(payload, dict):
+        if not re.fullmatch(r"[a-z0-9_]+", engine) or not isinstance(payload, dict):
+            logger.warning("Skipping unsupported Playground engine: %r", engine)
+            continue
+        schema = normalize_engine(engine, payload)
+        if not schema["params"]:
+            logger.warning("Skipping Playground engine %r with no parameters", engine)
             continue
         schemas[f"{engine}.json"] = json.dumps(
-            normalize_engine(engine, payload), indent=2, ensure_ascii=False
-        )
+            schema, indent=2, ensure_ascii=False
+        ).encode("utf-8")
 
-    if not schemas:
-        raise RuntimeError("Playground returned no supported engines.")
+    missing = REQUIRED_ENGINES - {name.removesuffix(".json") for name in schemas}
+    if len(schemas) < MIN_ENGINES or missing:
+        raise RuntimeError(
+            f"Incomplete Playground catalog: {len(schemas)} engines, expected at least "
+            f"{MIN_ENGINES}; missing core engines: {sorted(missing)}. "
+            "Existing catalog was not changed."
+        )
+    return dict(sorted(schemas.items()))
+
+
+def generate_engines(
+    output_dir: Path = ENGINES_DIR, *, only_if_missing: bool = False
+) -> int:
+    """Publish a validated catalog, serializing writers across local processes."""
+    from filelock import FileLock
 
     output_dir.parent.mkdir(parents=True, exist_ok=True)
-    with TemporaryDirectory(dir=output_dir.parent, prefix=".engines-") as temporary:
-        staging = Path(temporary) / "engines"
-        staging.mkdir()
-        for name, content in schemas.items():
-            (staging / name).write_text(content, encoding="utf-8")
-        generated_at = staging / ".generated-at"
-        generated_at.write_text(datetime.now(UTC).isoformat(), encoding="utf-8")
-        if not existing:
-            # Publish the first catalog all at once. Remove an empty destination
-            # first because Windows cannot rename a directory onto one.
-            try:
-                try:
-                    output_dir.rmdir()
-                except FileNotFoundError:
-                    pass
-                staging.rename(output_dir)
-            except OSError:
-                # Another starter may have published its complete catalog first.
-                if not any(output_dir.glob("*.json")):
-                    raise
+    with FileLock(output_dir.with_name(f".{output_dir.name}.lock"), timeout=60):
+        # A different starter may have completed the catalog while we waited.
+        if only_if_missing and catalog_generated_at(output_dir) is not None:
             return len(list(output_dir.glob("*.json")))
-
-        # Replace complete files so readers never see partially written JSON.
-        for name in schemas:
-            (staging / name).replace(output_dir / name)
-        for path in output_dir.glob("*.json"):
-            if path.name not in schemas:
-                path.unlink(missing_ok=True)
-        generated_at.replace(output_dir / generated_at.name)
+        schemas = build_schemas(fetch_props(PLAYGROUND_URL))
+        manifest = {
+            "generated_at": datetime.now(UTC).isoformat(),
+            "files": {
+                name: hashlib.sha256(content).hexdigest()
+                for name, content in schemas.items()
+            },
+        }
+        with TemporaryDirectory(dir=output_dir.parent, prefix=".engines-") as temporary:
+            staging = Path(temporary)
+            for name, content in schemas.items():
+                (staging / name).write_bytes(content)
+            (staging / CATALOG_MANIFEST).write_bytes(
+                json.dumps(manifest).encode("utf-8")
+            )
+            output_dir.mkdir(exist_ok=True)
+            # A killed writer leaves no valid manifest; the next starter repairs it.
+            (output_dir / CATALOG_MANIFEST).unlink(missing_ok=True)
+            for name in schemas:
+                (staging / name).replace(output_dir / name)
+            for path in output_dir.glob("*.json"):
+                if path.name not in schemas:
+                    path.unlink(missing_ok=True)
+            (output_dir / ".generated-at").unlink(missing_ok=True)
+            (staging / CATALOG_MANIFEST).replace(output_dir / CATALOG_MANIFEST)
     return len(schemas)
 
 
 def ensure_engines() -> None:
-    """Generate missing schemas, or warn when an existing catalog needs refreshing."""
-    if not any(ENGINES_DIR.glob("*.json")):
-        generate_engines(ENGINES_DIR, only_if_missing=True)
+    """Repair incomplete catalogs, or warn when a complete catalog needs refreshing."""
+    generated_at = catalog_generated_at(ENGINES_DIR)
+    if generated_at is None:
+        try:
+            generate_engines(ENGINES_DIR, only_if_missing=True)
+        except Exception as exc:
+            raise RuntimeError(
+                f"Engine catalog is missing or incomplete and generation failed: {exc}. "
+                "Retry from a source checkout: uv run python build-engines.py. "
+                "For MCP Bundle installs, install an updated bundle or rebuild it from source."
+            ) from exc
         return
 
-    try:
-        generated_at = datetime.fromisoformat(
-            (ENGINES_DIR / ".generated-at").read_text(encoding="utf-8").strip()
+    if (age := datetime.now(UTC) - generated_at) > timedelta(days=14):
+        logger.warning(
+            "Engine catalog was generated %s days ago and may be outdated. "
+            "Refresh from the project root: uv run python build-engines.py "
+            "(Docker: rebuild with docker build --no-cache and redeploy; "
+            "MCP Bundle: install an updated bundle or rebuild it from source).",
+            age.days,
         )
-        age = datetime.now(UTC) - generated_at
-    except (OSError, ValueError, TypeError):
-        reason = "generation date is unknown"
-    else:
-        if age <= timedelta(days=14):
-            return
-        reason = f"was generated {age.days} days ago and may be outdated"
-
-    logger.warning(
-        "Engine catalog %s. Refresh from the project root: uv run python build-engines.py "
-        "(for Docker or MCP Bundle installs, rebuild the image or bundle).",
-        reason,
-    )

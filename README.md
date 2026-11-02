@@ -82,13 +82,7 @@ Get your API key: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-ke
 
 ### Claude Desktop Extension (MCP bundle)
 
-For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) (or build it as below) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. The bundle uses the MCPB `uv` runtime: it ships only the source, `pyproject.toml` and `uv.lock`, and Claude Desktop provisions Python and the locked dependencies with uv at install time, so nothing is vendored and one bundle works on macOS, Windows and Linux.
-
-```bash
-uv run mcpb/build.py   # needs Node.js for the MCPB CLI; writes dist/serpapi-mcp-<version>.mcpb
-```
-
-Everything bundle-related lives in [mcpb/](mcpb/), plus [.mcpbignore](.mcpbignore) at the project root. The build regenerates the engine schemas from the SerpApi Playground (`--no-rebuild-engines` bundles `engines/` from the working tree instead), validates [mcpb/manifest.json](mcpb/manifest.json), packs the git-tracked files minus [.mcpbignore](.mcpbignore) with the manifest at the bundle root, then installs it into a temp dir and starts it over stdio to make sure it works (`--no-smoke` skips that last step). The bundle is only built at release time: pushing a `v<version>` tag runs the release workflow, which runs the test suite and then deploys the hosted server, publishes the MCP Registry entry, and builds the bundle and attaches it to the GitHub release. Pull requests run the manifest and stdio entry point tests in `tests/test_mcpb.py` but do not pack a bundle.
+For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. It provisions Python and dependencies with uv at install time. The same bundle works on macOS, Windows and Linux.
 
 The same stdio entry point works with any local MCP host that launches servers as a subprocess:
 
@@ -165,9 +159,7 @@ Search responses preserve the existing MCP `structuredContent.result` string and
 - [Google Maps Directions](https://serpapi.com/google-maps-directions-api): missing start and destination addresses. Coordinates or place data IDs already supplied satisfy the corresponding endpoint.
 - Other catalog engines use their required fields, such as YouTube's `search_query`, Yelp's `find_loc`, and Amazon's `k`. Engine rules account for known defaults and alternatives, including Amazon category nodes, eBay categories, and Google Scholar citation searches.
 
-The form is derived from the original arguments on each request. It uses no `requestState` or process-local continuation storage, so a retry can run on another replica without a shared state-protection key. Authentication is applied on every HTTP request, and only answers for requested fields are used. If an answer introduces another requirement, the tool lists the remaining fields for the agent to supply in a new call.
-
-Engine parameter metadata comes from the SerpApi Playground and is generated into `engines/<engine>.json`. Add an `EngineInputRules` entry in [`src/engine_input_rules.py`](src/engine_input_rules.py) when requirements depend on other parameters, defaults, or alternatives. The shared MCP handler in [`src/search_input.py`](src/search_input.py) needs no engine-specific branches. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
+If an answer introduces another requirement, the tool lists the remaining fields for the agent to supply in a new call. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
 
 ## Interactive UI (MCP apps)
 
@@ -177,48 +169,6 @@ The `search` tool returns JSON by default. For hosts that support the [MCP Apps 
 - `search_dashboard`: summary metrics, a source-breakdown chart, and a results table with a click-to-expand detail panel.
 
 Both accept the same `params` as `search`. Hosts that don't support MCP Apps simply ignore these tools.
-
-Preview them locally without an MCP host:
-
-```bash
-uv run fastmcp dev apps src/server.py
-```
-
-## Development
-
-The generated `engines/` folder is ignored by Git. HTTP and stdio startup call `ensure_engines()` to generate it from the SerpApi Playground if it is missing or empty, so the first local run needs network access. The complete catalog is published together so overlapping startups cannot read a partial catalog. If the folder contains only leftover non-JSON files, remove it before generating again. Docker and MCP Bundle builds generate the schemas ahead of time; startup skips generation when they are present. To refresh an existing local catalog, run `uv run python build-engines.py` from the project root. This updates current schemas and removes retired engines. If fetching or parsing fails, the existing catalog is kept. There is no automatic refresh during local startup.
-
-Successful generation records its UTC timestamp in `engines/.generated-at`. Startup logs a warning to stderr when the catalog is more than 14 days old or its generation date is unknown, including the refresh command above. The warning does not block startup or change any files. Docker images and MCP Bundles keep this timestamp, so rebuild and redeploy the image or reinstall the rebuilt bundle to refresh them. The age check runs only at startup.
-
-```bash
-# Local development
-uv sync && uv run src/server.py
-
-# Docker
-docker build -t serpapi-mcp . && docker run -p 8000:8000 serpapi-mcp
-
-# Build the Claude Desktop extension (MCP Bundle); rebuilds engines, needs Node.js for the MCPB CLI
-uv run mcpb/build.py
-
-# Release: update pyproject.toml, server.json, mcpb/manifest.json and uv.lock together.
-uv run --no-sync scripts/bump_version.py 2.0.0
-# Review and commit the changes before tagging the release.
-# Nothing ships on a plain push to main. The tag runs the release workflow, which runs the test
-# suite and then deploys the hosted server, publishes server.json to the MCP Registry, and builds
-# the MCP Bundle and attaches it to the GitHub release.
-git tag v2.0.0 && git push origin v2.0.0
-
-# Refresh the local catalog now, even if engines/ already exists
-uv run python build-engines.py
-
-# Testing with MCP Inspector
-npx @modelcontextprotocol/inspector
-# Configure: URL mcp.serpapi.com/YOUR_KEY/mcp, Transport "Streamable HTTP transport"
-```
-
-The `Refresh engine catalog` workflow rebuilds and redeploys the hosted server every Monday at 09:00 IST (03:30 UTC), or through **Run workflow** in GitHub Actions. It checks out the latest published release, requires it to match the newest `v*` tag, and checks that the latest release run for that exact commit has a successful `Deploy hosted server` job. A missing, skipped, failed, or unfinished deployment blocks the refresh. It runs tests, then uses a fresh GitHub-hosted runner to build a Docker image with current schemas and deploy it to `prod` with a unique image tag. Docker generates the catalog again during its build, so the tested and deployed catalogs can differ if the Playground changes between those steps.
-
-The refresh and release deployment jobs share a concurrency group. Before enabling the refresh workflow on `main`, deploy a release containing these changes and the shared lock, then test a manual refresh. If the workflow reaches `main` first, disable it in GitHub Actions until that release succeeds. Pause refreshes during an intentional production rollback; GitHub release history does not track deployments made outside this workflow. Avoid rerunning deployments from older tags that predate the shared lock.
 
 ## Troubleshooting
 
@@ -237,13 +187,7 @@ The refresh and release deployment jobs share a concurrency group. Before enabli
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Install dependencies: `uv install`
-4. Make your changes
-5. Commit changes: `git commit -m 'Add amazing feature'`
-6. Push to branch: `git push origin feature/amazing-feature`
-7. Open a Pull Request
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, schema refresh commands, testing, Docker and MCP Bundle builds, and releases.
 
 ## License
 

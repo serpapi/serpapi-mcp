@@ -1,4 +1,4 @@
-"""Regression tests for publishing a catalog during concurrent cold starts."""
+"""Regressions for catalog repair and overlapping writers, using real processes."""
 
 import json
 import multiprocessing
@@ -8,133 +8,158 @@ from unittest.mock import patch
 import pytest
 
 from src import engine_catalog
+from tests.catalog_support import PARAMETERS, PROPS, snapshot
 
 
-PROPS = {"parameters": {"a_fixture": {}, "b_fixture": {}}}
+def _start(engines, entered, release, fetched, publisher):
+    from filelock import FileLock
 
-
-def _paused_start(engines, ready, release, pause):
-    """Pause a real process at its first publication to force the race."""
     engine_catalog.ENGINES_DIR = engines
-    engine_catalog.fetch_props = lambda url: PROPS
+    parameters = {
+        **PROPS["parameters"],
+        ("first_only" if publisher else "second_only"): PARAMETERS,
+    }
 
-    def wait():
-        ready.set()
-        assert release.wait(20), "Test did not release the generator"
+    def fetch(url):
+        fetched.set()
+        return {"parameters": parameters}
 
-    generate = engine_catalog.generate_engines
+    engine_catalog.fetch_props = fetch
+    replace, acquire = Path.replace, FileLock.acquire
 
-    def generate_after_check(*args, **kwargs):
-        if pause == "before-generation":
-            wait()
-        return generate(*args, **kwargs)
-
-    def publish(original, source, target):
-        first = not ready.is_set()
-        if first and pause == "before":
-            wait()
-        result = original(source, target)
-        if first and pause == "after":
-            wait()
+    def publish(source, target):
+        result = replace(source, target)
+        if publisher and not entered.is_set():
+            entered.set()
+            assert release.wait(30), "Publisher was not released"
         return result
 
-    rename, replace = Path.rename, Path.replace
+    def lock(self, *args, **kwargs):
+        if not publisher:
+            entered.set()
+        return acquire(self, *args, **kwargs)
+
     with (
-        patch.object(engine_catalog, "generate_engines", generate_after_check),
-        patch.object(
-            Path, "rename", lambda source, target: publish(rename, source, target)
-        ),
-        patch.object(
-            Path, "replace", lambda source, target: publish(replace, source, target)
-        ),
+        patch.object(Path, "replace", publish),
+        patch.object(FileLock, "acquire", lock),
     ):
         engine_catalog.ensure_engines()
 
 
-@pytest.mark.parametrize("pause", ["before-generation", "before", "after"])
-def test_overlapping_startups_and_interruption_keep_a_complete_catalog(
-    tmp_path, monkeypatch, pause
-):
-    engines = tmp_path / "engines"
-    parameters = dict(PROPS["parameters"])
-    if pause != "after":
-        engines.mkdir()
-        parameters["winner_only"] = {}  # The loser must not remove newer engines.
-    rename = Path.rename
-
-    def windows_rename(source, target):
-        if Path(target).exists():
-            raise FileExistsError(target)
-        return rename(source, target)
-
-    # Windows refuses even an empty target; POSIX normally replaces it.
-    monkeypatch.setattr(Path, "rename", windows_rename)
-    monkeypatch.setattr(engine_catalog, "ENGINES_DIR", engines)
-    monkeypatch.setattr(
-        engine_catalog, "fetch_props", lambda url: {"parameters": parameters}
-    )
-    context = multiprocessing.get_context("spawn")
-    ready, release = context.Event(), context.Event()
-    process = context.Process(
-        target=_paused_start, args=(engines, ready, release, pause)
-    )
-    process.start()
-    try:
-        assert ready.wait(20), "Generator did not reach publication"
-        # The second starter either generates everything or reuses everything.
-        engine_catalog.ensure_engines()
-        assert {
-            file.stem: json.loads(file.read_text()) for file in engines.glob("*.json")
-        } == {
-            name: {"engine": name, "params": {}, "common_params": {}}
-            for name in parameters
-        }
-        assert (engines / ".generated-at").is_file()
-        before = {
-            file.name: (file.read_bytes(), file.stat().st_mtime_ns)
-            for file in engines.iterdir()
-        }
-
-        if pause != "after":
-            release.set()
-            process.join(20)
-            assert process.exitcode == 0
-        else:
-            # A crash at publication must leave a usable catalog for later startups.
-            process.kill()
-            process.join(5)
-
-        def offline(url):
-            pytest.fail("A completed catalog must be reused without fetching")
-
-        monkeypatch.setattr(engine_catalog, "fetch_props", offline)
-        engine_catalog.ensure_engines()
-        assert {
-            file.name: (file.read_bytes(), file.stat().st_mtime_ns)
-            for file in engines.iterdir()
-        } == before
-    finally:
-        if process.is_alive():
-            process.kill()
-            process.join(5)
-        process.close()
-
-
-def test_failed_first_publication_does_not_fall_back_to_partial_writes(
-    tmp_path, monkeypatch
+@pytest.mark.parametrize("initial", ["missing", "damaged"])
+@pytest.mark.parametrize("ending", ["complete", "killed"])
+def test_overlapping_starters_wait_for_publication_and_recover_a_killed_writer(
+    tmp_path, monkeypatch, initial, ending
 ):
     engines = tmp_path / "engines"
     monkeypatch.setattr(engine_catalog, "ENGINES_DIR", engines)
     monkeypatch.setattr(engine_catalog, "fetch_props", lambda url: PROPS)
+    if initial == "damaged":
+        engine_catalog.ensure_engines()
+        (engines / "google.json").write_text("old checkout")
 
-    def fail_rename(source, target):
-        raise PermissionError("Cannot publish catalog")
+    context = multiprocessing.get_context("spawn")
+    entered, waiting, release, first_fetch, second_fetch = [
+        context.Event() for _ in range(5)
+    ]
+    first = context.Process(
+        target=_start, args=(engines, entered, release, first_fetch, True)
+    )
+    second = context.Process(
+        target=_start, args=(engines, waiting, release, second_fetch, False)
+    )
+    first.start()
+    try:
+        assert entered.wait(20), "First writer did not publish a file"
+        assert engine_catalog.catalog_generated_at(engines) is None
+        second.start()
+        assert waiting.wait(20), "Second starter did not try to acquire the writer lock"
+        if ending == "killed":
+            first.kill()
+        else:
+            release.set()
+        first.join(20)
+        second.join(20)
+        assert second.exitcode == 0
+        if ending == "complete":
+            assert first.exitcode == 0
+        assert second_fetch.is_set() == (ending == "killed")
+        expected = {
+            **PROPS["parameters"],
+            ("first_only" if ending == "complete" else "second_only"): PARAMETERS,
+        }
+        assert {
+            p.name: p.read_bytes() for p in engines.glob("*.json")
+        } == engine_catalog.build_schemas({"parameters": expected})
+        assert engine_catalog.catalog_generated_at(engines) is not None
+        before = snapshot(engines)
+        monkeypatch.setattr(
+            engine_catalog,
+            "fetch_props",
+            lambda url: pytest.fail("Complete catalog must work offline"),
+        )
+        engine_catalog.ensure_engines()
+        assert snapshot(engines) == before
+    finally:
+        for process in (first, second):
+            if process.pid is not None:
+                if process.is_alive():
+                    process.kill()
+                process.join(5)
+            process.close()
 
-    with monkeypatch.context() as failure:
-        failure.setattr(Path, "rename", fail_rename)
-        with pytest.raises(PermissionError):
-            engine_catalog.ensure_engines()
-    assert not list(engines.glob("*.json"))
 
+@pytest.mark.parametrize(
+    "damage", ["checkout-deletions", "checkout-overwrites", "leftovers-only", "legacy"]
+)
+def test_startup_repairs_catalog_damage_and_then_reuses_it_offline(
+    tmp_path, monkeypatch, damage
+):
+    engines = tmp_path / "engines"
+    monkeypatch.setattr(engine_catalog, "ENGINES_DIR", engines)
+    monkeypatch.setattr(engine_catalog, "fetch_props", lambda url: PROPS)
     engine_catalog.ensure_engines()
-    assert {file.stem for file in engines.glob("*.json")} == set(PROPS["parameters"])
+    expected = {p.name: p.read_bytes() for p in engines.glob("*.json")}
+    if damage == "checkout-deletions":
+        for path in sorted(engines.glob("*.json"))[:80]:
+            path.unlink()
+    elif damage == "checkout-overwrites":
+        (engines / "google.json").write_text('{"engine":"google","params":{}}')
+    elif damage == "leftovers-only":
+        for path in engines.glob("*.json"):
+            path.unlink()
+        (engines / ".DS_Store").write_bytes(b"fixture")
+        (engines / ".generated-at").write_text("2026-10-30T00:00:00+00:00")
+    else:
+        (engines / ".catalog").unlink()
+    calls = []
+    monkeypatch.setattr(
+        engine_catalog, "fetch_props", lambda url: calls.append(url) or PROPS
+    )
+    engine_catalog.ensure_engines()
+    assert len(calls) == 1
+    assert {p.name: p.read_bytes() for p in engines.glob("*.json")} == expected
+    assert engine_catalog.catalog_generated_at(engines) is not None
+    before = snapshot(engines)
+    monkeypatch.setattr(
+        engine_catalog, "fetch_props", lambda url: pytest.fail("Unexpected fetch")
+    )
+    engine_catalog.ensure_engines()
+    assert snapshot(engines) == before
+
+
+def test_failed_publication_is_not_accepted_and_can_be_retried(tmp_path, monkeypatch):
+    engines = tmp_path / "engines"
+    monkeypatch.setattr(engine_catalog, "ENGINES_DIR", engines)
+    monkeypatch.setattr(engine_catalog, "fetch_props", lambda url: PROPS)
+    with patch.object(
+        Path, "replace", side_effect=PermissionError("Cannot publish catalog")
+    ):
+        with pytest.raises(
+            RuntimeError, match="uv run python build-engines.py"
+        ) as failure:
+            engine_catalog.ensure_engines()
+        assert isinstance(failure.value.__cause__, PermissionError)
+    assert engine_catalog.catalog_generated_at(engines) is None
+    engine_catalog.ensure_engines()
+    assert engine_catalog.catalog_generated_at(engines) is not None

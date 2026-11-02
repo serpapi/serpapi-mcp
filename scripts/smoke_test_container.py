@@ -15,6 +15,7 @@ from pathlib import Path
 
 import httpx
 from fastmcp import Client
+from src.engine_catalog import catalog_generated_at
 
 deadline = time.monotonic() + 60
 while True:
@@ -27,7 +28,8 @@ while True:
         time.sleep(0.5)
 
 async def check():
-    generated_at = datetime.fromisoformat(Path("/app/engines/.generated-at").read_text())
+    generated_at = catalog_generated_at(Path("/app/engines"))
+    assert generated_at is not None, "Image contains an incomplete catalog"
     assert timedelta(0) <= datetime.now(UTC) - generated_at < timedelta(minutes=15)
     files = sorted(Path("/app/engines").glob("*.json"))
     assert files, "Image contains no schemas"
