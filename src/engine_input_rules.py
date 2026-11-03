@@ -5,11 +5,10 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
-from pathlib import Path
 from typing import Any
 
+from src import engine_catalog
 
-ENGINES_DIR = Path(__file__).resolve().parents[1] / "engines"
 Params = dict[str, Any]
 RequiredFields = tuple[str, ...]
 CONTROL_FIELDS = {"api_key", "engine", "output"}
@@ -226,7 +225,7 @@ def get_search_input_spec(params: Params) -> SearchInputSpec | None:
     engine = params.get("engine", "google_light")
     if not isinstance(engine, str) or not re.fullmatch(r"[a-z0-9_]+", engine):
         return None
-    path = ENGINES_DIR / f"{engine}.json"
+    path = engine_catalog.ENGINES_DIR / f"{engine}.json"
     if not path.is_file():
         return None
     metadata = json.loads(path.read_text())["params"]

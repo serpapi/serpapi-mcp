@@ -82,13 +82,7 @@ Get your API key: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-ke
 
 ### Claude Desktop Extension (MCP bundle)
 
-For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) (or build it as below) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. The bundle uses the MCPB `uv` runtime: it ships only the source, `pyproject.toml` and `uv.lock`, and Claude Desktop provisions Python and the locked dependencies with uv at install time, so nothing is vendored and one bundle works on macOS, Windows and Linux.
-
-```bash
-uv run mcpb/build.py   # needs Node.js for the MCPB CLI; writes dist/serpapi-mcp-<version>.mcpb
-```
-
-Everything bundle-related lives in [mcpb/](mcpb/), plus [.mcpbignore](.mcpbignore) at the project root. The build regenerates the engine schemas from the SerpApi Playground (`--no-rebuild-engines` bundles `engines/` from the working tree instead), validates [mcpb/manifest.json](mcpb/manifest.json), packs the git-tracked files minus [.mcpbignore](.mcpbignore) with the manifest at the bundle root, then installs it into a temp dir and starts it over stdio to make sure it works (`--no-smoke` skips that last step). The bundle is only built at release time: pushing a `v<version>` tag runs the release workflow, which runs the test suite and then deploys the hosted server, publishes the MCP Registry entry, and builds the bundle and attaches it to the GitHub release. Pull requests run the manifest and stdio entry point tests in `tests/test_mcpb.py` but do not pack a bundle.
+For a local, one-click install, download the `.mcpb` bundle from the [latest release](https://github.com/serpapi/serpapi-mcp/releases/latest) and open it with Claude Desktop (or drop it onto **Settings → Extensions**). Claude Desktop asks for your SerpApi API key during install, stores it as a sensitive setting, and runs the server locally over stdio. It provisions Python and dependencies with uv at install time. The same bundle works on macOS, Windows and Linux.
 
 The same stdio entry point works with any local MCP host that launches servers as a subprocess:
 
@@ -165,9 +159,7 @@ Search responses preserve the existing MCP `structuredContent.result` string and
 - [Google Maps Directions](https://serpapi.com/google-maps-directions-api): missing start and destination addresses. Coordinates or place data IDs already supplied satisfy the corresponding endpoint.
 - Other catalog engines use their required fields, such as YouTube's `search_query`, Yelp's `find_loc`, and Amazon's `k`. Engine rules account for known defaults and alternatives, including Amazon category nodes, eBay categories, and Google Scholar citation searches.
 
-The form is derived from the original arguments on each request. It uses no `requestState` or process-local continuation storage, so a retry can run on another replica without a shared state-protection key. Authentication is applied on every HTTP request, and only answers for requested fields are used. If an answer introduces another requirement, the tool lists the remaining fields for the agent to supply in a new call.
-
-To extend guided search, add required fields, descriptions, types, and options to the engine's `engines/<engine>.json` file. Add an `EngineInputRules` entry in [`src/engine_input_rules.py`](src/engine_input_rules.py) when requirements depend on other parameters, defaults, or alternatives. The shared MCP handler in [`src/search_input.py`](src/search_input.py) needs no engine-specific branches. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
+If an answer introduces another requirement, the tool lists the remaining fields for the agent to supply in a new call. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
 
 ## Interactive UI (MCP apps)
 
@@ -177,40 +169,6 @@ The `search` tool returns JSON by default. For hosts that support the [MCP Apps 
 - `search_dashboard`: summary metrics, a source-breakdown chart, and a results table with a click-to-expand detail panel.
 
 Both accept the same `params` as `search`. Hosts that don't support MCP Apps simply ignore these tools.
-
-Preview them locally without an MCP host:
-
-```bash
-uv run fastmcp dev apps src/server.py
-```
-
-## Development
-
-```bash
-# Local development
-uv sync && uv run src/server.py
-
-# Docker
-docker build -t serpapi-mcp . && docker run -p 8000:8000 serpapi-mcp
-
-# Build the Claude Desktop extension (MCP Bundle); rebuilds engines, needs Node.js for the MCPB CLI
-uv run mcpb/build.py
-
-# Release: update pyproject.toml, server.json, mcpb/manifest.json and uv.lock together.
-uv run --no-sync scripts/bump_version.py 2.0.0
-# Review and commit the changes before tagging the release.
-# Nothing ships on a plain push to main. The tag runs the release workflow, which runs the test
-# suite and then deploys the hosted server, publishes server.json to the MCP Registry, and builds
-# the MCP Bundle and attaches it to the GitHub release.
-git tag v2.0.0 && git push origin v2.0.0
-
-# Regenerate engine resources (Playground scrape)
-python build-engines.py
-
-# Testing with MCP Inspector
-npx @modelcontextprotocol/inspector
-# Configure: URL mcp.serpapi.com/YOUR_KEY/mcp, Transport "Streamable HTTP transport"
-```
 
 ## Troubleshooting
 
@@ -229,13 +187,7 @@ npx @modelcontextprotocol/inspector
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Install dependencies: `uv install`
-4. Make your changes
-5. Commit changes: `git commit -m 'Add amazing feature'`
-6. Push to branch: `git push origin feature/amazing-feature`
-7. Open a Pull Request
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, schema refresh commands, testing, Docker and MCP Bundle builds, and releases.
 
 ## License
 

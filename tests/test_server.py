@@ -6,21 +6,33 @@ Request), so the suite pins the actual library contract without a network call
 or an API key.
 """
 
+import html
 import json
+import os
+import shutil
+import subprocess
+import sys
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+from urllib.error import URLError
 
 import pytest
 import requests
 import serpapi
 from fastmcp import Client
+from fastmcp.client.transports import PythonStdioTransport
 from serpapi.models import SerpResults
 from starlette.requests import Request
 from starlette.testclient import TestClient
 
+import src.engine_catalog as engine_catalog
 import src.mcp_components.apps as mcp_apps
-import src.mcp_components.resources as mcp_resources
 import src.mcp_components.tools as mcp_tools
 import src.server as server
 from src.version import __version__
+from tests.catalog_support import PROPS, snapshot, write_catalog
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def make_serpapi_http_error(
@@ -90,9 +102,234 @@ async def test_filesystem_provider_registers_tools_apps_and_resources():
     assert "serpapi://engines/{engine_name}" in templates
 
 
-def test_engines_dir_resolves_to_repo_engines_directory():
-    assert mcp_resources.ENGINES_DIR.exists()
-    assert (mcp_resources.ENGINES_DIR / "google_light.json").exists()
+@pytest.fixture
+def engine_project(tmp_path):
+    """Run the real generator against a local Playground HTML fixture."""
+    project = tmp_path / "project"
+    shutil.copytree(
+        ROOT / "src",
+        project / "src",
+        ignore=shutil.ignore_patterns("__pycache__"),
+    )
+    shutil.copy(ROOT / "pyproject.toml", project / "pyproject.toml")
+    shutil.copy(ROOT / "build-engines.py", project / "build-engines.py")
+    playground = project / "playground.html"
+    playground.write_text(
+        f'<div data-react-props="{html.escape(json.dumps(PROPS))}"></div>'
+    )
+    (project / "catalog_fixture.py").write_text(
+        "from src import engine_catalog\n"
+        f"engine_catalog.PLAYGROUND_URL = {playground.as_uri()!r}\n"
+    )
+    (project / "stdio_fixture.py").write_text(
+        "import catalog_fixture\n"
+        "import runpy\n"
+        f"runpy.run_path({str(project / 'src/stdio.py')!r}, run_name='__main__')\n"
+    )
+    return project
+
+
+GENERATED_SCHEMA = {
+    "engine": "fixture_engine",
+    "params": {
+        "q": {
+            "type": "string",
+            "required": True,
+            "description": "**Query**",
+            "group": "search_query",
+        }
+    },
+    "common_params": {},
+}
+
+
+@pytest.mark.parametrize("catalog_state", ["missing", "fresh", "stale"])
+def test_http_startup_serves_schemas_and_warns_when_refresh_is_due(
+    engine_project, catalog_state
+):
+    engines = engine_project / "engines"
+    engines.mkdir()
+    if catalog_state != "missing":
+        # Check either side of 14 days without depending on test execution speed.
+        age = timedelta(days=14) + timedelta(
+            minutes=5 if catalog_state == "stale" else -5
+        )
+        write_catalog(
+            engines,
+            {"fixture_engine": GENERATED_SCHEMA},
+            (datetime.now(UTC) - age).isoformat(),
+        )
+        (engine_project / "playground.html").unlink()
+    before = {
+        file.name: (file.read_bytes(), file.stat().st_mtime_ns)
+        for file in engines.iterdir()
+    }
+    # A separate process ensures the resource provider cannot use the checkout's catalog.
+    check = """
+import json
+import catalog_fixture
+from starlette.testclient import TestClient
+from src.server import starlette_app
+
+with TestClient(starlette_app) as client:
+    def call(method, params):
+        response = client.post(
+            "/mcp", headers={"Accept": "application/json, text/event-stream"},
+            json={"jsonrpc": "2.0", "id": 1, "method": method, "params": params},
+        )
+        response.raise_for_status()
+        return response.json()["result"]
+
+    call("initialize", {
+        "protocolVersion": "2025-06-18", "capabilities": {},
+        "clientInfo": {"name": "startup-test", "version": "1"},
+    })
+    resources = [
+        json.loads(call("resources/read", {"uri": uri})["contents"][0]["text"])
+        for uri in ("serpapi://engines", "serpapi://engines/fixture_engine")
+    ]
+    print(json.dumps(resources))
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", check],
+        cwd=engine_project.parent,
+        env={**os.environ, "PYTHONPATH": str(engine_project)},
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    # This also rejects generator chatter on stdout, without matching log wording.
+    index, schema = json.loads(result.stdout)
+    assert index["engines"] == (
+        sorted(PROPS["parameters"])
+        if catalog_state == "missing"
+        else ["fixture_engine"]
+    )
+    assert schema == GENERATED_SCHEMA
+    assert ("uv run python build-engines.py" in result.stderr) == (
+        catalog_state == "stale"
+    )
+    if catalog_state != "missing":
+        assert {
+            file.name: (file.read_bytes(), file.stat().st_mtime_ns)
+            for file in engines.iterdir()
+        } == before
+
+
+async def test_stdio_cold_start_and_stale_offline_restart_serve_the_same_schemas(
+    engine_project,
+):
+    async def read_catalog():
+        transport = PythonStdioTransport(
+            engine_project / "stdio_fixture.py",
+            cwd=str(engine_project.parent),
+            keep_alive=False,
+        )
+        async with Client(transport, init_timeout=15) as client:
+            index = json.loads(
+                (await client.read_resource("serpapi://engines"))[0].text
+            )
+            schema = json.loads(
+                (await client.read_resource("serpapi://engines/fixture_engine"))[0].text
+            )
+        assert index["engines"] == sorted(PROPS["parameters"])
+        assert schema == GENERATED_SCHEMA
+
+    assert not (engine_project / "engines").exists()
+    await read_catalog()
+    manifest_path = engine_project / "engines/.catalog"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["generated_at"] = (datetime.now(UTC) - timedelta(days=30)).isoformat()
+    manifest_path.write_text(json.dumps(manifest))
+    schema = engine_project / "engines/fixture_engine.json"
+    before = (schema.read_bytes(), schema.stat().st_mtime_ns)
+
+    # Restart cannot regenerate or access the source fixture, but must still serve it.
+    (engine_project / "build-engines.py").unlink()
+    (engine_project / "playground.html").unlink()
+    await read_catalog()
+    assert (schema.read_bytes(), schema.stat().st_mtime_ns) == before
+
+
+@pytest.mark.parametrize(
+    "upstream_failure",
+    [True, False],
+    ids=["fetch-fails", "empty-catalog"],
+)
+def test_http_startup_fails_without_generated_schemas(
+    monkeypatch, tmp_path, upstream_failure
+):
+    def fetch(url):
+        if upstream_failure:
+            raise URLError("offline")
+        return {"parameters": {}}
+
+    monkeypatch.setattr(engine_catalog, "ENGINES_DIR", tmp_path / "engines")
+    monkeypatch.setattr(engine_catalog, "fetch_props", fetch)
+    with pytest.raises(RuntimeError, match="uv run python build-engines.py"):
+        with TestClient(server.starlette_app):
+            pytest.fail("HTTP startup must not succeed without schemas")
+
+
+def test_manual_refresh_replaces_stale_catalog_and_keeps_it_when_fetch_fails(
+    engine_project,
+):
+    engines = engine_project / "engines"
+    engines.mkdir()
+    (engines / "fixture_engine.json").write_text(
+        '{"engine": "fixture_engine", "params": {}}'
+    )
+    (engines / "retired_engine.json").write_text('{"engine": "retired_engine"}')
+    (engines / ".generated-at").write_text(
+        (datetime.now(UTC) - timedelta(days=30)).isoformat()
+    )
+
+    def refresh():
+        return subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                "import catalog_fixture, runpy; runpy.run_path('build-engines.py', run_name='__main__')",
+            ],
+            cwd=engine_project,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+
+    started_at = datetime.now(UTC)
+    result = refresh()
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == ""
+    schema = engines / "fixture_engine.json"
+    assert json.loads(schema.read_text()) == GENERATED_SCHEMA
+    assert not (engines / "retired_engine.json").exists()
+    assert (
+        started_at <= engine_catalog.catalog_generated_at(engines) <= datetime.now(UTC)
+    )
+    before = snapshot(engines)
+    # Exercise the actual CLI (also used by Docker), without bypassing its sanity checks.
+    for parameters in (
+        {name: PROPS["parameters"][name] for name in ("google", "google_light")},
+        {
+            **{
+                name: payload
+                for name, payload in PROPS["parameters"].items()
+                if name != "google_light"
+            },
+            "replacement_fixture": PROPS["parameters"]["google"],
+        },
+    ):
+        props = {"parameters": parameters}
+        (engine_project / "playground.html").write_text(
+            f'<div data-react-props="{html.escape(json.dumps(props))}"></div>'
+        )
+        assert refresh().returncode != 0
+        assert snapshot(engines) == before
+    (engine_project / "playground.html").unlink()
+    assert refresh().returncode != 0
+    assert snapshot(engines) == before
 
 
 @pytest.mark.parametrize("mode", ["auto", "legacy"])
@@ -188,7 +425,7 @@ async def test_engines_index_resource_reads_engine_files():
     result = await server.mcp.read_resource("serpapi://engines")
     body = json.loads(result.contents[0].content)
 
-    assert body["count"] == len(list(mcp_resources.ENGINES_DIR.glob("*.json")))
+    assert body["count"] == len(list(engine_catalog.ENGINES_DIR.glob("*.json")))
     assert "google_light" in body["engines"]
     assert "resources" not in body
 

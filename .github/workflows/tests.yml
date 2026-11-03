@@ -46,3 +46,16 @@ jobs:
 
       - name: Run tests
         run: uv run pytest -q
+
+  docker:
+    name: Live Docker smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.8"
+          python-version: "3.13"
+      - name: Smoke-test production Docker image
+        timeout-minutes: 15
+        run: uv run --no-project python scripts/smoke_test_container.py

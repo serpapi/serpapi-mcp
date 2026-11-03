@@ -7,16 +7,40 @@ to what the server actually exposes and start the entry point for real.
 
 import json
 import os
+import shutil
 import tomllib
 from pathlib import Path
 
 from fastmcp import Client
 from fastmcp.client.transports import PythonStdioTransport
 
+from mcpb import build
+import pytest
 import src.server as server
+from tests.catalog_support import write_catalog
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "mcpb" / "manifest.json").read_text(encoding="utf-8"))
+
+
+def test_bundle_copies_manifest_and_rejects_a_damaged_catalog(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    engines = project / "engines"
+    write_catalog(
+        engines,
+        {"google": {"engine": "google", "params": {}}},
+        "2020-01-01T00:00:00+00:00",
+    )
+    monkeypatch.setattr(build, "ROOT", project)
+
+    staging = tmp_path / "bundle"
+    assert build.stage_engines(staging, rebuild=False) == 1
+    assert {
+        file.name: file.read_bytes() for file in (staging / "engines").iterdir()
+    } == {file.name: file.read_bytes() for file in engines.iterdir()}
+    (engines / "google.json").write_text("{}")
+    with pytest.raises(SystemExit):
+        build.stage_engines(tmp_path / "damaged-bundle", rebuild=False)
 
 
 def test_manifest_version_matches_pyproject_and_registry():
@@ -68,11 +92,17 @@ async def test_manifest_tools_match_server_tools():
     assert {tool["name"] for tool in MANIFEST["tools"]} == server_tools
 
 
-async def test_stdio_entry_point_serves_tools_and_resources(tmp_path):
+async def test_stdio_entry_point_serves_tools_and_resources(tmp_path, protocol_catalog):
     # Start from an unrelated cwd so only the entry point's own sys.path
     # bootstrap can make the `src.*` imports resolve, as in an installed bundle.
+    project = tmp_path / "bundle"
+    shutil.copytree(
+        ROOT / "src", project / "src", ignore=shutil.ignore_patterns("__pycache__")
+    )
+    shutil.copy2(ROOT / "pyproject.toml", project / "pyproject.toml")
+    shutil.copytree(protocol_catalog, project / "engines")
     transport = PythonStdioTransport(
-        ROOT / MANIFEST["server"]["entry_point"],
+        project / MANIFEST["server"]["entry_point"],
         env={**os.environ, "SERPAPI_API_KEY": "test-key"},
         cwd=str(tmp_path),
         keep_alive=False,

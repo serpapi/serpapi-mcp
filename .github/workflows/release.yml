@@ -104,8 +104,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev --frozen
 
+      - name: Generate engine schemas
+        run: uv run --no-sync python build-engines.py
+
       - name: Run tests
-        run: uv run pytest -q
+        run: uv run pytest -q --live-catalog
 
   bundle:
     name: MCP Bundle
@@ -163,6 +166,10 @@ jobs:
     name: Deploy hosted server
     needs: [verify, test]
     if: github.event_name == 'push' || inputs.deploy
+    concurrency:
+      group: mcp-server-prod
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -173,7 +180,9 @@ jobs:
 
       - name: Install AWS Copilot CLI
         run: |
-          curl -Lo copilot-cli https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux
+          curl --fail --location --silent --show-error --output copilot-cli \
+            https://github.com/aws/copilot-cli/releases/download/v1.34.1/copilot-linux-v1.34.1
+          echo "620117da1445bceffecc51d7e73d1798938c4b68a242dc4eadd056aa48467a65  copilot-cli" | sha256sum --check
           chmod +x copilot-cli
           sudo mv copilot-cli /usr/local/bin/copilot
 
