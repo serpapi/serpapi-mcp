@@ -3,7 +3,7 @@
   "manifest_version": "0.4",
   "name": "serpapi-mcp",
   "display_name": "SerpApi",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Official SerpApi MCP server for Google, Bing, and other search engines.",
   "long_description": "Live, structured search results from SerpApi inside your MCP host: web, news, images, shopping, jobs, local businesses, flights, hotels, videos, scholar, app stores and more, across Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, Amazon and other engines.\n\nEvery engine's parameters are exposed as MCP resources (`serpapi://engines`), results come back as JSON or token-efficient Markdown, and hosts that support MCP Apps get interactive table and dashboard views.\n\nRequires a SerpApi API key: https://serpapi.com/manage-api-key",
   "author": {
