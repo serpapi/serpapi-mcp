@@ -1,0 +1,107 @@
+name: Refresh engine catalog
+
+on:
+  schedule:
+    # Every Monday at 03:30 UTC (09:00 IST).
+    - cron: "30 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Hold the release deploy job's lock from version selection through deployment.
+concurrency:
+  group: mcp-server-prod
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  refresh:
+    name: Test and redeploy latest release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Find latest published release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RELEASE_TAG="$(gh api "repos/${GITHUB_REPOSITORY}/releases/latest" --jq '.tag_name')"
+          echo "tag=${RELEASE_TAG}" >> "${GITHUB_OUTPUT}"
+
+      - name: Check out release
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ steps.release.outputs.tag }}
+
+      - name: Verify the latest release tag and project version
+        id: verify_latest_tag
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          LATEST_TAG="$(git -c versionsort.suffix=- ls-remote --tags --refs --sort=-version:refname origin 'v*' \
+            | awk 'NR == 1 { sub("refs/tags/", "", $2); print $2 }')"
+          if [[ "${LATEST_TAG}" != "${RELEASE_TAG}" ]]; then
+            echo "::error::Latest published release ${RELEASE_TAG} differs from newest release tag ${LATEST_TAG}. Resolve the newer release before refreshing to avoid rolling production back."
+            exit 1
+          fi
+          PROJECT_VERSION="$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          if [[ "${RELEASE_TAG}" != "v${PROJECT_VERSION}" ]]; then
+            echo "::error::Release tag ${RELEASE_TAG} does not match pyproject.toml version ${PROJECT_VERSION} (expected v${PROJECT_VERSION})."
+            exit 1
+          fi
+
+      - name: Require the release deployment lock
+        id: verify_release_lock
+        run: |
+          if ! grep -Eq '^[[:space:]]+group: mcp-server-prod$' .github/workflows/release.yml; then
+            echo "::error::This release predates the shared deployment lock. Publish a release containing the catalog refresh changes first."
+            exit 1
+          fi
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.8"
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --group dev --frozen
+
+      - name: Regenerate engine catalog
+        run: |
+          uv run --no-sync python build-engines.py
+          if [[ ! -f engines/.catalog ]]; then
+            echo "::error::This release predates catalog validation. Publish a release containing these changes first."
+            exit 1
+          fi
+
+      - name: Run tests
+        run: uv run --no-sync pytest -q --live-catalog
+
+      - name: Install AWS Copilot CLI
+        run: |
+          curl --fail --location --silent --show-error \
+            --output copilot-cli \
+            https://github.com/aws/copilot-cli/releases/download/v1.34.1/copilot-linux-v1.34.1
+          echo "620117da1445bceffecc51d7e73d1798938c4b68a242dc4eadd056aa48467a65  copilot-cli" | sha256sum --check
+          chmod +x copilot-cli
+          sudo mv copilot-cli /usr/local/bin/copilot
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # A fresh runner rebuilds the Dockerfile, including build-engines.py.
+      # A unique image tag updates the service even when the release is unchanged.
+      - name: Rebuild and deploy service
+        run: |
+          copilot svc deploy \
+            --env prod \
+            --name mcp-server-api \
+            --tag "catalog-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"

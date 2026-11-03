@@ -2,6 +2,11 @@
 scratch/
 *.mcpb
 
+# Generated engine schemas
+/engines/
+/.engines-*/
+/.engines.lock
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

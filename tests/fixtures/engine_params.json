@@ -1,0 +1,142 @@
+{
+  "amazon": {},
+  "bing_maps": {
+    "q": {
+      "required": true
+    }
+  },
+  "booking": {
+    "q": {
+      "required": true
+    }
+  },
+  "ebay": {
+    "_nkw": {
+      "required": true
+    }
+  },
+  "extract": {
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "include_markdown": {
+      "type": "boolean",
+      "description": "Include Markdown in the response. Default: `true`."
+    }
+  },
+  "google": {
+    "q": {
+      "required": true
+    }
+  },
+  "google_flights": {},
+  "google_hotels": {
+    "q": {
+      "required": true
+    },
+    "check_in_date": {
+      "required": true
+    },
+    "check_out_date": {
+      "required": true
+    }
+  },
+  "google_jobs": {
+    "q": {
+      "required": true
+    }
+  },
+  "google_lens": {
+    "url": {
+      "required": true
+    },
+    "type": {
+      "required": true,
+      "type": "select"
+    }
+  },
+  "google_light": {
+    "q": {
+      "required": true
+    }
+  },
+  "google_maps": {
+    "type": {
+      "required": true,
+      "type": "select"
+    }
+  },
+  "google_maps_directions": {},
+  "google_news": {},
+  "google_play_product": {
+    "product_id": {
+      "required": true
+    },
+    "store": {
+      "type": "select",
+      "required": true
+    }
+  },
+  "google_scholar": {
+    "q": {
+      "required": true
+    }
+  },
+  "google_shopping": {
+    "q": {
+      "required": true
+    }
+  },
+  "google_sports": {
+    "kgmid": {
+      "required": true
+    },
+    "sp": {
+      "type": "select",
+      "options": [
+        "ft",
+        "bk"
+      ],
+      "required": true
+    },
+    "type": {
+      "type": "select",
+      "options": [
+        "team",
+        "league"
+      ],
+      "required": true
+    }
+  },
+  "google_trends_trending_now": {
+    "geo": {
+      "type": "select",
+      "required": true
+    },
+    "frequency": {
+      "type": "select",
+      "required": true
+    }
+  },
+  "walmart": {
+    "query": {
+      "required": true
+    }
+  },
+  "yandex_images": {
+    "text": {
+      "required": true
+    }
+  },
+  "yelp": {
+    "find_loc": {
+      "required": true
+    }
+  },
+  "youtube": {
+    "search_query": {
+      "required": true
+    }
+  }
+}

@@ -12,9 +12,9 @@ from mcp.types import ResourceTemplateReference
 from serpapi.models import SerpResults
 from starlette.middleware import Middleware
 
-import src.mcp_components.resources as resources
 import src.mcp_components.tools as tools
-import src.engine_input_rules as input_rules
+import src.engine_catalog as engine_catalog
+from tests.catalog_support import write_catalog
 from src.server import ApiKeyMiddleware, mcp
 
 
@@ -519,8 +519,8 @@ async def test_new_catalog_engine_needs_no_mcp_handler_changes(
         },
         "common_params": {"api_key": {"required": True}},
     }
-    (tmp_path / "example.json").write_text(json.dumps(metadata))
-    monkeypatch.setattr(input_rules, "ENGINES_DIR", tmp_path)
+    write_catalog(tmp_path, {"example": metadata})
+    monkeypatch.setattr(engine_catalog, "ENGINES_DIR", tmp_path)
     responses = {"count": 0, "enabled": False, "choice": "b"}
 
     async def answer(message, response_type, params, context):
@@ -543,7 +543,7 @@ async def test_engine_completion_matches_catalog_and_handles_unknown_references(
     ref = ResourceTemplateReference(
         type="ref/resource", uri="serpapi://engines/{engine_name}"
     )
-    engines = sorted(path.stem for path in resources.ENGINES_DIR.glob("*.json"))
+    engines = sorted(path.stem for path in engine_catalog.ENGINES_DIR.glob("*.json"))
     async with Client(mcp, mode=mode) as client:
         assert client.server_capabilities.completions is not None
         for prefix in ("google_f", "google_flights", "does_not_exist", ""):

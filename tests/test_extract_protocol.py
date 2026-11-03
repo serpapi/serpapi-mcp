@@ -14,7 +14,7 @@ from src.server import mcp
 
 @pytest.fixture
 def extract_upstream(monkeypatch):
-    # Exercise the shipped catalog, including missing-URL guided input.
+    # Exercise the protocol catalog, including missing-URL guided input.
     monkeypatch.setenv("SERPAPI_API_KEY", "EXTRACT_TEST_KEY")
     calls = []
 
@@ -283,7 +283,7 @@ async def test_extract_preserves_upstream_error_wrapper(extract_upstream, monkey
     assert result.content[0].text == "Error: Extraction failed"
 
 
-async def test_extract_resource_and_guided_input_use_shipped_schema():
+async def test_extract_resource_and_guided_input_use_catalog_schema():
     spec = input_rules.get_search_input_spec({"engine": "extract"})
     assert spec is not None
     assert "url" in spec.fields

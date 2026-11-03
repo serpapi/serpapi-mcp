@@ -14,17 +14,16 @@ from mcp.types import (
     ResourceTemplateReference,
 )
 
+from src import engine_catalog
 
 logger = logging.getLogger(__name__)
 
-ENGINES_DIR = Path(__file__).resolve().parents[2] / "engines"
-
 
 def _get_engine_files() -> list[Path]:
-    if not ENGINES_DIR.exists():
-        logger.warning("Engines directory not found: %s", ENGINES_DIR)
+    if not engine_catalog.ENGINES_DIR.exists():
+        logger.warning("Engines directory not found: %s", engine_catalog.ENGINES_DIR)
         return []
-    return sorted(ENGINES_DIR.glob("*.json"))
+    return sorted(engine_catalog.ENGINES_DIR.glob("*.json"))
 
 
 def complete_engine_name(
@@ -96,7 +95,7 @@ def get_engine_schema(engine_name: str) -> ResourceResult:
             code=INVALID_PARAMS,
             message=f"Invalid engine name: {engine_name!r}. Expected [a-z0-9_]+.",
         )
-    engine_path = ENGINES_DIR / f"{engine_name}.json"
+    engine_path = engine_catalog.ENGINES_DIR / f"{engine_name}.json"
     if not engine_path.exists():
         raise MCPError(
             code=INVALID_PARAMS,

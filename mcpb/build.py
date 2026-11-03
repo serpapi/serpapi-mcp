@@ -22,7 +22,7 @@ out of this folder):
     the server does not need at runtime (tests, CI, deployment files, this
     folder, ...);
   * engines/, regenerated from the SerpApi Playground with build-engines.py
-    (as the Dockerfile does), whether or not it has been committed.
+    (as the Dockerfile does), including its checksum manifest.
 """
 
 from __future__ import annotations
@@ -41,6 +41,10 @@ from pathlib import Path
 
 MCPB_DIR = Path(__file__).resolve().parent
 ROOT = MCPB_DIR.parent
+# The catalog validator uses only the standard library, including in --no-project builds.
+sys.path.insert(0, str(ROOT))
+from src.engine_catalog import CATALOG_MANIFEST, catalog_generated_at
+
 MANIFEST = MCPB_DIR / "manifest.json"
 ICON = MCPB_DIR / "icon.png"
 MCPBIGNORE = ROOT / ".mcpbignore"
@@ -59,6 +63,7 @@ REQUIRED_ENTRIES = {
     "src/stdio.py",
     "src/server.py",
     "engines/google.json",
+    "engines/.catalog",
 }
 FORBIDDEN_PREFIXES = (
     ".venv/",
@@ -131,8 +136,6 @@ def stage_sources(staging: Path) -> int:
     staging.mkdir(parents=True)
     count = 0
     for relative in tracked_files():
-        if relative.parts[0] == ENGINES_DIR:  # populated by stage_engines instead
-            continue
         source = ROOT / relative
         if not source.is_file():  # deleted locally but not yet `git rm`-ed
             continue
@@ -151,7 +154,7 @@ def stage_sources(staging: Path) -> int:
 
 
 def stage_engines(staging: Path, rebuild: bool) -> int:
-    """Populate ``staging/engines`` with every engine schema, committed or not."""
+    """Populate and validate the bundle's generated engine catalog."""
     target = staging / ENGINES_DIR
     if rebuild:
         # build-engines.py writes to ./engines relative to its cwd, so run it
@@ -172,18 +175,23 @@ def stage_engines(staging: Path, rebuild: bool) -> int:
             )
         except subprocess.CalledProcessError:
             fail(
-                "rebuilding the engine schemas failed (it needs network access to "
-                "serpapi.com); pass --no-rebuild-engines to bundle engines/ from "
-                "the working tree instead"
+                "rebuilding the engine schemas failed; see the error above. "
+                "If you have a complete local catalog, pass --no-rebuild-engines "
+                "to bundle it instead"
             )
     else:
         target.mkdir(parents=True, exist_ok=True)
         for schema in sorted((ROOT / ENGINES_DIR).glob("*.json")):
             shutil.copy2(schema, target / schema.name)
+        manifest = ROOT / ENGINES_DIR / CATALOG_MANIFEST
+        if manifest.is_file():
+            shutil.copy2(manifest, target / manifest.name)
 
     count = len(list(target.glob("*.json")))
-    if count == 0:
-        fail("no engine schemas to bundle")
+    if catalog_generated_at(target) is None:
+        fail(
+            "engine catalog is missing or incomplete; rebuild without --no-rebuild-engines"
+        )
     return count
 
 
