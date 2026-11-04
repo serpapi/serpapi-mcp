@@ -15,6 +15,16 @@
       "required": true
     }
   },
+  "extract": {
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "include_markdown": {
+      "type": "boolean",
+      "description": "Include Markdown in the response. Default: `true`."
+    }
+  },
   "google": {
     "q": {
       "required": true

@@ -11,6 +11,30 @@ from src import engine_catalog
 from tests.catalog_support import PARAMETERS, PROPS, snapshot
 
 
+@pytest.mark.parametrize("engine", ["google", "extract"])
+def test_generated_catalog_advertises_only_supported_output_formats(engine):
+    payload = {
+        **PARAMETERS,
+        "serpapi_parameters": {
+            "parameters": {
+                "output": {
+                    "type": "select",
+                    "options": ["json", "html", "md"],
+                    "html": "Return JSON, raw HTML, or Markdown.",
+                }
+            }
+        },
+    }
+    schemas = engine_catalog.build_schemas(
+        {"parameters": {**PROPS["parameters"], engine: payload}}
+    )
+    schema = json.loads(schemas[f"{engine}.json"])
+    output = schema["common_params"]["output"]
+    assert output["options"] == ["json", "md"]
+    assert "html" not in output["description"].lower()
+    assert "optimized for LLMs and AI agents" in output["description"]
+
+
 def _start(engines, entered, release, fetched, publisher):
     from filelock import FileLock
 

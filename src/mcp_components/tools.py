@@ -239,6 +239,81 @@ async def search(
         return _text_result(content=map_search_error(e), is_error=True)
 
 
+extract_tool_description = """Extract content from a public http(s) URL, discover site URLs, or crawl pages.
+
+API options go in params: url is required; params.mode is scrape (default), map, or crawl. See serpapi://engines/extract for all options.
+
+Top-level mode controls the response:
+- complete (default): full JSON.
+- compact: native Markdown by default.
+
+params.output selects the format and overrides either default:
+- "md": return native Markdown unchanged in either response mode.
+- "json": return JSON, with filtering determined by the response mode.
+
+Compact JSON removes metadata. For scrape responses containing markdown, it also keeps only markdown and any error field. include_markdown=false or an explicit json_restrictor skips this extra filtering. Map/crawl and responses without markdown keep their remaining fields. Use complete with output="json" for full JSON.
+
+Crawl max_pages defaults to 10 (maximum 100). Each successfully extracted, uncached page consumes one credit.
+
+Examples:
+Full scrape JSON: {"params":{"url":"https://example.com"},"mode":"complete"}
+Scrape Markdown: {"params":{"url":"https://example.com"},"mode":"compact"}
+Map URLs as JSON: {"params":{"url":"https://example.com","mode":"map"},"mode":"complete"}
+Crawl pages as Markdown: {"params":{"url":"https://example.com","mode":"crawl","max_pages":2},"mode":"compact"}
+"""
+
+
+@tool(
+    description=extract_tool_description,
+    output_schema={
+        "type": "object",
+        "properties": {"result": {"type": "string"}},
+        "required": ["result"],
+        "x-fastmcp-wrap-result": True,
+    },
+    annotations=ToolAnnotations(
+        title="SerpApi extract",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=False,
+        openWorldHint=True,
+    ),
+)
+async def extract(
+    params: dict[str, Any] | None = None,
+    mode: str = "complete",
+    ctx: Context | None = None,
+) -> ToolResult | InputRequiredResult:
+    """Extract page content with the SerpApi Extract API."""
+    params = {**(params or {}), "engine": "extract"}
+    if mode == "compact":
+        params.setdefault("output", "md")
+    result = await search(params=params, mode=mode, ctx=ctx)
+    if (
+        mode == "compact"
+        and params.get("mode", "scrape") == "scrape"
+        and params.get("output", "json") == "json"
+        and str(params.get("include_markdown", True)).lower() != "false"
+        and "json_restrictor" not in params
+        and isinstance(result, ToolResult)
+        and not result.is_error
+    ):
+        try:
+            data = json.loads(result.content[0].text)
+        except json.JSONDecodeError:
+            # Guided input cancellation returns a plain-text message.
+            return result
+        if "markdown" in data:
+            return _text_result(
+                content=json.dumps(
+                    {key: data[key] for key in ("markdown", "error") if key in data},
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+    return result
+
+
 def resolve_api_key() -> str:
     """Return the caller's SerpApi key, or raise naming the fix.
 
