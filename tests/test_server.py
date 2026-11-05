@@ -1736,7 +1736,7 @@ def test_shopping_rows_handles_empty():
 def test_shopping_rows_handles_missing_fields():
     data = {"shopping_results": [{"title": "Widget", "source": "Store"}]}
     rows = mcp_apps.shopping_rows(data)
-    assert rows[0]["price"] == 0
+    assert rows[0]["price"] is None
     assert rows[0]["price_fmt"] == "—"
     assert rows[0]["rating"] == 0
     assert rows[0]["discount"] == ""
@@ -1792,6 +1792,55 @@ def test_build_shopping_app_no_chart_without_prices():
     body = ui_json(app)
     assert "BarChart" not in body
     assert "DataTable" in body
+
+
+def _shopping_table_for_prices(prices):
+    items = [
+        {"title": str(index), "price": label, "extracted_price": amount}
+        for index, (label, amount) in enumerate(prices)
+    ]
+    view = mcp_apps.build_shopping_app({"shopping_results": items}).to_json()["view"]
+    return next(
+        node for node in view["children"][0]["children"] if node["type"] == "DataTable"
+    )
+
+
+@pytest.mark.parametrize(
+    ("prices", "code"),
+    [
+        ([("₹24,990", 24990), ("₹9.99", 9.99)], "INR"),
+        ([("1.234,50 €", 1234.5), ("EUR 9.99", 9.99)], "EUR"),
+    ],
+)
+def test_shopping_price_column_formats_numeric_values_in_the_listed_currency(
+    prices, code
+):
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert column["format"] == f"currency:{code}"
+    assert [row[column["key"]] for row in table["rows"]] == [
+        amount for _, amount in prices
+    ]
+
+
+@pytest.mark.parametrize("symbol", ["$", "¥"])
+def test_shopping_ambiguous_prices_keep_labels_and_sort_by_amount(symbol):
+    amounts = [1200, 9.99, 100, 0, 2, 10, 11, 12, 13, 14, 15]
+    prices = [(f"{symbol}{amount:,.2f}", amount) for amount in amounts]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    cells = [row[column["key"]] for row in table["rows"]]
+    assert column["format"] == "last"
+    assert [cell[-1] for cell in cells] == [label for label, _ in prices]
+    expected = [f"{symbol}{amount:,.2f}" for amount in sorted(amounts)]
+    assert [cell[-1] for cell in sorted(cells)] == expected
+
+
+def test_shopping_mixed_currencies_preserve_individual_offer_labels():
+    prices = [("€20", 20), ("₹20", 20)]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert [row[column["key"]][-1] for row in table["rows"]] == ["€20", "₹20"]
 
 
 def test_shopping_currency_inr():

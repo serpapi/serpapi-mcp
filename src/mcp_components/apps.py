@@ -631,8 +631,9 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
             {
                 "title": item.get("title", ""),
                 "source": item.get("source", ""),
-                "price": price or 0,
-                "price_fmt": item.get("price", "—"),
+                "price": price,
+                "price_fmt": item.get("price")
+                or (str(price) if price is not None else "—"),
                 "old_price_fmt": item.get("old_price", ""),
                 "discount": discount_tag,
                 "rating": item.get("rating") or 0,
@@ -645,24 +646,25 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _extract_currency_prefix(data: dict[str, Any]) -> str:
-    """Extract the currency symbol from the first shopping result's price string."""
+    """Find the listed currency on either side of a shopping price."""
     for item in data.get("shopping_results") or []:
-        price_str = item.get("price", "")
-        if price_str:
-            prefix = ""
-            for ch in price_str:
-                if ch.isdigit() or ch in ".,":
-                    break
-                prefix += ch
-            if prefix:
-                return prefix
+        if marker := _shopping_currency_marker(item.get("price") or ""):
+            return marker
     return "$"
+
+
+def _shopping_currency_marker(label: str) -> str:
+    match = re.fullmatch(r"([^\d]*?)\d[\d.,\s'’]*([^\d]*)", label.strip())
+    return (match[1] + match[2]).strip() if match else ""
 
 
 def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     """Derive summary metrics and price-by-source chart data."""
     rows = shopping_rows(data)
-    prices = [r["price"] for r in rows if r["price"] > 0]
+    priced = sorted(
+        (r for r in rows if (r["price"] or 0) > 0), key=lambda r: r["price"]
+    )
+    prices = [r["price"] for r in priced]
     on_sale = sum(1 for r in rows if r["old_price_fmt"])
     avg_rating = (
         sum(r["rating"] for r in rows if r["rating"])
@@ -672,7 +674,6 @@ def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     )
 
     # Price by source (top 10 cheapest for the bar chart)
-    priced = sorted([r for r in rows if r["price"] > 0], key=lambda r: r["price"])
     price_chart = [{"source": r["source"], "price": r["price"]} for r in priced[:10]]
 
     symbol = _extract_currency_prefix(data)
@@ -689,15 +690,45 @@ def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-_SHOPPING_COLUMNS = [
-    DataTableColumn(key="title", header="Product", sortable=True),
-    DataTableColumn(key="source", header="Seller", sortable=True),
-    DataTableColumn(key="price", header="Price", sortable=True, format="currency"),
-    DataTableColumn(key="old_price_fmt", header="Was"),
-    DataTableColumn(key="discount", header="Discount"),
-    DataTableColumn(key="rating", header="Rating", sortable=True),
-    DataTableColumn(key="reviews", header="Reviews", sortable=True),
-]
+# A bare dollar or yen sign can stand for several currencies.
+_SHOPPING_CURRENCY_CODES = {
+    **{code: code for code in _CURRENCY_SYMBOLS},
+    "₹": "INR",
+    "€": "EUR",
+    "R$": "BRL",
+    "US$": "USD",
+    "A$": "AUD",
+    "AU$": "AUD",
+    "C$": "CAD",
+    "CA$": "CAD",
+}
+
+
+def _shopping_price_column(rows: list[dict[str, Any]]) -> DataTableColumn:
+    codes = {
+        _SHOPPING_CURRENCY_CODES.get(_shopping_currency_marker(row["price_fmt"]))
+        for row in rows
+    }
+    if (
+        len(codes) == 1
+        and None not in codes
+        and all(row["price"] is not None for row in rows)
+    ):
+        return DataTableColumn(
+            key="price", header="Price", sortable=True, format=f"currency:{codes.pop()}"
+        )
+
+    # Prefab sorts a cell's raw value. Its 'last' pipe displays the label
+    # from this pair; a fixed-width numeric rank keeps array comparisons in
+    # amount order even for labels such as "$1,200" and "$9.99".
+    width = len(str(len(rows)))
+    by_price = sorted(rows, key=lambda r: (r["price"] is None, r["price"]))
+    for rank, row in enumerate(by_price):
+        row["listed_price"] = [str(rank).zfill(width), row["price_fmt"]]
+    return DataTableColumn(
+        key="listed_price", header="Price", sortable=True, format="last"
+    )
+
 
 _SHOPPING_CHART_CSS = """
 .serpapi-price-chart { padding-left: min(8rem, 20vw); }
@@ -750,7 +781,15 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
 
             # Products table
             DataTable(
-                columns=_SHOPPING_COLUMNS,
+                columns=[
+                    DataTableColumn(key="title", header="Product", sortable=True),
+                    DataTableColumn(key="source", header="Seller", sortable=True),
+                    _shopping_price_column(rows),
+                    DataTableColumn(key="old_price_fmt", header="Was"),
+                    DataTableColumn(key="discount", header="Discount"),
+                    DataTableColumn(key="rating", header="Rating", sortable=True),
+                    DataTableColumn(key="reviews", header="Reviews", sortable=True),
+                ],
                 rows=rows,
                 search=True,
                 paginated=True,
