@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
@@ -435,6 +436,33 @@ _JOB_BENEFIT_LABELS = {
     "Tuition reimbursement",
 }
 
+_JOB_PAY_AMOUNT = r"(?:[$€£₹¥]\s*)?\d[\d,.]*(?:[KM])?"
+_JOB_SALARY = re.compile(
+    rf"{_JOB_PAY_AMOUNT}(?:\s*[-–—]\s*{_JOB_PAY_AMOUNT})?"
+    r"\s+(?:a|an|per)\s+(?:hour|day|week|month|year)",
+    re.IGNORECASE,
+)
+_JOB_POSTED = re.compile(
+    r"(?:\d+\+? (?:minute|hour|day|week|month|year)s? ago|just posted|today|yesterday)",
+    re.IGNORECASE,
+)
+_JOB_SCHEDULE_TYPE = r"(?:Full-time|Part-time|Contractor|Contract|Temporary|Internship|Volunteer|Per diem)"
+_JOB_SCHEDULE = re.compile(
+    rf"{_JOB_SCHEDULE_TYPE}(?: (?:and|or) {_JOB_SCHEDULE_TYPE})*", re.IGNORECASE
+)
+
+
+def _job_extension(extensions: list[str], pattern: re.Pattern[str]) -> str:
+    """Read a recognized label without guessing from the job description."""
+    return next(
+        (
+            label
+            for label in extensions
+            if isinstance(label, str) and pattern.fullmatch(label)
+        ),
+        "",
+    )
+
 
 def jobs_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Flatten jobs_results into table-ready rows with structured metadata."""
@@ -448,11 +476,15 @@ def jobs_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
                 "title": job.get("title", ""),
                 "company": job.get("company_name", ""),
                 "location": job.get("location", ""),
-                "salary": ext.get("salary", ""),
-                "schedule": ext.get("schedule_type", ""),
-                "posted": ext.get("posted_at", ""),
+                "salary": ext.get("salary") or _job_extension(extensions, _JOB_SALARY),
+                "schedule": ext.get("schedule_type")
+                or _job_extension(extensions, _JOB_SCHEDULE),
+                "posted": ext.get("posted_at")
+                or _job_extension(extensions, _JOB_POSTED),
                 "qualifications": ext.get("qualifications", ""),
-                "work_from_home": ext.get("work_from_home", False),
+                "work_from_home": ext.get(
+                    "work_from_home", "Work from home" in extensions
+                ),
                 "benefits": benefits,
                 "benefits_fmt": ", ".join(benefits) if benefits else "—",
                 "via": job.get("via", ""),
@@ -667,6 +699,11 @@ _SHOPPING_COLUMNS = [
     DataTableColumn(key="reviews", header="Reviews", sortable=True),
 ]
 
+_SHOPPING_CHART_CSS = """
+.serpapi-price-chart { padding-left: min(8rem, 20vw); }
+.serpapi-price-chart .recharts-surface { overflow: visible; }
+"""
+
 
 def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
     """Compose the shopping price comparison dashboard."""
@@ -678,7 +715,9 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
 
     title = f"Shopping: {query}" if query else "Shopping dashboard"
 
-    with PrefabApp(title=title, state={"selected": None}) as app:
+    with PrefabApp(
+        title=title, state={"selected": None}, css=[_SHOPPING_CHART_CSS]
+    ) as app:
         with Column(gap=4, css_class="p-4"):
             # Metrics row
             with Grid(columns=[1, 1, 1, 1], gap=4):
@@ -701,9 +740,11 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
             if summary["price_chart"]:
                 BarChart(
                     data=summary["price_chart"],
-                    series=[ChartSeries(data_key="price", label="Price ($)")],
+                    series=[ChartSeries(data_key="price", label=f"Price ({sym})")],
                     x_axis="source",
-                    height=240,
+                    # Give wrapped seller labels room beside and between bars.
+                    css_class="serpapi-price-chart",
+                    height=max(240, len(summary["price_chart"]) * 40),
                     horizontal=True,
                 )
 

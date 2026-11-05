@@ -1483,6 +1483,85 @@ def test_jobs_rows_handles_missing_extensions():
     assert rows[0]["description"] == ""
 
 
+def test_jobs_metadata_falls_back_to_live_extension_labels():
+    data = {
+        "jobs_results": [
+            {
+                "extensions": [
+                    "5 days ago",
+                    "60–65 an hour",
+                    "Full-time and Contractor",
+                    "No degree mentioned",
+                ],
+                "detected_extensions": {"qualifications": "No degree mentioned"},
+            },
+            {
+                "extensions": ["10 hours ago", "Full-time", "Work from home"],
+            },
+            {"extensions": ["150K–230K a year", "Full-time and Part-time"]},
+        ]
+    }
+    summary = mcp_apps.jobs_summary(data)
+    assert summary["with_salary"] == 2
+    assert summary["remote"] == 1
+    first, second, third = summary["rows"]
+    assert first["salary"] == "60–65 an hour"
+    assert first["schedule"] == "Full-time and Contractor"
+    assert first["posted"] == "5 days ago"
+    assert second["salary"] == ""
+    assert second["posted"] == "10 hours ago"
+    assert third["salary"] == "150K–230K a year"
+    assert third["schedule"] == "Full-time and Part-time"
+
+
+def test_jobs_structured_metadata_takes_precedence_over_labels():
+    row = mcp_apps.jobs_rows(
+        {
+            "jobs_results": [
+                {
+                    "extensions": [
+                        "1 day ago",
+                        "100K a year",
+                        "Full-time",
+                        "Work from home",
+                    ],
+                    "detected_extensions": {
+                        "salary": "120K a year",
+                        "schedule_type": "Contract",
+                        "posted_at": "today",
+                        "work_from_home": False,
+                    },
+                }
+            ]
+        }
+    )[0]
+    assert row["salary"] == "120K a year"
+    assert row["schedule"] == "Contract"
+    assert row["posted"] == "today"
+    assert row["work_from_home"] is False
+
+
+def test_jobs_metadata_does_not_guess_from_unrecognized_labels():
+    row = mcp_apps.jobs_rows(
+        {
+            "jobs_results": [
+                {
+                    "extensions": [
+                        "401(k)",
+                        "5 years experience",
+                        "40 hours per week",
+                        "Paid time off",
+                        "No degree mentioned",
+                        "Vollzeit",
+                    ],
+                    "description": "Full-time job paying 100K a year.",
+                }
+            ]
+        }
+    )[0]
+    assert (row["salary"], row["schedule"], row["posted"]) == ("", "", "")
+
+
 def test_jobs_summary_computes_metrics():
     summary = mcp_apps.jobs_summary(_SAMPLE_JOBS_PAYLOAD)
     assert summary["total"] == 3
