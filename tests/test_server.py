@@ -1483,6 +1483,85 @@ def test_jobs_rows_handles_missing_extensions():
     assert rows[0]["description"] == ""
 
 
+def test_jobs_metadata_falls_back_to_live_extension_labels():
+    data = {
+        "jobs_results": [
+            {
+                "extensions": [
+                    "5 days ago",
+                    "60–65 an hour",
+                    "Full-time and Contractor",
+                    "No degree mentioned",
+                ],
+                "detected_extensions": {"qualifications": "No degree mentioned"},
+            },
+            {
+                "extensions": ["10 hours ago", "Full-time", "Work from home"],
+            },
+            {"extensions": ["150K–230K a year", "Full-time and Part-time"]},
+        ]
+    }
+    summary = mcp_apps.jobs_summary(data)
+    assert summary["with_salary"] == 2
+    assert summary["remote"] == 1
+    first, second, third = summary["rows"]
+    assert first["salary"] == "60–65 an hour"
+    assert first["schedule"] == "Full-time and Contractor"
+    assert first["posted"] == "5 days ago"
+    assert second["salary"] == ""
+    assert second["posted"] == "10 hours ago"
+    assert third["salary"] == "150K–230K a year"
+    assert third["schedule"] == "Full-time and Part-time"
+
+
+def test_jobs_structured_metadata_takes_precedence_over_labels():
+    row = mcp_apps.jobs_rows(
+        {
+            "jobs_results": [
+                {
+                    "extensions": [
+                        "1 day ago",
+                        "100K a year",
+                        "Full-time",
+                        "Work from home",
+                    ],
+                    "detected_extensions": {
+                        "salary": "120K a year",
+                        "schedule_type": "Contract",
+                        "posted_at": "today",
+                        "work_from_home": False,
+                    },
+                }
+            ]
+        }
+    )[0]
+    assert row["salary"] == "120K a year"
+    assert row["schedule"] == "Contract"
+    assert row["posted"] == "today"
+    assert row["work_from_home"] is False
+
+
+def test_jobs_metadata_does_not_guess_from_unrecognized_labels():
+    row = mcp_apps.jobs_rows(
+        {
+            "jobs_results": [
+                {
+                    "extensions": [
+                        "401(k)",
+                        "5 years experience",
+                        "40 hours per week",
+                        "Paid time off",
+                        "No degree mentioned",
+                        "Vollzeit",
+                    ],
+                    "description": "Full-time job paying 100K a year.",
+                }
+            ]
+        }
+    )[0]
+    assert (row["salary"], row["schedule"], row["posted"]) == ("", "", "")
+
+
 def test_jobs_summary_computes_metrics():
     summary = mcp_apps.jobs_summary(_SAMPLE_JOBS_PAYLOAD)
     assert summary["total"] == 3
@@ -1657,7 +1736,7 @@ def test_shopping_rows_handles_empty():
 def test_shopping_rows_handles_missing_fields():
     data = {"shopping_results": [{"title": "Widget", "source": "Store"}]}
     rows = mcp_apps.shopping_rows(data)
-    assert rows[0]["price"] == 0
+    assert rows[0]["price"] is None
     assert rows[0]["price_fmt"] == "—"
     assert rows[0]["rating"] == 0
     assert rows[0]["discount"] == ""
@@ -1713,6 +1792,55 @@ def test_build_shopping_app_no_chart_without_prices():
     body = ui_json(app)
     assert "BarChart" not in body
     assert "DataTable" in body
+
+
+def _shopping_table_for_prices(prices):
+    items = [
+        {"title": str(index), "price": label, "extracted_price": amount}
+        for index, (label, amount) in enumerate(prices)
+    ]
+    view = mcp_apps.build_shopping_app({"shopping_results": items}).to_json()["view"]
+    return next(
+        node for node in view["children"][0]["children"] if node["type"] == "DataTable"
+    )
+
+
+@pytest.mark.parametrize(
+    ("prices", "code"),
+    [
+        ([("₹24,990", 24990), ("₹9.99", 9.99)], "INR"),
+        ([("1.234,50 €", 1234.5), ("EUR 9.99", 9.99)], "EUR"),
+    ],
+)
+def test_shopping_price_column_formats_numeric_values_in_the_listed_currency(
+    prices, code
+):
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert column["format"] == f"currency:{code}"
+    assert [row[column["key"]] for row in table["rows"]] == [
+        amount for _, amount in prices
+    ]
+
+
+@pytest.mark.parametrize("symbol", ["$", "¥"])
+def test_shopping_ambiguous_prices_keep_labels_and_sort_by_amount(symbol):
+    amounts = [1200, 9.99, 100, 0, 2, 10, 11, 12, 13, 14, 15]
+    prices = [(f"{symbol}{amount:,.2f}", amount) for amount in amounts]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    cells = [row[column["key"]] for row in table["rows"]]
+    assert column["format"] == "last"
+    assert [cell[-1] for cell in cells] == [label for label, _ in prices]
+    expected = [f"{symbol}{amount:,.2f}" for amount in sorted(amounts)]
+    assert [cell[-1] for cell in sorted(cells)] == expected
+
+
+def test_shopping_mixed_currencies_preserve_individual_offer_labels():
+    prices = [("€20", 20), ("₹20", 20)]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert [row[column["key"]][-1] for row in table["rows"]] == ["€20", "₹20"]
 
 
 def test_shopping_currency_inr():

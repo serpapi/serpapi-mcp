@@ -7,7 +7,7 @@ dependencies = [
     "fastmcp[apps]>=4.0.3",
     # Prefab (the MCP Apps UI library) ships frequent breaking changes and
     # fastmcp does not pin an upper bound, so pin it explicitly here.
-    "prefab-ui>=0.20.2,<0.21",
+    "prefab-ui>=0.21.1,<0.22",
     "python-dotenv>=1.0.0",
     "httpx>=0.25.0",
     "uvicorn>=0.38.0",

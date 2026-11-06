@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
@@ -435,6 +436,33 @@ _JOB_BENEFIT_LABELS = {
     "Tuition reimbursement",
 }
 
+_JOB_PAY_AMOUNT = r"(?:[$€£₹¥]\s*)?\d[\d,.]*(?:[KM])?"
+_JOB_SALARY = re.compile(
+    rf"{_JOB_PAY_AMOUNT}(?:\s*[-–—]\s*{_JOB_PAY_AMOUNT})?"
+    r"\s+(?:a|an|per)\s+(?:hour|day|week|month|year)",
+    re.IGNORECASE,
+)
+_JOB_POSTED = re.compile(
+    r"(?:\d+\+? (?:minute|hour|day|week|month|year)s? ago|just posted|today|yesterday)",
+    re.IGNORECASE,
+)
+_JOB_SCHEDULE_TYPE = r"(?:Full-time|Part-time|Contractor|Contract|Temporary|Internship|Volunteer|Per diem)"
+_JOB_SCHEDULE = re.compile(
+    rf"{_JOB_SCHEDULE_TYPE}(?: (?:and|or) {_JOB_SCHEDULE_TYPE})*", re.IGNORECASE
+)
+
+
+def _job_extension(extensions: list[str], pattern: re.Pattern[str]) -> str:
+    """Read a recognized label without guessing from the job description."""
+    return next(
+        (
+            label
+            for label in extensions
+            if isinstance(label, str) and pattern.fullmatch(label)
+        ),
+        "",
+    )
+
 
 def jobs_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
     """Flatten jobs_results into table-ready rows with structured metadata."""
@@ -448,11 +476,15 @@ def jobs_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
                 "title": job.get("title", ""),
                 "company": job.get("company_name", ""),
                 "location": job.get("location", ""),
-                "salary": ext.get("salary", ""),
-                "schedule": ext.get("schedule_type", ""),
-                "posted": ext.get("posted_at", ""),
+                "salary": ext.get("salary") or _job_extension(extensions, _JOB_SALARY),
+                "schedule": ext.get("schedule_type")
+                or _job_extension(extensions, _JOB_SCHEDULE),
+                "posted": ext.get("posted_at")
+                or _job_extension(extensions, _JOB_POSTED),
                 "qualifications": ext.get("qualifications", ""),
-                "work_from_home": ext.get("work_from_home", False),
+                "work_from_home": ext.get(
+                    "work_from_home", "Work from home" in extensions
+                ),
                 "benefits": benefits,
                 "benefits_fmt": ", ".join(benefits) if benefits else "—",
                 "via": job.get("via", ""),
@@ -599,8 +631,14 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
             {
                 "title": item.get("title", ""),
                 "source": item.get("source", ""),
-                "price": price or 0,
-                "price_fmt": item.get("price", "—"),
+                "price": price,
+                "price_fmt": item.get("price")
+                or (str(price) if price is not None else "—"),
+                "price_search": " ".join(
+                    str(value)
+                    for value in (price, item.get("price"))
+                    if value is not None
+                ),
                 "old_price_fmt": item.get("old_price", ""),
                 "discount": discount_tag,
                 "rating": item.get("rating") or 0,
@@ -613,24 +651,25 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def _extract_currency_prefix(data: dict[str, Any]) -> str:
-    """Extract the currency symbol from the first shopping result's price string."""
+    """Find the listed currency on either side of a shopping price."""
     for item in data.get("shopping_results") or []:
-        price_str = item.get("price", "")
-        if price_str:
-            prefix = ""
-            for ch in price_str:
-                if ch.isdigit() or ch in ".,":
-                    break
-                prefix += ch
-            if prefix:
-                return prefix
+        if marker := _shopping_currency_marker(item.get("price") or ""):
+            return marker
     return "$"
+
+
+def _shopping_currency_marker(label: str) -> str:
+    match = re.fullmatch(r"([^\d]*?)\d[\d.,\s'’]*([^\d]*)", label.strip())
+    return (match[1] + match[2]).strip() if match else ""
 
 
 def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     """Derive summary metrics and price-by-source chart data."""
     rows = shopping_rows(data)
-    prices = [r["price"] for r in rows if r["price"] > 0]
+    priced = sorted(
+        (r for r in rows if (r["price"] or 0) > 0), key=lambda r: r["price"]
+    )
+    prices = [r["price"] for r in priced]
     on_sale = sum(1 for r in rows if r["old_price_fmt"])
     avg_rating = (
         sum(r["rating"] for r in rows if r["rating"])
@@ -640,7 +679,6 @@ def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     )
 
     # Price by source (top 10 cheapest for the bar chart)
-    priced = sorted([r for r in rows if r["price"] > 0], key=lambda r: r["price"])
     price_chart = [{"source": r["source"], "price": r["price"]} for r in priced[:10]]
 
     symbol = _extract_currency_prefix(data)
@@ -657,15 +695,50 @@ def shopping_summary(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-_SHOPPING_COLUMNS = [
-    DataTableColumn(key="title", header="Product", sortable=True),
-    DataTableColumn(key="source", header="Seller", sortable=True),
-    DataTableColumn(key="price", header="Price", sortable=True, format="currency"),
-    DataTableColumn(key="old_price_fmt", header="Was"),
-    DataTableColumn(key="discount", header="Discount"),
-    DataTableColumn(key="rating", header="Rating", sortable=True),
-    DataTableColumn(key="reviews", header="Reviews", sortable=True),
-]
+# A bare dollar or yen sign can stand for several currencies.
+_SHOPPING_CURRENCY_CODES = {
+    **{code: code for code in _CURRENCY_SYMBOLS},
+    "₹": "INR",
+    "€": "EUR",
+    "R$": "BRL",
+    "US$": "USD",
+    "A$": "AUD",
+    "AU$": "AUD",
+    "C$": "CAD",
+    "CA$": "CAD",
+}
+
+
+def _shopping_price_column(rows: list[dict[str, Any]]) -> DataTableColumn:
+    codes = {
+        _SHOPPING_CURRENCY_CODES.get(_shopping_currency_marker(row["price_fmt"]))
+        for row in rows
+    }
+    if (
+        len(codes) == 1
+        and None not in codes
+        and all(row["price"] is not None for row in rows)
+    ):
+        return DataTableColumn(
+            key="price", header="Price", sortable=True, format=f"currency:{codes.pop()}"
+        )
+
+    # Prefab sorts a cell's raw value. Its 'last' pipe displays the label
+    # from this pair; a fixed-width numeric rank keeps array comparisons in
+    # amount order even for labels such as "$1,200" and "$9.99".
+    width = len(str(len(rows)))
+    by_price = sorted(rows, key=lambda r: (r["price"] is None, r["price"]))
+    for rank, row in enumerate(by_price):
+        row["listed_price"] = [str(rank).zfill(width), row["price_fmt"]]
+    return DataTableColumn(
+        key="listed_price", header="Price", sortable=True, format="last"
+    )
+
+
+_SHOPPING_CHART_CSS = """
+.serpapi-price-chart { padding-left: min(8rem, 20vw); }
+.serpapi-price-chart .recharts-surface { overflow: visible; }
+"""
 
 
 def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
@@ -678,7 +751,9 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
 
     title = f"Shopping: {query}" if query else "Shopping dashboard"
 
-    with PrefabApp(title=title, state={"selected": None}) as app:
+    with PrefabApp(
+        title=title, state={"selected": None}, css=[_SHOPPING_CHART_CSS]
+    ) as app:
         with Column(gap=4, css_class="p-4"):
             # Metrics row
             with Grid(columns=[1, 1, 1, 1], gap=4):
@@ -701,15 +776,32 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
             if summary["price_chart"]:
                 BarChart(
                     data=summary["price_chart"],
-                    series=[ChartSeries(data_key="price", label="Price ($)")],
+                    series=[ChartSeries(data_key="price", label=f"Price ({sym})")],
                     x_axis="source",
-                    height=240,
+                    # Give wrapped seller labels room beside and between bars.
+                    css_class="serpapi-price-chart",
+                    height=max(240, len(summary["price_chart"]) * 40),
                     horizontal=True,
                 )
 
             # Products table
             DataTable(
-                columns=_SHOPPING_COLUMNS,
+                columns=[
+                    DataTableColumn(key="title", header="Product", sortable=True),
+                    DataTableColumn(key="source", header="Seller", sortable=True),
+                    _shopping_price_column(rows),
+                    # Search amounts and labels independently of the sort value.
+                    DataTableColumn(
+                        key="price_search",
+                        header="Listed price",
+                        header_class="hidden",
+                        cell_class="hidden",
+                    ),
+                    DataTableColumn(key="old_price_fmt", header="Was"),
+                    DataTableColumn(key="discount", header="Discount"),
+                    DataTableColumn(key="rating", header="Rating", sortable=True),
+                    DataTableColumn(key="reviews", header="Reviews", sortable=True),
+                ],
                 rows=rows,
                 search=True,
                 paginated=True,
