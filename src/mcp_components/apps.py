@@ -2,6 +2,7 @@ from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import urlparse
+import asyncio
 
 from fastmcp.tools import tool
 from mcp.types import ToolAnnotations
@@ -774,7 +775,7 @@ ENGINE_APP_BUILDERS: dict[str, Any] = {
 )
 async def search_table(params: dict[str, Any] | None = None) -> PrefabApp:
     try:
-        data = fetch_search_data(params)
+        data = await asyncio.to_thread(fetch_search_data, params)
     except Exception as exc:
         return _error_app(
             str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)
@@ -802,7 +803,7 @@ async def search_table(params: dict[str, Any] | None = None) -> PrefabApp:
 )
 async def search_dashboard(params: dict[str, Any] | None = None) -> PrefabApp:
     try:
-        data = fetch_search_data(params)
+        data = await asyncio.to_thread(fetch_search_data, params)
     except Exception as exc:
         return _error_app(
             str(exc) if isinstance(exc, RuntimeError) else map_search_error(exc)

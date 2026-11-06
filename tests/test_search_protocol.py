@@ -4,6 +4,7 @@ import json
 from contextlib import AsyncExitStack
 
 import httpx
+import asyncio
 import pytest
 from fastmcp import Client, FastMCP
 from fastmcp.client.elicitation import ElicitResult
@@ -653,3 +654,24 @@ async def test_search_continuation_runs_on_another_http_replica(
     }
     assert len(upstream) == 1
     assert upstream[0]["api_key"] == "HTTP_KEY"
+
+
+async def test_upstream_call_runs_off_the_event_loop(monkeypatch):
+    """A slow SerpApi call must not block the server's event loop."""
+    monkeypatch.setenv("SERPAPI_API_KEY", "TEST_KEY")
+    ran_on_loop = []
+
+    def search(params):
+        try:
+            asyncio.get_running_loop()
+            ran_on_loop.append(True)
+        except RuntimeError:
+            ran_on_loop.append(False)
+        return SerpResults({"organic_results": []}, client=None)
+
+    monkeypatch.setattr(tools.serpapi, "search", search)
+
+    async with Client(mcp) as client:
+        await client.call_tool("search", {"params": {"q": "coffee"}})
+
+    assert ran_on_loop == [False]
