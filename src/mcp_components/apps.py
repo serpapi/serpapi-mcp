@@ -634,6 +634,11 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
                 "price": price,
                 "price_fmt": item.get("price")
                 or (str(price) if price is not None else "—"),
+                "price_search": " ".join(
+                    str(value)
+                    for value in (price, item.get("price"))
+                    if value is not None
+                ),
                 "old_price_fmt": item.get("old_price", ""),
                 "discount": discount_tag,
                 "rating": item.get("rating") or 0,
@@ -785,6 +790,13 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
                     DataTableColumn(key="title", header="Product", sortable=True),
                     DataTableColumn(key="source", header="Seller", sortable=True),
                     _shopping_price_column(rows),
+                    # Search amounts and labels independently of the sort value.
+                    DataTableColumn(
+                        key="price_search",
+                        header="Listed price",
+                        header_class="hidden",
+                        cell_class="hidden",
+                    ),
                     DataTableColumn(key="old_price_fmt", header="Was"),
                     DataTableColumn(key="discount", header="Discount"),
                     DataTableColumn(key="rating", header="Rating", sortable=True),
