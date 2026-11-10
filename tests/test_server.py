@@ -1843,6 +1843,42 @@ def test_shopping_mixed_currencies_preserve_individual_offer_labels():
     assert [row[column["key"]][-1] for row in table["rows"]] == ["€20", "₹20"]
 
 
+@pytest.mark.parametrize("qualifier", ["/mo", " now"])
+def test_shopping_qualified_prices_preserve_labels(qualifier):
+    prices = [(f"€30{qualifier}", 30), ("€1,079.99", 1079.99)]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert column["format"] == "last"
+    assert [row[column["key"]][-1] for row in table["rows"]] == [
+        label for label, _ in prices
+    ]
+
+
+@pytest.mark.parametrize("first_offer", [0, 1])
+def test_shopping_dashboard_currency_ignores_price_qualifiers(first_offer):
+    offers = [
+        {"source": "AT&T", "price": "$31.12/mo", "extracted_price": 31.12},
+        {"source": "Viaero Wireless", "price": "$33.31 now", "extracted_price": 33.31},
+        {"source": "Best Buy", "price": "$1,079.99", "extracted_price": 1079.99},
+        {"source": "OWC", "price": "$899.00", "extracted_price": 899.0},
+    ]
+    data = {"shopping_results": offers[first_offer:] + offers[:first_offer]}
+    assert mcp_apps.shopping_summary(data)["currency_symbol"] == "$"
+
+    view = mcp_apps.build_shopping_app(data).to_json()["view"]
+    children = view["children"][0]["children"]
+    metrics = next(node for node in children if node["type"] == "Grid")["children"]
+    price_range = next(node for node in metrics if node["label"] == "Price range")
+    assert price_range["value"] == "$31–$1,080"
+    chart = next(node for node in children if node["type"] == "BarChart")
+    assert chart["series"][0]["label"] == "Price ($)"
+    table = next(node for node in children if node["type"] == "DataTable")
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert [row[column["key"]][-1] for row in table["rows"]] == [
+        offer["price"] for offer in data["shopping_results"]
+    ]
+
+
 def test_shopping_currency_inr():
     """Shopping with INR prices should show ₹ in metrics, not $."""
     data = {
@@ -1878,23 +1914,25 @@ def test_shopping_currency_inr():
     assert not re.search(r"\$\d", body)
 
 
-def test_extract_currency_prefix_various():
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]})
-        == "$"
-    )
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]})
-        == "₹"
-    )
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]})
-        == "€"
-    )
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]})
-        == "R$"
-    )
+@pytest.mark.parametrize(
+    ("label", "symbol"),
+    [
+        ("$99.00", "$"),
+        ("₹6,999", "₹"),
+        ("€49.99", "€"),
+        ("R$150", "R$"),
+        ("1.234,50 €", "€"),
+        ("R$ 99,90", "R$"),
+        ("12,99 zł", "zł"),
+        ("EUR 9.99", "EUR"),
+    ],
+)
+def test_extract_currency_prefix_various(label, symbol):
+    data = {"shopping_results": [{"price": label}]}
+    assert mcp_apps._extract_currency_prefix(data) == symbol
+
+
+def test_extract_currency_prefix_without_prices():
     assert mcp_apps._extract_currency_prefix({}) == "$"
 
 

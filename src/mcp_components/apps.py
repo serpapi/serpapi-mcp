@@ -653,8 +653,10 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
 def _extract_currency_prefix(data: dict[str, Any]) -> str:
     """Find the listed currency on either side of a shopping price."""
     for item in data.get("shopping_results") or []:
-        if marker := _shopping_currency_marker(item.get("price") or ""):
-            return marker
+        label = (item.get("price") or "").strip()
+        match = re.fullmatch(r"([^\d]*?)\d[\d.,\s'’]*([^\d]*)", label)
+        if match and (symbol := match[1].strip() or match[2].strip()):
+            return symbol
     return "$"
 
 
