@@ -1,6 +1,7 @@
 import json
 import os
 from typing import Any
+import asyncio
 
 import serpapi
 from fastmcp import Context
@@ -203,7 +204,7 @@ async def search(
         if isinstance(prepared, ToolResult):
             return _text_result(prepared.content[0].text, is_error=prepared.is_error)
         params = prepared
-        response = fetch_search_response(params)
+        response = await asyncio.to_thread(fetch_search_response, params)
         if isinstance(response, str):
             if output == "md":
                 return _text_result(content=response)
