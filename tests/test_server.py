@@ -1483,6 +1483,85 @@ def test_jobs_rows_handles_missing_extensions():
     assert rows[0]["description"] == ""
 
 
+def test_jobs_metadata_falls_back_to_live_extension_labels():
+    data = {
+        "jobs_results": [
+            {
+                "extensions": [
+                    "5 days ago",
+                    "60–65 an hour",
+                    "Full-time and Contractor",
+                    "No degree mentioned",
+                ],
+                "detected_extensions": {"qualifications": "No degree mentioned"},
+            },
+            {
+                "extensions": ["10 hours ago", "Full-time", "Work from home"],
+            },
+            {"extensions": ["150K–230K a year", "Full-time and Part-time"]},
+        ]
+    }
+    summary = mcp_apps.jobs_summary(data)
+    assert summary["with_salary"] == 2
+    assert summary["remote"] == 1
+    first, second, third = summary["rows"]
+    assert first["salary"] == "60–65 an hour"
+    assert first["schedule"] == "Full-time and Contractor"
+    assert first["posted"] == "5 days ago"
+    assert second["salary"] == ""
+    assert second["posted"] == "10 hours ago"
+    assert third["salary"] == "150K–230K a year"
+    assert third["schedule"] == "Full-time and Part-time"
+
+
+def test_jobs_structured_metadata_takes_precedence_over_labels():
+    row = mcp_apps.jobs_rows(
+        {
+            "jobs_results": [
+                {
+                    "extensions": [
+                        "1 day ago",
+                        "100K a year",
+                        "Full-time",
+                        "Work from home",
+                    ],
+                    "detected_extensions": {
+                        "salary": "120K a year",
+                        "schedule_type": "Contract",
+                        "posted_at": "today",
+                        "work_from_home": False,
+                    },
+                }
+            ]
+        }
+    )[0]
+    assert row["salary"] == "120K a year"
+    assert row["schedule"] == "Contract"
+    assert row["posted"] == "today"
+    assert row["work_from_home"] is False
+
+
+def test_jobs_metadata_does_not_guess_from_unrecognized_labels():
+    row = mcp_apps.jobs_rows(
+        {
+            "jobs_results": [
+                {
+                    "extensions": [
+                        "401(k)",
+                        "5 years experience",
+                        "40 hours per week",
+                        "Paid time off",
+                        "No degree mentioned",
+                        "Vollzeit",
+                    ],
+                    "description": "Full-time job paying 100K a year.",
+                }
+            ]
+        }
+    )[0]
+    assert (row["salary"], row["schedule"], row["posted"]) == ("", "", "")
+
+
 def test_jobs_summary_computes_metrics():
     summary = mcp_apps.jobs_summary(_SAMPLE_JOBS_PAYLOAD)
     assert summary["total"] == 3
@@ -1657,7 +1736,7 @@ def test_shopping_rows_handles_empty():
 def test_shopping_rows_handles_missing_fields():
     data = {"shopping_results": [{"title": "Widget", "source": "Store"}]}
     rows = mcp_apps.shopping_rows(data)
-    assert rows[0]["price"] == 0
+    assert rows[0]["price"] is None
     assert rows[0]["price_fmt"] == "—"
     assert rows[0]["rating"] == 0
     assert rows[0]["discount"] == ""
@@ -1715,6 +1794,273 @@ def test_build_shopping_app_no_chart_without_prices():
     assert "DataTable" in body
 
 
+def _shopping_table_for_prices(prices):
+    items = [
+        {"title": str(index), "price": label, "extracted_price": amount}
+        for index, (label, amount) in enumerate(prices)
+    ]
+    view = mcp_apps.build_shopping_app({"shopping_results": items}).to_json()["view"]
+    return next(
+        node for node in view["children"][0]["children"] if node["type"] == "DataTable"
+    )
+
+
+@pytest.mark.parametrize(
+    ("prices", "code"),
+    [
+        ([("₹24,990", 24990), ("₹9.99", 9.99)], "INR"),
+        ([("1.234,50 €", 1234.5), ("EUR 9.99", 9.99)], "EUR"),
+    ],
+)
+def test_shopping_price_column_formats_numeric_values_in_the_listed_currency(
+    prices, code
+):
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert column["format"] == f"currency:{code}"
+    assert [row[column["key"]] for row in table["rows"]] == [
+        amount for _, amount in prices
+    ]
+
+
+@pytest.mark.parametrize("symbol", ["$", "¥"])
+def test_shopping_ambiguous_prices_keep_labels_and_sort_by_amount(symbol):
+    amounts = [1200, 9.99, 100, 0, 2, 10, 11, 12, 13, 14, 15]
+    prices = [(f"{symbol}{amount:,.2f}", amount) for amount in amounts]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    cells = [row[column["key"]] for row in table["rows"]]
+    assert column["format"] == "last"
+    assert [cell[-1] for cell in cells] == [label for label, _ in prices]
+    expected = [f"{symbol}{amount:,.2f}" for amount in sorted(amounts)]
+    assert [cell[-1] for cell in sorted(cells)] == expected
+
+
+def test_shopping_mixed_currencies_preserve_individual_offer_labels():
+    prices = [("€20", 20), ("₹20", 20)]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert [row[column["key"]][-1] for row in table["rows"]] == ["€20", "₹20"]
+
+
+@pytest.mark.parametrize("qualifier", ["/mo", " now"])
+def test_shopping_qualified_prices_preserve_labels(qualifier):
+    prices = [(f"€30{qualifier}", 30), ("€1,079.99", 1079.99)]
+    table = _shopping_table_for_prices(prices)
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert column["format"] == "last"
+    assert [row[column["key"]][-1] for row in table["rows"]] == [
+        label for label, _ in prices
+    ]
+
+
+@pytest.mark.parametrize("first_offer", [0, 1])
+def test_shopping_dashboard_currency_ignores_price_qualifiers(first_offer):
+    offers = [
+        {"source": "AT&T", "price": "$31.12/mo", "extracted_price": 31.12},
+        {"source": "Viaero Wireless", "price": "$33.31 now", "extracted_price": 33.31},
+        {"source": "Best Buy", "price": "$1,079.99", "extracted_price": 1079.99},
+        {"source": "OWC", "price": "$899.00", "extracted_price": 899.0},
+    ]
+    data = {"shopping_results": offers[first_offer:] + offers[:first_offer]}
+    assert mcp_apps.shopping_summary(data)["currency_symbol"] == "$"
+
+    view = mcp_apps.build_shopping_app(data).to_json()["view"]
+    children = view["children"][0]["children"]
+    metrics = next(node for node in children if node["type"] == "Grid")["children"]
+    price_range = next(node for node in metrics if node["label"] == "Price range")
+    assert price_range["value"] == "$31–$1,080"
+    chart = next(node for node in children if node["type"] == "BarChart")
+    assert chart["series"][0]["label"] == "Price ($)"
+    table = next(node for node in children if node["type"] == "DataTable")
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert [row[column["key"]][-1] for row in table["rows"]] == [
+        offer["price"] for offer in data["shopping_results"]
+    ]
+
+
+@pytest.mark.parametrize(
+    ("label", "amount", "symbol"),
+    [
+        ("819,94 € jetzt", 819.94, "€"),
+        ("1 519,00 € maintenant", 1519, "€"),
+        ("85,40 €/mois x 24", 85.4, "€"),
+        ("Teraz 7349,00 zł", 7349, "zł"),
+        ("CHF 39.10/Monat x 24", 39.1, "CHF"),
+        ("51,83 $/mois", 51.83, "$"),
+        ("R$ 8.499,00 agora", 8499, "R$"),
+        ("£12.00 now", 12, "£"),
+        ("30 €/Monat", 30, "€"),
+        ("12,99 zł/mies.", 12.99, "zł"),
+        ("From $31.12/mo for 36 months", 31.12, "$"),
+        ("ab 12,99 €", 12.99, "€"),
+        ("Now US$33.31", 33.31, "US$"),
+        ("EUR 9.99 per month", 9.99, "EUR"),
+        ("Now 9.99 EUR", 9.99, "EUR"),
+        ("₹1,299/month for 12 months", 1299, "₹"),
+        ("￥1,200/月", 1200, "￥"),
+        ("1 200 Kč/měsíc", 1200, "Kč"),
+        ("99 kr/mån", 99, "kr"),
+        ("58 949,00 грн", 58949, "грн"),
+        ("R 1 849,00 now", 1849, "R"),
+        ("$ 5.199.000 ahora", 5199000, "$"),
+        ("102 990,00 ₽", 102990, "₽"),
+        ("S/ 4,999.00 now", 4999, "S/"),
+        ("Now Ksh 4,999.00", 4999, "Ksh"),
+        ("QAR 4,999.00/mo", 4999, "QAR"),
+        ("4.999,00 MAD maintenant", 4999, "MAD"),
+        ("Now 1.234,50 RSD", 1234.5, "RSD"),
+        ("Q 1,234.50 ahora", 1234.5, "Q"),
+        ("Bs 1.234,50 ahora", 1234.5, "Bs"),
+        ("Gs. 1.235 ahora", 1235, "Gs."),
+        ("රු. 1,234.50 now", 1234.5, "රු."),
+        ("RD$1,234.50 ahora", 1234.5, "RD$"),
+        ("GH₵1,234.50 now", 1234.5, "GH₵"),
+        ("58.949,00 TL şimdi", 58949, "TL"),
+        ("58 949 тг сейчас", 58949, "тг"),
+        ("29.990.000đ", 29990000, "đ"),
+        ("Now KSh 4,999.00", 4999, "KSh"),
+        ("58 949 сом/мес.", 58949, "сом"),
+        ("1.234,00 MT agora", 1234, "MT"),
+        ("\u200f١٬٢٣٤٫٥٠ ج.م.\u200f الآن", 1234.5, "ج.م."),
+        ("\u200f4,449.00 د.إ.\u200f", 4449, "د.إ."),
+        ("1\u202f234,50\u00a0€ maintenant", 1234.5, "€"),
+        ("1\u202f234,50 $CA maintenant", 1234.5, "$CA"),
+        ("Br 1 234,50/месяц", 1234.5, "Br"),
+        ("TOP DEAL 9,99 €", 9.99, "€"),
+        ("Bs.S 1.234,50 ahora", 1234.5, "Bs.S"),
+    ],
+)
+def test_shopping_dashboard_recognizes_currency_in_qualified_labels(
+    label, amount, symbol
+):
+    assert (
+        mcp_apps.shopping_summary({"shopping_results": [{"price": label}]})[
+            "currency_symbol"
+        ]
+        == symbol
+    )
+    data = {
+        "shopping_results": [
+            {"title": "Qualified offer", "price": label, "extracted_price": amount},
+            {"title": "Other offer", "price": f"{symbol}1", "extracted_price": 1},
+        ]
+    }
+    assert mcp_apps.shopping_summary(data)["currency_symbol"] == symbol
+    children = mcp_apps.build_shopping_app(data).to_json()["view"]["children"][0][
+        "children"
+    ]
+    metrics = next(node for node in children if node["type"] == "Grid")["children"]
+    price_range = next(node for node in metrics if node["label"] == "Price range")
+    assert price_range["value"] == f"{symbol}1–{symbol}{amount:,.0f}"
+    chart = next(node for node in children if node["type"] == "BarChart")
+    assert chart["series"][0]["label"] == f"Price ({symbol})"
+    table = next(node for node in children if node["type"] == "DataTable")
+    column = next(column for column in table["columns"] if column["header"] == "Price")
+    assert column["format"] == "last"
+    assert table["rows"][0][column["key"]][-1] == label
+    assert label in table["rows"][0]["price_search"]
+    assert [
+        row["price"] for row in sorted(table["rows"], key=lambda r: r[column["key"]])
+    ] == [
+        1,
+        amount,
+    ]
+
+
+@pytest.mark.parametrize(
+    "label", ["31.12/mo", "NOW 33.31", "EMI 31 x 12", "WARM 99", "Free", ""]
+)
+def test_shopping_dashboard_skips_labels_without_currency(label):
+    data = {"shopping_results": [{"price": label}, {"price": "12,99 € jetzt"}]}
+    assert mcp_apps.shopping_summary(data)["currency_symbol"] == "€"
+
+
+@pytest.mark.parametrize("qualifier", ["{}", "From {}/mo x 24"])
+@pytest.mark.parametrize(
+    ("label", "symbol"),
+    [
+        ("1\u202f234,50 $CA", "$CA"),
+        ("1\u202f234,50 $US", "$US"),
+        ("1\u202f234,50 £GB", "£GB"),
+        ("CN¥1,234.50", "CN¥"),
+        ("EC$1,234.50", "EC$"),
+        ("E£1,234.50", "E£"),
+        ("L£1,234.50", "L£"),
+        ("1.234,50 Br", "Br"),
+        ("1.234,50 ден.", "ден."),
+        ("1.234,50 KM", "KM"),
+        ("1235 Lekë", "Lekë"),
+        ("1 234,50 soʻm", "soʻm"),
+        ("1 234,50 so'm", "so'm"),
+        ("Bs.S 1.234,50", "Bs.S"),
+        ("B/. 1,234.50", "B/."),
+        ("L 1,234.50", "L"),
+        ("नेरू १,२३४.५०", "नेरू"),
+        ("रू १,२३४.५०", "रू"),
+        ("၁,၂၃၅ K", "K"),
+        ("1\u202f234,50 DA", "DA"),
+        ("1\u202f234,500 DT", "DT"),
+        ("TSh 1,234.50", "TSh"),
+        ("USh 1,235", "USh"),
+        ("ብር 1,234.50", "ብር"),
+        ("1\u202f235 F\u202fCFA", "F\u202fCFA"),
+        ("1\u202f235 FCFA", "FCFA"),
+        ("CFPF 1,235", "CFPF"),
+        ("1\u202f235 FCFP", "FCFP"),
+        ("Cg. 1,234.50", "Cg."),
+        ("1 234,50 Kz", "Kz"),
+        ("1234,50 MTn", "MTn"),
+        ("ZK 1,234.50", "ZK"),
+        ("\u200f1.234,50 د.ج.\u200f", "د.ج."),
+        ("\u200f1.234,500 د.ت.\u200f", "د.ت."),
+        ("\u200f١٬٢٣٥ د.ع.\u200f", "د.ع."),
+        ("\u200f١٬٢٣٥ ل.ل.\u200f", "ل.ل."),
+        ("\u200eریال ۱٬۲۳۵", "ریال"),
+        ("ALL IN 9,99 €", "€"),
+        ("TRY 9,99 €", "€"),
+        ("GH¢ 1,234.00", "GH¢"),
+        ("$U 1.234", "$U"),
+        ("COL$ 1.234", "COL$"),
+        ("Mex$1,234", "Mex$"),
+        ("1,200円", "円"),
+        ("1,200,000원", "원"),
+        ("1,200元", "元"),
+        ("Tk 1,234", "Tk"),
+        ("Dhs 1,234", "Dhs"),
+        ("SR 1,234", "SR"),
+        ("QR 1,234", "QR"),
+        ("KD 12.500", "KD"),
+        ("1 234,50 DH", "DH"),
+        ("LE 1,234", "LE"),
+        ("Php 1,299", "Php"),
+        ("1 299 дин.", "дин."),
+        ("129,99 LEI", "LEI"),
+        ("Fr. 1'234.50", "Fr."),
+        ("\u20c1 1,234.50", "\u20c1"),
+        ("1,234.50 \u20c1", "\u20c1"),
+        ("TOP DEAL 9,99 zł", "zł"),
+        ("ALL IN 129 kr", "kr"),
+        ("PEN SET 9,99 zł", "zł"),
+        ("Größe L 9,99 zł", "zł"),
+        ("Q4 deal 9,99 zł", "zł"),
+        ("Pack of 2 L 9,99 zł", "zł"),
+        ("12xR$ 99,90", "R$"),
+        ("12XR$ 99,90", "R$"),
+        ("12X$ 99.90", "$"),
+        ("12×R$ 99,90", "R$"),
+        ("12XCHF 99.90", "CHF"),
+        ("1,200円から", "円"),
+        ("1,200,000원부터", "원"),
+        ("每月 100元起", "元"),
+    ],
+)
+def test_shopping_currency_preserves_localized_symbols(label, symbol, qualifier):
+    # A distinct second currency proves the first label was recognized, including $.
+    data = {"shopping_results": [{"price": qualifier.format(label)}, {"price": "₿1"}]}
+    assert mcp_apps._extract_currency_prefix(data) == symbol
+
+
 def test_shopping_currency_inr():
     """Shopping with INR prices should show ₹ in metrics, not $."""
     data = {
@@ -1750,23 +2096,25 @@ def test_shopping_currency_inr():
     assert not re.search(r"\$\d", body)
 
 
-def test_extract_currency_prefix_various():
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "$99.00"}]})
-        == "$"
-    )
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "₹6,999"}]})
-        == "₹"
-    )
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "€49.99"}]})
-        == "€"
-    )
-    assert (
-        mcp_apps._extract_currency_prefix({"shopping_results": [{"price": "R$150"}]})
-        == "R$"
-    )
+@pytest.mark.parametrize(
+    ("label", "symbol"),
+    [
+        ("$99.00", "$"),
+        ("₹6,999", "₹"),
+        ("€49.99", "€"),
+        ("R$150", "R$"),
+        ("1.234,50 €", "€"),
+        ("R$ 99,90", "R$"),
+        ("12,99 zł", "zł"),
+        ("EUR 9.99", "EUR"),
+    ],
+)
+def test_extract_currency_prefix_various(label, symbol):
+    data = {"shopping_results": [{"price": label}]}
+    assert mcp_apps._extract_currency_prefix(data) == symbol
+
+
+def test_extract_currency_prefix_without_prices():
     assert mcp_apps._extract_currency_prefix({}) == "$"
 
 
