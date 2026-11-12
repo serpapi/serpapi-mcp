@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from collections import Counter
 from datetime import UTC, datetime
 from typing import Any
@@ -650,13 +651,76 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+# ISO currency codes and localized symbols supplement Unicode currency symbols.
+# Letter boundaries allow USD9.99 and 12xR$99 but exclude fragments inside words.
+_SHOPPING_CURRENCY_LABEL = re.compile(
+    # CJK suffixes need no separator before qualifiers such as 円から or 元起.
+    r"(?<=\d)[円元원]|"
+    r"(?:(?<![^\W\d_])|(?<=\d[xX×]))(?:"
+    # Regional markers can precede or follow a sign: CA$, $CA, CN¥, E£.
+    r"(?:[A-Z]{1,2}|COL|Mex)[$£¥¢₵]|[$£¥][A-Z]{1,2}|"
+    r"AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|"
+    r"BOB|BRL|BSD|BTN|BWP|BYN|BZD|CAD|CDF|CHF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|"
+    r"DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|"
+    r"HKD|HNL|HRK|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|"
+    r"KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|"
+    r"MRU|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|"
+    r"PKR|PLN|PYG|QAR|RON|RSD|RUB|RWF|SAR|SBD|SCR|SDG|SEK|SGD|SHP|SLE|SLL|SOS|"
+    r"SRD|SSP|STN|SVC|SYP|SZL|THB|TJS|TMT|TND|TOP|TRY|TTD|TWD|TZS|UAH|UGX|USD|"
+    r"UYU|UZS|VES|VND|VUV|WST|XAF|XCD|XCG|XDR|XOF|XPF|XSU|YER|ZAR|ZMW|ZWG|ZWL|"
+    r"zł|Kč|kr\.?|Ft|lei|Rp|RM|Rs\.?|R|грн|руб\.?|S/\.?|K[Ss]h|Bs(?:\.S)?|Gs\.?|Q|රු\.?|"
+    r"TL|тг|đ|сом|MTn?|Br|ден\.?|KM|Lekë?|so['ʻ’]m|B/\.?|L|नेरू|रू|DA|DT|[TU]Sh|"
+    r"ብር|F\s?CFA|CFPF|FCFP|Cg\.|Kz|ZK|K|ریال|"
+    r"円|元|원|Tk|Dhs|SR|QR|KD|DH|LEI|LE|Php|дин\.?|Fr\.|"
+    r"лв\.?|د\.إ\.?|ر\.س\.?|ر\.ق\.?|د\.ك\.?|د\.ب\.?|ر\.ع\.?|د\.أ\.?|ج\.م\.?|د\.م\.?|"
+    r"د\.ج\.?|د\.ت\.?|د\.ع\.?|ل\.ل\.?"
+    r")(?![^\W\d_])"
+)
+
+
 def _extract_currency_prefix(data: dict[str, Any]) -> str:
-    """Find the listed currency on either side of a shopping price."""
+    """Find the listed currency without sale or installment qualifiers."""
     for item in data.get("shopping_results") or []:
-        label = (item.get("price") or "").strip()
-        match = re.fullmatch(r"([^\d]*?)\d[\d.,\s'’]*([^\d]*)", label)
-        if match and (symbol := match[1].strip() or match[2].strip()):
-            return symbol
+        label = item.get("price") or ""
+        if not re.search(r"\d", label):
+            continue
+        # Don't confuse an installment separator with a regional sign (12XR$).
+        label = re.sub(r"(?<=\d)[xX×](?=[A-Z]{0,3}[$£¥¢₵])", " ", label)
+        # Include the currency-symbol block for runtimes with older Unicode data.
+        symbol_index = next(
+            (
+                i
+                for i, char in enumerate(label)
+                if unicodedata.category(char) == "Sc" or "\u20a0" <= char <= "\u20cf"
+            ),
+            len(label),
+        )
+        matches = list(_SHOPPING_CURRENCY_LABEL.finditer(label))
+        if symbol_index < len(label):
+            # Prefer an explicit sign to sale words that also happen to be codes
+            # (e.g. "TOP DEAL 9,99 €"), preserving compound signs such as $CA.
+            for match in matches:
+                if match.start() <= symbol_index < match.end():
+                    return match[0]
+            return label[symbol_index]
+        # A token beside the amount is stronger evidence than promotional words
+        # elsewhere ("TOP DEAL 9,99 zł"). Prefer suffixes when both sides match.
+        for match in reversed(matches):
+            i = match.start() - 1
+            while i >= 0 and (label[i].isspace() or label[i] in "\u200e\u200f\u061c"):
+                i -= 1
+            if i >= 0 and label[i].isdecimal():
+                return match[0]
+        for match in matches:
+            i = match.end()
+            while i < len(label) and (
+                label[i].isspace() or label[i] in "\u200e\u200f\u061c"
+            ):
+                i += 1
+            if i < len(label) and label[i].isdecimal():
+                return match[0]
+        if matches:
+            return matches[0][0]
     return "$"
 
 
