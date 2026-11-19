@@ -12,7 +12,7 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 Add the hosted server to Claude Code, Cursor, VS Code, Codex, Copilot CLI, Gemini CLI, Grok Build, Zed, OpenCode, Hermes and [13+ more agents](https://github.com/neon-solutions/add-mcp#supported-agents) with [add-mcp](https://github.com/neon-solutions/add-mcp):
 
 ```bash
-npx add-mcp https://mcp.serpapi.com/mcp --header 'Authorization: Bearer ${SERPAPI_API_KEY}' --name serpapi
+npx add-mcp https://mcp.serpapi.com/mcp --header 'Authorization: Bearer ${SERPAPI_API_KEY}' --name SerpApi
 ```
 
 [Get your API key](https://serpapi.com/manage-api-key) from SerpApi and enter it when the command asks for it.
