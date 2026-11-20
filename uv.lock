@@ -955,16 +955,16 @@ wheels = [
 
 [[package]]
 name = "prefab-ui"
-version = "0.20.2"
+version = "0.21.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cyclopts" },
     { name = "pydantic" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/41/99/4e61eb3d3f8b09bdaa28bda3c99971264555f486a485333cb8e6f56c7d8c/prefab_ui-0.20.2.tar.gz", hash = "sha256:4ac17ebf8ec1c5a918a188625837fc608157907430a59c4feb8adac80e01262b", size = 4118979, upload-time = "2026-06-03T02:13:49.312Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3e/b8/81abe3ba9a85e3862933b274bd7293eef557415e21d00c3b7efdf73a67d8/prefab_ui-0.21.1.tar.gz", hash = "sha256:26e84e0ba195845edd1f36ff88a2ef3d76e9d79044518fa6636a5862e0a1bac5", size = 4442004, upload-time = "2026-10-26T19:18:08.154Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4a/d0/59b697dd5a44e632fcc4aba42ff5f88224df672ffea1f5e9a5a9e9e50698/prefab_ui-0.20.2-py3-none-any.whl", hash = "sha256:861d4914e4d9120996b4d5c6753788beeca433754d7bb3cfbd13f9dba7ea8e85", size = 1852274, upload-time = "2026-06-03T02:13:47.539Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/06/b4fdf18094199cf470dc9f33fff1ba945f7108e1b177d3d14a4eb9273f1c/prefab_ui-0.21.1-py3-none-any.whl", hash = "sha256:94185e9032475ec1b348fc70e23ba5328f458279e0b8af972aa7c755ff9301d3", size = 2039921, upload-time = "2026-10-26T19:18:06.375Z" },
 ]
 
 [[package]]
@@ -1479,7 +1479,7 @@ requires-dist = [
     { name = "filelock", specifier = ">=3.20,<5" },
     { name = "httpx", specifier = ">=0.25.0" },
     { name = "markdownify", specifier = ">=0.14.1" },
-    { name = "prefab-ui", specifier = ">=0.20.2,<0.21" },
+    { name = "prefab-ui", specifier = ">=0.21.1,<0.22" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "serpapi", specifier = ">=1.1.1" },
     { name = "starlette", specifier = ">=1.0.1" },
