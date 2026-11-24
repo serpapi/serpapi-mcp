@@ -327,6 +327,12 @@ async def test_clients_without_guided_input_receive_actionable_errors(
         HOTEL_PARAMS,
         {**HOTEL_PARAMS, "property_token": "property"},
         {
+            "engine": "google_hotels",
+            "property_token": "property",
+            "check_in_date": "2030-10-01",
+            "check_out_date": "2030-10-08",
+        },
+        {
             "engine": "google_maps_directions",
             "start_coords": "30.19,-97.66",
             "end_data_id": "place",
@@ -346,6 +352,7 @@ async def test_clients_without_guided_input_receive_actionable_errors(
         {"engine": "google_maps", "place_id": "place"},
         {"engine": "google_maps", "data_cid": "123"},
         {"engine": "bing_maps", "place_id": "place"},
+        {"engine": "youtube_music", "next_page_token": "token"},
         {"engine": "google_news"},
         {"engine": "future_engine", "future_parameter": "value"},
     ],

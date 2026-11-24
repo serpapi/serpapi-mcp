@@ -137,6 +137,7 @@ ENGINE_INPUT_RULES = {
         validate=_validate_flights,
     ),
     "google_hotels": EngineInputRules(
+        alternatives={"q": ("property_token",)},
         fields={
             "q": {"title": "Destination or hotel"},
             "check_in_date": {
@@ -169,6 +170,7 @@ ENGINE_INPUT_RULES = {
     "google_scholar": EngineInputRules(alternatives={"q": ("cites", "cluster")}),
     "google_shopping": EngineInputRules(alternatives={"q": ("shoprs",)}),
     "yandex_images": EngineInputRules(alternatives={"text": ("url",)}),
+    "youtube_music": EngineInputRules(alternatives={"q": ("next_page_token",)}),
     "google_lens": EngineInputRules(
         defaulted=("type",), alternatives={"url": ("image_id",)}
     ),
