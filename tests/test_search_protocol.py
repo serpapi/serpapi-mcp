@@ -343,12 +343,34 @@ async def test_clients_without_guided_input_receive_actionable_errors(
         {"engine": "google_scholar", "cites": "123"},
         {"engine": "google_scholar", "cluster": "123"},
         {"engine": "google_shopping", "shoprs": "filter"},
+        {"engine": "google_shopping_light", "shoprs": "filter1||filter2"},
+        {"engine": "google_trends", "cat": 47},
+        {"engine": "google_trends", "cat": "319"},
+        {"engine": "google_trends", "cat": 0, "data_type": "RELATED_QUERIES"},
+        {"engine": "google_trends", "cat": "0", "data_type": "RELATED_TOPICS"},
+        {"engine": "youtube", "sp": "EgJAAQ%253D%253D"},
+        {"engine": "youtube", "sp": "EgJAAQ=="},
+        {"engine": "youtube", "search_query": "espresso", "sp": "opaque+page/token=="},
+        {
+            "engine": "google_scholar_author",
+            "view_op": "view_citation",
+            "citation_id": "LSsXyncAAAAJ:9yKSN-GCB0IC",
+        },
+        {"engine": "google_images", "tbs": "rimg:CXB4QJia8PBLYVOqCTJxfnnl4AIA"},
+        {"engine": "google_images", "tbs": "isz:l,rimg:CXB4QJia8PBLYVOqCTJxfnnl4AIA"},
+        {"engine": "google", "tbm": "isch", "tbs": "rimg:abc,isz:l"},
+        {"engine": "google", "udm": 2, "tbs": "rimg:abc"},
+        {"engine": "google", "udm": "2", "tbs": "rimg:abc"},
         {"engine": "yandex_images", "url": "https://example.com/image.jpg"},
         {"engine": "google_lens", "url": "https://example.com/image.jpg"},
         {"engine": "google_lens", "image_id": "image"},
         {"engine": "google_play_product", "product_id": "com.example.app"},
         {"engine": "google_trends_trending_now"},
         {"engine": "google_maps", "q": "coffee"},
+        {"engine": "google_maps", "q": "coffee", "type": None},
+        {"engine": "google_maps", "q": "coffee", "type": ""},
+        {"engine": "google_maps", "data": "!4m5!3m4!1s0xabc:0xdef!8m2!3d40.7!4d-74.0"},
+        {"engine": "google_maps", "type": "search", "data": "!1s0xABC%3A0xDEF"},
         {"engine": "google_maps", "place_id": "place"},
         {"engine": "google_maps", "data_cid": "123"},
         {"engine": "bing_maps", "place_id": "place"},
@@ -369,6 +391,48 @@ async def test_complete_and_alternate_searches_do_not_prompt(upstream, params):
 
 
 @pytest.mark.parametrize(
+    "params,missing",
+    [
+        ({"engine": "google_trends", "cat": "0"}, "q"),
+        ({"engine": "google_trends", "cat": True}, "q"),
+        ({"engine": "google_trends", "cat": "047"}, "q"),
+        ({"engine": "google_trends", "cat": 47, "data_type": "GEO_MAP_0"}, "q"),
+        ({"engine": "google_trends", "data_type": "RELATED_QUERIES"}, "q"),
+        ({"engine": "google_shopping_light", "shoprs": "  "}, "q"),
+        ({"engine": "youtube", "sp": "  "}, "search_query"),
+        (
+            {"engine": "google_scholar_author", "citation_id": "author:paper"},
+            "author_id",
+        ),
+        (
+            {
+                "engine": "google_scholar_author",
+                "view_op": "view_citation",
+                "citation_id": " ",
+            },
+            "author_id",
+        ),
+        ({"engine": "google_images", "tbs": "qdr:d"}, "q"),
+        ({"engine": "google_images", "tbs": "rimg:"}, "q"),
+        ({"engine": "google_maps", "data": "!3d40.7!4d-74.0"}, "q"),
+        ({"engine": "google_maps", "data": "!1s0x123"}, "q"),
+        ({"engine": "google_maps", "type": None}, "type"),
+        ({"engine": "google", "tbs": "rimg:abc"}, "q"),
+        ({"engine": "google", "udm": 2.0, "tbs": "rimg:abc"}, "q"),
+        ({"engine": "google", "tbm": "isch", "udm": "web", "tbs": "rimg:abc"}, "q"),
+    ],
+)
+async def test_unrelated_or_empty_filters_still_require_input(
+    upstream, params, missing
+):
+    async with Client(mcp) as client:
+        result = await client.call_tool_mcp("search", {"params": params})
+    assert result.is_error
+    assert f"parameters: {missing}." in result.content[0].text
+    assert not upstream
+
+
+@pytest.mark.parametrize(
     "params,token_name",
     [
         (
@@ -384,6 +448,8 @@ async def test_complete_and_alternate_searches_do_not_prompt(upstream, params):
             {"engine": "youtube_music", "next_page_token": {"value": "token"}},
             "next_page_token",
         ),
+        ({"engine": "google_shopping_light", "shoprs": False}, "shoprs"),
+        ({"engine": "youtube", "sp": False}, "sp"),
     ],
 )
 async def test_only_replacement_tokens_are_type_checked(upstream, params, token_name):
@@ -393,7 +459,8 @@ async def test_only_replacement_tokens_are_type_checked(upstream, params, token_
         assert f"{token_name} must be a string" in result.content[0].text
         assert not upstream
 
-        with_query = {**params, "q": "example"}
+        query = "search_query" if params["engine"] == "youtube" else "q"
+        with_query = {**params, query: "example"}
         result = await client.call_tool_mcp("search", {"params": with_query})
     assert not result.is_error
     assert upstream == [{**with_query, "api_key": "TEST_KEY"}]
