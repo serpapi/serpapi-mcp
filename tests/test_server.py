@@ -1761,6 +1761,7 @@ def test_shopping_summary_handles_empty():
     assert summary["price_min"] == 0
     assert summary["price_max"] == 0
     assert summary["price_chart"] == []
+    assert summary["currency_symbol"] == ""
 
 
 def test_build_shopping_app_produces_valid_app():
@@ -1897,6 +1898,8 @@ def test_shopping_dashboard_currency_ignores_price_qualifiers(first_offer):
         ("Now US$33.31", 33.31, "US$"),
         ("EUR 9.99 per month", 9.99, "EUR"),
         ("Now 9.99 EUR", 9.99, "EUR"),
+        ("9.99 eur now", 9.99, "eur"),
+        ("1,280 円から", 1280, "円"),
         ("₹1,299/month for 12 months", 1299, "₹"),
         ("￥1,200/月", 1200, "￥"),
         ("1 200 Kč/měsíc", 1200, "Kč"),
@@ -1969,7 +1972,19 @@ def test_shopping_dashboard_recognizes_currency_in_qualified_labels(
 
 
 @pytest.mark.parametrize(
-    "label", ["31.12/mo", "NOW 33.31", "EMI 31 x 12", "WARM 99", "Free", ""]
+    "label",
+    [
+        "31.12/mo",
+        "NOW 33.31",
+        "EMI 31 x 12",
+        "WARM 99",
+        "9.99 top seller",
+        "2 円形",
+        "3 元素",
+        "100 원가",
+        "Free",
+        "",
+    ],
 )
 def test_shopping_dashboard_skips_labels_without_currency(label):
     data = {"shopping_results": [{"price": label}, {"price": "12,99 € jetzt"}]}
@@ -2052,7 +2067,9 @@ def test_shopping_dashboard_skips_labels_without_currency(label):
         ("12XCHF 99.90", "CHF"),
         ("1,200円から", "円"),
         ("1,200,000원부터", "원"),
+        ("1,200,000 원부터", "원"),
         ("每月 100元起", "元"),
+        ("每月 100 元起", "元"),
     ],
 )
 def test_shopping_currency_preserves_localized_symbols(label, symbol, qualifier):
@@ -2114,8 +2131,17 @@ def test_extract_currency_prefix_various(label, symbol):
     assert mcp_apps._extract_currency_prefix(data) == symbol
 
 
-def test_extract_currency_prefix_without_prices():
-    assert mcp_apps._extract_currency_prefix({}) == "$"
+@pytest.mark.parametrize("label", ["99 credits", "99", None])
+def test_shopping_dashboard_does_not_assume_dollars(label):
+    data = {"shopping_results": [{"price": label, "extracted_price": 99}]}
+    children = mcp_apps.build_shopping_app(data).to_json()["view"]["children"][0][
+        "children"
+    ]
+    metrics = next(node for node in children if node["type"] == "Grid")["children"]
+    price_range = next(node for node in metrics if node["label"] == "Price range")
+    assert price_range["value"] == "99–99"
+    chart = next(node for node in children if node["type"] == "BarChart")
+    assert chart["series"][0]["label"] == "Price"
 
 
 async def test_search_dashboard_dispatches_to_shopping(monkeypatch):

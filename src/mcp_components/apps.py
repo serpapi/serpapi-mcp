@@ -657,12 +657,14 @@ def shopping_rows(data: dict[str, Any]) -> list[dict[str, Any]]:
 _SHOPPING_CURRENCY_LABEL = re.compile(
     # CJK suffixes need no separator before qualifiers such as 円から or 元起.
     r"(?<=\d)[円元원]|"
+    # After whitespace, require a known qualifier rather than matching words like 元素.
+    r"(?<=\d)\s+(?:円(?=から)|元(?=起)|원(?=부터))|"
     r"(?:(?<![^\W\d_])|(?<=\d[xX×]))(?:"
     # Regional markers can precede or follow a sign: CA$, $CA, CN¥, E£.
     r"(?:[A-Z]{1,2}|COL|Mex)[$£¥¢₵]|[$£¥][A-Z]{1,2}|"
     r"AED|AFN|ALL|AMD|ANG|AOA|ARS|AUD|AWG|AZN|BAM|BBD|BDT|BGN|BHD|BIF|BMD|BND|"
     r"BOB|BRL|BSD|BTN|BWP|BYN|BZD|CAD|CDF|CHF|CLP|CNY|COP|CRC|CUC|CUP|CVE|CZK|"
-    r"DJF|DKK|DOP|DZD|EGP|ERN|ETB|EUR|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|"
+    r"DJF|DKK|DOP|DZD|EGP|ERN|ETB|(?ai:EUR)|FJD|FKP|GBP|GEL|GHS|GIP|GMD|GNF|GTQ|GYD|"
     r"HKD|HNL|HRK|HTG|HUF|IDR|ILS|INR|IQD|IRR|ISK|JMD|JOD|JPY|KES|KGS|KHR|KMF|"
     r"KPW|KRW|KWD|KYD|KZT|LAK|LBP|LKR|LRD|LSL|LYD|MAD|MDL|MGA|MKD|MMK|MNT|MOP|"
     r"MRU|MUR|MVR|MWK|MXN|MYR|MZN|NAD|NGN|NIO|NOK|NPR|NZD|OMR|PAB|PEN|PGK|PHP|"
@@ -680,7 +682,7 @@ _SHOPPING_CURRENCY_LABEL = re.compile(
 
 
 def _extract_currency_prefix(data: dict[str, Any]) -> str:
-    """Find the listed currency without sale or installment qualifiers."""
+    """Find the listed currency without qualifiers, or leave it blank if unknown."""
     for item in data.get("shopping_results") or []:
         label = item.get("price") or ""
         if not re.search(r"\d", label):
@@ -711,7 +713,7 @@ def _extract_currency_prefix(data: dict[str, Any]) -> str:
             while i >= 0 and (label[i].isspace() or label[i] in "\u200e\u200f\u061c"):
                 i -= 1
             if i >= 0 and label[i].isdecimal():
-                return match[0]
+                return match[0].lstrip()
         for match in matches:
             i = match.end()
             while i < len(label) and (
@@ -722,7 +724,7 @@ def _extract_currency_prefix(data: dict[str, Any]) -> str:
                 return match[0]
         if matches:
             return matches[0][0]
-    return "$"
+    return ""
 
 
 def _shopping_currency_marker(label: str) -> str:
@@ -843,7 +845,11 @@ def build_shopping_app(data: dict[str, Any]) -> PrefabApp:
             if summary["price_chart"]:
                 BarChart(
                     data=summary["price_chart"],
-                    series=[ChartSeries(data_key="price", label=f"Price ({sym})")],
+                    series=[
+                        ChartSeries(
+                            data_key="price", label=f"Price ({sym})" if sym else "Price"
+                        )
+                    ],
                     x_axis="source",
                     # Give wrapped seller labels room beside and between bars.
                     css_class="serpapi-price-chart",
