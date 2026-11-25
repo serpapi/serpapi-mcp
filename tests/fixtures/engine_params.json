@@ -138,5 +138,10 @@
     "search_query": {
       "required": true
     }
+  },
+  "youtube_music": {
+    "q": {
+      "required": true
+    }
   }
 }

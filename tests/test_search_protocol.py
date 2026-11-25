@@ -327,6 +327,12 @@ async def test_clients_without_guided_input_receive_actionable_errors(
         HOTEL_PARAMS,
         {**HOTEL_PARAMS, "property_token": "property"},
         {
+            "engine": "google_hotels",
+            "property_token": "property",
+            "check_in_date": "2030-10-01",
+            "check_out_date": "2030-10-08",
+        },
+        {
             "engine": "google_maps_directions",
             "start_coords": "30.19,-97.66",
             "end_data_id": "place",
@@ -346,6 +352,8 @@ async def test_clients_without_guided_input_receive_actionable_errors(
         {"engine": "google_maps", "place_id": "place"},
         {"engine": "google_maps", "data_cid": "123"},
         {"engine": "bing_maps", "place_id": "place"},
+        {"engine": "youtube_music", "next_page_token": "token"},
+        {"engine": "youtube_music", "next_page_token": "a+b/==", "filter": "songs"},
         {"engine": "google_news"},
         {"engine": "future_engine", "future_parameter": "value"},
     ],
@@ -357,7 +365,50 @@ async def test_complete_and_alternate_searches_do_not_prompt(upstream, params):
     async with Client(mcp, elicitation_handler=should_not_ask) as client:
         result = await client.call_tool_mcp("search", {"params": params})
     assert not result.is_error
-    assert len(upstream) == 1
+    assert upstream == [{**params, "api_key": "TEST_KEY"}]
+
+
+@pytest.mark.parametrize(
+    "params,token_name",
+    [
+        (
+            {
+                "engine": "google_hotels",
+                "property_token": False,
+                "check_in_date": "2030-10-01",
+                "check_out_date": "2030-10-08",
+            },
+            "property_token",
+        ),
+        (
+            {"engine": "youtube_music", "next_page_token": {"value": "token"}},
+            "next_page_token",
+        ),
+    ],
+)
+async def test_only_replacement_tokens_are_type_checked(upstream, params, token_name):
+    async with Client(mcp) as client:
+        result = await client.call_tool_mcp("search", {"params": params})
+        assert result.is_error
+        assert f"{token_name} must be a string" in result.content[0].text
+        assert not upstream
+
+        with_query = {**params, "q": "example"}
+        result = await client.call_tool_mcp("search", {"params": with_query})
+    assert not result.is_error
+    assert upstream == [{**with_query, "api_key": "TEST_KEY"}]
+
+
+@pytest.mark.parametrize("empty_token", [[], {}])
+async def test_empty_music_tokens_still_require_q(upstream, empty_token):
+    async with Client(mcp) as client:
+        result = await client.call_tool_mcp(
+            "search",
+            {"params": {"engine": "youtube_music", "next_page_token": empty_token}},
+        )
+    assert result.is_error
+    assert "parameters: q." in result.content[0].text
+    assert not upstream
 
 
 @pytest.mark.parametrize(
@@ -390,6 +441,14 @@ async def test_invalid_supplied_flight_fields_never_search(upstream, params, fra
         (
             {
                 "engine": "google_hotels",
+                "property_token": "property",
+                "check_in_date": "2030-10-01",
+            },
+            {"check_out_date": "2030-10-08"},
+        ),
+        (
+            {
+                "engine": "google_hotels",
                 "check_in_date": "2030-10-01",
                 "check_out_date": "2030-10-08",
             },
@@ -412,6 +471,7 @@ async def test_invalid_supplied_flight_fields_never_search(upstream, params, fra
             {"start_addr": "Austin airport", "end_addr": "Austin city hall"},
         ),
         ({"engine": "youtube"}, {"search_query": "coffee"}),
+        ({"engine": "youtube_music", "next_page_token": "  "}, {"q": "coffee"}),
         ({"engine": "amazon"}, {"k": "coffee"}),
         ({"engine": "yelp", "find_desc": "coffee"}, {"find_loc": "Austin, TX"}),
         ({"engine": "google_sports", "kgmid": "/m/123"}, {"sp": "ft", "type": "team"}),
@@ -457,8 +517,13 @@ async def test_guided_search_uses_engine_requirements_and_preserves_arguments(
     "date_value", ["2030-09-30", "2030-10-01", "2030-02-30", "20301008", 20301008]
 )
 @pytest.mark.parametrize("via_form", [True, False])
-async def test_invalid_hotel_dates_never_search(upstream, date_value, via_form):
-    original = {k: v for k, v in HOTEL_PARAMS.items() if k != "check_out_date"}
+@pytest.mark.parametrize(
+    "lookup",
+    [{"q": "Bali resorts"}, {"property_token": "property"}],
+    ids=["query", "token"],
+)
+async def test_invalid_hotel_dates_never_search(upstream, date_value, via_form, lookup):
+    original = {"engine": "google_hotels", "check_in_date": "2030-10-01", **lookup}
 
     async def answer(*args):
         return ElicitResult(action="accept", content={"check_out_date": date_value})
