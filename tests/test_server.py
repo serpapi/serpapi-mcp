@@ -877,6 +877,19 @@ def test_map_search_error_falls_back_to_json_body():
     assert "server boom" in out
 
 
+def test_map_search_error_ignores_status_digits_in_url():
+    # The request URL carries the query and the API key, so it can contain
+    # "401", "403" or "429" when the status is something else.
+    out = mcp_tools.map_search_error(
+        make_serpapi_http_error(
+            400,
+            {"error": "Unsupported `foo` parameter."},
+            url="https://serpapi.com/search?q=401k+rules&api_key=a429b403",
+        )
+    )
+    assert "Unsupported `foo` parameter." in out
+
+
 def test_map_search_error_handles_generic_exception():
     assert mcp_tools.map_search_error(ValueError("weird")) == "Error: weird"
 

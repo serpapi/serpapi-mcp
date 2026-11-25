@@ -58,16 +58,17 @@ def map_search_error(exception) -> str:
     surface identical messages for the same upstream failure.
     """
     if isinstance(exception, serpapi.exceptions.HTTPError):
-        text = str(exception)
-        if "429" in text:
+        # str(exception) holds the request URL, query and API key included.
+        status = exception.status_code
+        if status == 429:
             return "Error: Rate limit exceeded. Please try again later."
-        if "401" in text:
+        if status == 401:
             return (
                 "Error: Invalid SerpApi API key. "
                 "Check the key in the request path or Authorization header, "
                 "or in SERPAPI_API_KEY for stdio hosts."
             )
-        if "403" in text:
+        if status == 403:
             return (
                 "Error: SerpApi API key forbidden. "
                 "Verify your subscription and key validity."
