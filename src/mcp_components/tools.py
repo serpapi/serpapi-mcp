@@ -1,6 +1,7 @@
 import json
 import os
 from typing import Any
+import asyncio
 
 import serpapi
 from fastmcp import Context
@@ -115,7 +116,8 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
 
     Guided search:
         Searches can request missing engine parameters from supporting clients using the engine catalog and engine-specific rules.
-        Flights collect airports and dates, hotels collect the destination and stay dates, and directions collect missing endpoints.
+        Flights collect airports and dates, and directions collect missing endpoints.
+        Hotels require stay dates and either a destination query or a property_token from an earlier result.
         Other clients receive a missing-parameter error. Cancellation does not run a search.
 
     Examples:
@@ -203,7 +205,7 @@ async def search(
         if isinstance(prepared, ToolResult):
             return _text_result(prepared.content[0].text, is_error=prepared.is_error)
         params = prepared
-        response = fetch_search_response(params)
+        response = await asyncio.to_thread(fetch_search_response, params)
         if isinstance(response, str):
             if output == "md":
                 return _text_result(content=response)

@@ -7,6 +7,16 @@ A Model Context Protocol (MCP) server implementation that integrates with [SerpA
 [![Install in VS Code](https://img.shields.io/badge/Install%20in-VS%20Code-blue?logo=visualstudiocode)](https://insiders.vscode.dev/redirect/mcp/install?name=serpapi-mcp&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fmcp.serpapi.com%2Fmcp%22%2C%22headers%22%3A%7B%22Authorization%22%3A%22Bearer%20YOUR_SERPAPI_API_KEY%22%7D%7D)
 [![Install in Cursor](https://img.shields.io/badge/Install%20in-Cursor-blue?logo=cursor)](https://cursor.com/en-US/install-mcp?name=serpapi-mcp&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vbWNwLnNlcnBhcGkuY29tL21jcCIsImhlYWRlcnMiOnsiQXV0aG9yaXphdGlvbiI6IkJlYXJlciBZT1VSX1NFUlBBUElfQVBJX0tFWSJ9fQ==)
 
+## Install
+
+Add the hosted server to Claude Code, Cursor, VS Code, Codex, Copilot CLI, Gemini CLI, Grok Build, Zed, OpenCode, Hermes and [13+ more agents](https://github.com/neon-solutions/add-mcp#supported-agents) with [add-mcp](https://github.com/neon-solutions/add-mcp):
+
+```bash
+npx add-mcp https://mcp.serpapi.com/mcp --header 'Authorization: Bearer ${SERPAPI_API_KEY}' --name SerpApi
+```
+
+[Get your API key](https://serpapi.com/manage-api-key) from SerpApi and enter it when the command asks for it.
+
 ## Features
 
 - **Multi-Engine Search**: Google, Bing, Yahoo, DuckDuckGo, YouTube, eBay, and [more](https://serpapi.com/search-engine-apis)
@@ -155,8 +165,9 @@ Search responses preserve the existing MCP `structuredContent.result` string and
 `search` uses the engine catalog and engine-specific rules to identify missing parameters. Supporting MCP 2026-07-28 clients receive a form before any search runs. Accepted answers are validated; decline or cancellation runs no search. Legacy clients and clients without form elicitation receive an error listing the missing parameters so the agent can ask in conversation. See [MCP input requests](https://modelcontextprotocol.io/specification/2026-07-28/basic/patterns/mrtr).
 
 - [Google Flights](https://serpapi.com/google-flights-api): departure and arrival identifiers, departure date, and a return date for round trips. Dates and airport identifiers are checked. Token-based searches, multi-city itineraries, and `selected_flights_json` retain their existing behavior.
-- [Google Hotels](https://serpapi.com/google-hotels-api): destination or hotel query, check-in date, and check-out date. Check-out must follow check-in. Guest counts and other optional filters keep the caller's values or the API defaults.
+- [Google Hotels](https://serpapi.com/google-hotels-api): supply a destination or hotel query, or use the `property_token` string from an earlier result instead of `q`. Both paths require check-in and check-out dates, with check-out after check-in. Guest counts and other optional filters keep the caller's values or the API defaults.
 - [Google Maps Directions](https://serpapi.com/google-maps-directions-api): missing start and destination addresses. Coordinates or place data IDs already supplied satisfy the corresponding endpoint.
+- [YouTube Music](https://serpapi.com/youtube-music-pagination): to paginate, start with `q` and a `filter`. The default `complete` JSON response includes `serpapi_pagination.next_page_token` when another page is available; `compact` JSON omits it. Pass that value as `next_page_token` with the same `filter` to continue without repeating `q`.
 - Other catalog engines use their required fields, such as YouTube's `search_query`, Yelp's `find_loc`, and Amazon's `k`. Engine rules account for known defaults and alternatives, including Amazon category nodes, eBay categories, and Google Scholar citation searches.
 
 If an answer introduces another requirement, the tool lists the remaining fields for the agent to supply in a new call. Forms support strings, numbers, booleans, and single-choice fields; unsupported complex fields receive the missing-parameter error. Unknown engines pass through to SerpApi.
