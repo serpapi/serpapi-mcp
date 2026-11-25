@@ -116,7 +116,8 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
 
     Guided search:
         Searches can request missing engine parameters from supporting clients using the engine catalog and engine-specific rules.
-        Flights collect airports and dates, hotels collect the destination and stay dates, and directions collect missing endpoints.
+        Flights collect airports and dates, and directions collect missing endpoints.
+        Hotels require stay dates and either a destination query or a property_token from an earlier result.
         Other clients receive a missing-parameter error. Cancellation does not run a search.
 
     Examples:

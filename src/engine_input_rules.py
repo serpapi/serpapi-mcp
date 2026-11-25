@@ -99,6 +99,17 @@ def _validate_flights(params: Params, fields: RequiredFields) -> str | None:
     return None
 
 
+def _query_token_error(params: Params, name: str) -> str | None:
+    token = params.get(name)
+    if (
+        is_missing(params.get("q"))
+        and not is_missing(token)
+        and not isinstance(token, str)
+    ):
+        return f"{name} must be a string."
+    return None
+
+
 def _validate_hotels(params: Params, fields: RequiredFields) -> str | None:
     error = _date_error(params, ("check_in_date", "check_out_date"))
     if error:
@@ -109,7 +120,7 @@ def _validate_hotels(params: Params, fields: RequiredFields) -> str | None:
         and params["check_out_date"] <= params["check_in_date"]
     ):
         return "check_out_date must be after check_in_date."
-    return None
+    return _query_token_error(params, "property_token")
 
 
 # These overrides cover defaults and alternatives absent from the catalog flags.
@@ -170,7 +181,10 @@ ENGINE_INPUT_RULES = {
     "google_scholar": EngineInputRules(alternatives={"q": ("cites", "cluster")}),
     "google_shopping": EngineInputRules(alternatives={"q": ("shoprs",)}),
     "yandex_images": EngineInputRules(alternatives={"text": ("url",)}),
-    "youtube_music": EngineInputRules(alternatives={"q": ("next_page_token",)}),
+    "youtube_music": EngineInputRules(
+        alternatives={"q": ("next_page_token",)},
+        validate=lambda params, _: _query_token_error(params, "next_page_token"),
+    ),
     "google_lens": EngineInputRules(
         defaulted=("type",), alternatives={"url": ("image_id",)}
     ),
