@@ -24,10 +24,18 @@ def is_missing(value: Any) -> bool:
 @dataclass(frozen=True)
 class EngineInputRules:
     required: RequiredFields | Callable[[Params], RequiredFields] | None = None
-    alternatives: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    alternatives: dict[str, tuple[str, ...] | Callable[[Params], bool]] = field(
+        default_factory=dict
+    )
     defaulted: tuple[str, ...] = ()
     fields: dict[str, Params] = field(default_factory=dict)
     validate: Callable[[Params, RequiredFields], str | None] | None = None
+
+    def has_alternative(self, name: str, params: Params) -> bool:
+        alternative = self.alternatives.get(name, ())
+        if callable(alternative):
+            return alternative(params)
+        return any(not is_missing(params.get(other)) for other in alternative)
 
 
 def _flight_fields(params: Params) -> RequiredFields:
@@ -49,11 +57,52 @@ def _flight_fields(params: Params) -> RequiredFields:
 def _maps_fields(params: Params) -> RequiredFields:
     if any(not is_missing(params.get(name)) for name in ("place_id", "data_cid")):
         return ()
-    if params.get("type", "search") == "search":
+    mode = params.get("type")
+    if mode == "search":
         return ("q",)
-    if params.get("type") == "place":
+    if mode is None or (isinstance(mode, str) and not mode.strip()):
+        data = params.get("data")
+        # A Maps data filter only identifies a place if it contains a data_id.
+        if isinstance(data, str) and re.search(
+            r"!1s0x[\da-f]+(?::|%3a)0x[\da-f]+(?:!|$)", data, re.IGNORECASE | re.ASCII
+        ):
+            return ()
+        if "type" not in params or not is_missing(params.get("q")):
+            return ("q",)
+    if mode == "place":
         return ("type", "data")
     return ("type",)
+
+
+def _trends_category_search(params: Params) -> bool:
+    category = params.get("cat")
+    if not isinstance(category, (int, str)) or not re.fullmatch(
+        r"0|[1-9][0-9]*", str(category)
+    ):
+        return False
+    data_type = params.get("data_type")
+    if data_type in ("RELATED_QUERIES", "RELATED_TOPICS"):
+        return True
+    return data_type in (None, "", "TIMESERIES") and category not in (0, "0")
+
+
+def _related_image_search(params: Params) -> bool:
+    tbs = params.get("tbs")
+    return isinstance(tbs, str) and bool(re.search(r"(?:^|,)rimg:[^,\s]+(?:,|$)", tbs))
+
+
+def _google_image_search(params: Params) -> bool:
+    tbm, udm = params.get("tbm"), params.get("udm")
+    image_mode = (tbm == "isch" and is_missing(udm)) or (
+        str(udm) == "2" and is_missing(tbm)
+    )
+    return image_mode and _related_image_search(params)
+
+
+def _scholar_citation_search(params: Params) -> bool:
+    return params.get("view_op") == "view_citation" and not is_missing(
+        params.get("citation_id")
+    )
 
 
 def _date_error(params: Params, names: RequiredFields) -> str | None:
@@ -99,10 +148,10 @@ def _validate_flights(params: Params, fields: RequiredFields) -> str | None:
     return None
 
 
-def _query_token_error(params: Params, name: str) -> str | None:
+def _query_token_error(params: Params, name: str, query: str = "q") -> str | None:
     token = params.get(name)
     if (
-        is_missing(params.get("q"))
+        is_missing(params.get(query))
         and not is_missing(token)
         and not isinstance(token, str)
     ):
@@ -125,6 +174,7 @@ def _validate_hotels(params: Params, fields: RequiredFields) -> str | None:
 
 # These overrides cover defaults and alternatives absent from the catalog flags.
 ENGINE_INPUT_RULES = {
+    "google": EngineInputRules(alternatives={"q": _google_image_search}),
     "google_flights": EngineInputRules(
         required=_flight_fields,
         fields={
@@ -174,13 +224,34 @@ ENGINE_INPUT_RULES = {
         },
     ),
     "google_maps": EngineInputRules(required=_maps_fields),
+    "google_images": EngineInputRules(alternatives={"q": _related_image_search}),
     "bing_maps": EngineInputRules(alternatives={"q": ("place_id",)}),
     "amazon": EngineInputRules(required=("k",), alternatives={"k": ("node",)}),
     "ebay": EngineInputRules(alternatives={"_nkw": ("category_id",)}),
     "walmart": EngineInputRules(alternatives={"query": ("cat_id",)}),
     "google_scholar": EngineInputRules(alternatives={"q": ("cites", "cluster")}),
-    "google_shopping": EngineInputRules(alternatives={"q": ("shoprs",)}),
+    "google_scholar_author": EngineInputRules(
+        alternatives={"author_id": _scholar_citation_search},
+        validate=lambda params, _: (
+            _query_token_error(params, "citation_id", "author_id")
+            if _scholar_citation_search(params)
+            else None
+        ),
+    ),
+    "google_shopping": EngineInputRules(
+        alternatives={"q": ("shoprs",)},
+        validate=lambda params, _: _query_token_error(params, "shoprs"),
+    ),
+    "google_shopping_light": EngineInputRules(
+        alternatives={"q": ("shoprs",)},
+        validate=lambda params, _: _query_token_error(params, "shoprs"),
+    ),
+    "google_trends": EngineInputRules(alternatives={"q": _trends_category_search}),
     "yandex_images": EngineInputRules(alternatives={"text": ("url",)}),
+    "youtube": EngineInputRules(
+        alternatives={"search_query": ("sp",)},
+        validate=lambda params, _: _query_token_error(params, "sp", "search_query"),
+    ),
     "youtube_music": EngineInputRules(
         alternatives={"q": ("next_page_token",)},
         validate=lambda params, _: _query_token_error(params, "next_page_token"),
@@ -205,10 +276,7 @@ class SearchInputSpec:
             name
             for name in self.fields
             if is_missing(params.get(name))
-            and not any(
-                not is_missing(params.get(other))
-                for other in self.rules.alternatives.get(name, ())
-            )
+            and not self.rules.has_alternative(name, params)
         ]
 
     def validation_error(self, params: Params) -> str | None:

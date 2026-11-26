@@ -42,6 +42,11 @@
       "required": true
     }
   },
+  "google_images": {
+    "q": {
+      "required": true
+    }
+  },
   "google_jobs": {
     "q": {
       "required": true
@@ -83,7 +88,17 @@
       "required": true
     }
   },
+  "google_scholar_author": {
+    "author_id": {
+      "required": true
+    }
+  },
   "google_shopping": {
+    "q": {
+      "required": true
+    }
+  },
+  "google_shopping_light": {
     "q": {
       "required": true
     }
@@ -106,6 +121,11 @@
         "team",
         "league"
       ],
+      "required": true
+    }
+  },
+  "google_trends": {
+    "q": {
       "required": true
     }
   },
