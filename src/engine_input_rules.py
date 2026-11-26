@@ -57,15 +57,17 @@ def _flight_fields(params: Params) -> RequiredFields:
 def _maps_fields(params: Params) -> RequiredFields:
     if any(not is_missing(params.get(name)) for name in ("place_id", "data_cid")):
         return ()
-    mode = params.get("type", "search")
-    if mode in (None, "", "search"):
+    mode = params.get("type")
+    if mode == "search":
+        return ("q",)
+    if mode is None or (isinstance(mode, str) and not mode.strip()):
         data = params.get("data")
         # A Maps data filter only identifies a place if it contains a data_id.
         if isinstance(data, str) and re.search(
             r"!1s0x[\da-f]+(?::|%3a)0x[\da-f]+(?:!|$)", data, re.IGNORECASE | re.ASCII
         ):
             return ()
-        if mode == "search" or not is_missing(params.get("q")):
+        if "type" not in params or not is_missing(params.get("q")):
             return ("q",)
     if mode == "place":
         return ("type", "data")
@@ -98,11 +100,8 @@ def _google_image_search(params: Params) -> bool:
 
 
 def _scholar_citation_search(params: Params) -> bool:
-    citation = params.get("citation_id")
-    return (
-        params.get("view_op") == "view_citation"
-        and isinstance(citation, str)
-        and not is_missing(citation)
+    return params.get("view_op") == "view_citation" and not is_missing(
+        params.get("citation_id")
     )
 
 
@@ -232,9 +231,17 @@ ENGINE_INPUT_RULES = {
     "walmart": EngineInputRules(alternatives={"query": ("cat_id",)}),
     "google_scholar": EngineInputRules(alternatives={"q": ("cites", "cluster")}),
     "google_scholar_author": EngineInputRules(
-        alternatives={"author_id": _scholar_citation_search}
+        alternatives={"author_id": _scholar_citation_search},
+        validate=lambda params, _: (
+            _query_token_error(params, "citation_id", "author_id")
+            if _scholar_citation_search(params)
+            else None
+        ),
     ),
-    "google_shopping": EngineInputRules(alternatives={"q": ("shoprs",)}),
+    "google_shopping": EngineInputRules(
+        alternatives={"q": ("shoprs",)},
+        validate=lambda params, _: _query_token_error(params, "shoprs"),
+    ),
     "google_shopping_light": EngineInputRules(
         alternatives={"q": ("shoprs",)},
         validate=lambda params, _: _query_token_error(params, "shoprs"),

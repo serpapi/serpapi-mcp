@@ -118,6 +118,7 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
         Searches can request missing engine parameters from supporting clients using the engine catalog and engine-specific rules.
         Flights collect airports and dates, and directions collect missing endpoints.
         Hotels require stay dates and either a destination query or a property_token from an earlier result.
+        YouTube filters and queryless feeds can use sp alone. When paginating a text search, repeat the original search_query with sp.
         Other clients receive a missing-parameter error. Cancellation does not run a search.
 
     Examples:
@@ -140,7 +141,7 @@ search_tool_description = """Universal search tool supporting all SerpApi engine
         - bing
         - yahoo
         - duckduckgo
-        - youtube_search
+        - youtube
         - baidu
         - ebay
     """
