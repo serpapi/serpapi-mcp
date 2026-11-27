@@ -13,6 +13,22 @@ from serpapi.models import SerpResults
 from src.search_input import prepare_search_input
 
 
+_SERVER_ERROR = (
+    "SerpApi encountered a server error. Contact support@serpapi.com for assistance."
+)
+# https://serpapi.com/api-status-and-error-codes
+_SERPAPI_HTTP_FALLBACKS = {
+    400: "SerpApi could not process the request. Check for missing required parameters.",
+    401: "No valid SerpApi API key was provided.",
+    403: "This account does not have permission to make the request. It may have been deleted.",
+    404: "The requested resource does not exist.",
+    410: "The search expired and was deleted from the archive.",
+    429: "The hourly throughput limit was exceeded or the account has run out of searches.",
+    500: _SERVER_ERROR,
+    503: _SERVER_ERROR,
+}
+
+
 def extract_error_response(exception) -> str:
     """
     Helper function to extract meaningful error information from nested exceptions.
@@ -51,28 +67,23 @@ def extract_error_response(exception) -> str:
     return str(exception)
 
 
-def map_search_error(exception) -> str:
+def map_search_error(exception: Exception) -> str:
     """Map a SerpApi/transport exception to a user-facing 'Error: ...' string.
 
     Shared by the text `search` tool and the App tools so all entry points
     surface identical messages for the same upstream failure.
     """
+    if isinstance(exception, serpapi.exceptions.TimeoutError):
+        return "Error: Could not reach SerpApi: the request timed out."
     if isinstance(exception, serpapi.exceptions.HTTPError):
         # str(exception) holds the request URL, query and API key included.
         status = exception.status_code
-        if status == 429:
-            return "Error: Rate limit exceeded. Please try again later."
-        if status == 401:
-            return (
-                "Error: Invalid SerpApi API key. "
-                "Check the key in the request path or Authorization header, "
-                "or in SERPAPI_API_KEY for stdio hosts."
-            )
-        if status == 403:
-            return (
-                "Error: SerpApi API key forbidden. "
-                "Verify your subscription and key validity."
-            )
+        if status == -1:
+            return "Error: Could not reach SerpApi."
+        detail = exception.error.strip() if isinstance(exception.error, str) else None
+        message = detail or _SERPAPI_HTTP_FALLBACKS.get(status)
+        prefix = f"Error: SerpApi HTTP {status}"
+        return f"{prefix}: {message}" if message else f"{prefix}."
     return f"Error: {extract_error_response(exception)}"
 
 
