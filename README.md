@@ -212,9 +212,12 @@ Both accept the same `params` as `search`. Hosts that don't support MCP Apps sim
 ## Troubleshooting
 
 - **"Missing API key"**: Include key in URL path `/{YOUR_KEY}/mcp` or header `Bearer YOUR_KEY`
-- **"Invalid key"**: Verify at [serpapi.com/dashboard](https://serpapi.com/dashboard)  
-- **"Rate limit exceeded"**: Wait or upgrade your SerpApi plan
+- **HTTP 401**: Check that the supplied key matches the one on your [API key page](https://serpapi.com/manage-api-key).
+- **HTTP 403**: The account does not have permission to make this request. Check that the account is still active.
+- **HTTP 429**: If you hit the hourly throughput limit, slow down requests. If the account has run out of searches, check your remaining searches on the [dashboard](https://serpapi.com/dashboard).
 - **"No results"**: Try different query or engine
+
+For HTTP failures, the tools show the status code and SerpApi's `error` message when available. See [SerpApi's status and error codes](https://serpapi.com/api-status-and-error-codes) for the documented fallback meanings.
 
 ## Privacy policy
 

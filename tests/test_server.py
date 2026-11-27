@@ -43,8 +43,10 @@ def make_serpapi_http_error(
     resp.status_code = status
     resp.reason = reason
     resp.url = url
-    resp._content = json.dumps(body).encode()
-    resp.headers["Content-Type"] = "application/json"
+    resp._content = body if isinstance(body, bytes) else json.dumps(body).encode()
+    resp.headers["Content-Type"] = (
+        "text/plain" if isinstance(body, bytes) else "application/json"
+    )
     try:
         resp.raise_for_status()
     except requests.exceptions.HTTPError as exc:
@@ -759,31 +761,36 @@ async def test_search_apps_force_json_output(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "status, fragment",
+    "status, message",
     [
-        (429, "Rate limit exceeded"),
-        (401, "Invalid SerpApi API key"),
-        (403, "forbidden"),
+        (429, "Your account has run out of searches."),
+        (401, "Invalid API key."),
+        (403, "This account has been deleted."),
     ],
 )
-async def test_search_maps_real_http_errors(monkeypatch, status, fragment):
+async def test_search_maps_real_http_errors(monkeypatch, status, message):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
-    use_search(monkeypatch, raiser(make_serpapi_http_error(status, {"error": "x"})))
+    use_search(monkeypatch, raiser(make_serpapi_http_error(status, {"error": message})))
     out = await mcp_tools.search(params={"q": "x"})
     assert out.is_error
-    assert out.content[0].text.startswith("Error:")
-    assert fragment in out.content[0].text
+    assert out.content[0].text == f"Error: SerpApi HTTP {status}: {message}"
+    assert out.structured_content == {"result": out.content[0].text}
 
 
-async def test_search_unmapped_http_error_returns_json_body(monkeypatch):
-    use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
-    use_search(
-        monkeypatch, raiser(make_serpapi_http_error(500, {"error": "server boom"}))
+async def test_search_ignores_status_digits_in_request_url(monkeypatch):
+    use_request(monkeypatch, real_request(state={"api_key": "a429b403"}))
+    err = make_serpapi_http_error(
+        400,
+        {"error": "Unsupported `foo` parameter."},
+        reason="Bad Request",
+        url="https://serpapi.com/search?q=401k+rules&api_key=a429b403",
     )
-    out = await mcp_tools.search(params={"q": "x"})
+    use_search(monkeypatch, raiser(err))
+    out = await mcp_tools.search(params={"q": "401k rules"})
     assert out.is_error
-    assert out.content[0].text.startswith("Error:")
-    assert "server boom" in out.content[0].text
+    assert (
+        out.content[0].text == "Error: SerpApi HTTP 400: Unsupported `foo` parameter."
+    )
 
 
 async def test_search_generic_exception_uses_extractor(monkeypatch):
@@ -857,24 +864,63 @@ async def test_healthcheck_returns_healthy_with_utc_timestamp():
 
 
 @pytest.mark.parametrize(
-    "status, fragment",
+    "status, body, fragments",
     [
-        (429, "Rate limit exceeded"),
-        (401, "Invalid SerpApi API key"),
-        (403, "forbidden"),
+        (400, {}, ("required parameter",)),
+        (401, {"error": " "}, ("valid", "API key")),
+        (403, {}, ("permission", "deleted")),
+        (404, {}, ("resource", "does not exist")),
+        (410, {}, ("expired", "archive")),
+        (429, {"error": None}, ("hourly throughput", "run out of searches")),
+        (500, {}, ("support@serpapi.com",)),
+        (503, b"<html>Service unavailable</html>", ("support@serpapi.com",)),
     ],
 )
-def test_map_search_error_maps_known_statuses(status, fragment):
-    out = mcp_tools.map_search_error(make_serpapi_http_error(status, {"error": "x"}))
-    assert out.startswith("Error:")
-    assert fragment in out
+def test_map_search_error_uses_documented_fallback(status, body, fragments):
+    out = mcp_tools.map_search_error(make_serpapi_http_error(status, body))
+    assert out.startswith(f"Error: SerpApi HTTP {status}: ")
+    for fragment in fragments:
+        assert fragment in out
 
 
-def test_map_search_error_falls_back_to_json_body():
-    out = mcp_tools.map_search_error(
-        make_serpapi_http_error(500, {"error": "server boom"})
+@pytest.mark.parametrize(
+    "body, expected",
+    [
+        (
+            {"error": "Upstream gateway unavailable."},
+            "Error: SerpApi HTTP 502: Upstream gateway unavailable.",
+        ),
+        ({"error": {"detail": "not a message"}}, "Error: SerpApi HTTP 502."),
+    ],
+)
+def test_map_search_error_handles_undocumented_status(body, expected):
+    assert mcp_tools.map_search_error(make_serpapi_http_error(502, body)) == expected
+
+
+@pytest.mark.parametrize(
+    "exception_type",
+    [serpapi.exceptions.HTTPConnectionError, serpapi.exceptions.TimeoutError],
+)
+def test_map_search_error_handles_no_response_without_echoing_url(exception_type):
+    err = exception_type(
+        requests.exceptions.RequestException("failed for /search?api_key=a429b403")
     )
-    assert "server boom" in out
+    out = mcp_tools.map_search_error(err)
+    assert out.startswith("Error: Could not reach SerpApi")
+    assert "a429b403" not in out
+
+
+def test_map_search_error_ignores_status_digits_in_url():
+    # The request URL carries the query and the API key, so it can contain
+    # "401", "403" or "429" when the status is something else.
+    out = mcp_tools.map_search_error(
+        make_serpapi_http_error(
+            400,
+            {"error": "Unsupported `foo` parameter."},
+            url="https://serpapi.com/search?q=401k+rules&api_key=a429b403",
+        )
+    )
+    assert "Unsupported `foo` parameter." in out
 
 
 def test_map_search_error_handles_generic_exception():
@@ -1005,10 +1051,11 @@ async def test_search_table_without_api_key_renders_error_app(monkeypatch):
 
 async def test_search_dashboard_maps_http_error_to_error_app(monkeypatch):
     use_request(monkeypatch, real_request(state={"api_key": "KEY"}))
-    use_search(monkeypatch, raiser(make_serpapi_http_error(429, {"error": "x"})))
+    message = "Your account has run out of searches."
+    use_search(monkeypatch, raiser(make_serpapi_http_error(429, {"error": message})))
     app = await mcp_apps.search_dashboard(params={"q": "x"})
     assert app.title == "Search error"
-    assert "Rate limit exceeded" in ui_json(app)
+    assert f"Error: SerpApi HTTP 429: {message}" in ui_json(app)
 
 
 # --- MCP Apps: Flights-specific helpers and builder -------------------------
